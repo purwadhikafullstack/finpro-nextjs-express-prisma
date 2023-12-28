@@ -8,8 +8,7 @@ import express, {
   Router,
 } from 'express';
 import cors from 'cors';
-import { join } from 'path';
-import { NODE_ENV, PORT } from './config';
+import { PORT } from './config';
 import { SampleRouter } from './routers/sample.router';
 
 export default class App {
