@@ -10,12 +10,107 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model User {
+  id               String           @id @default(uuid())
+  name             String
+  email            String
+  password         String
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  userRoles        UserRole[]
+  reveral          Reveral?
+  PointsWallet     PointsWallet?
+  coupontDiscounts CouponDiscount[]
+  DiscountsWallet  DiscountsWallet?
 
-  @@map("samples") // if you want to use snake_case format
+  @@map("users")
+}
+
+model Role {
+  id        Int        @id @default(autoincrement())
+  title     String
+  userRoles UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  id     Int    @id @default(autoincrement())
+  User   User   @relation(fields: [userId], references: [id])
+  userId String
+  Role   Role   @relation(fields: [roleId], references: [id])
+  roleId Int
+
+  @@map("userRoles")
+}
+
+model Reveral {
+  id                 String              @id @default(uuid())
+  code               String              @default(uuid())
+  User               User                @relation(fields: [userId], references: [id])
+  userId             String              @unique
+  pointsTransactions PointsTransaction[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  @@map("reverals")
+}
+
+model PointsWallet {
+  id                 String              @id @default(uuid())
+  User               User                @relation(fields: [userId], references: [id])
+  userId             String              @unique
+  pointsTransactions PointsTransaction[]
+
+  @@map("pointsWallets")
+}
+
+model PointsTransaction {
+  id             String       @id @default(uuid())
+  Reveral        Reveral      @relation(fields: [reveralId], references: [id])
+  reveralId      String
+  PointsWallet   PointsWallet @relation(fields: [pointsWalletId], references: [id])
+  pointsWalletId String
+  points         Float        @default(10000)
+  expiredAt      DateTime
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("pointsTransactions")
+}
+
+model CouponDiscount {
+  id                  String                @id @default(uuid())
+  title               String
+  total               String
+  User                User                  @relation(fields: [userId], references: [id])
+  userId              String
+  discountTransaction DiscountTransaction[]
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+
+  @@map("coupondiscounts")
+}
+
+model DiscountsWallet {
+  id                  String                @id @default(uuid())
+  User                User                  @relation(fields: [userId], references: [id])
+  userId              String                @unique
+  discountTransaction DiscountTransaction[]
+
+  @@map("discountsWallets")
+}
+
+model DiscountTransaction {
+  id                String          @id @default(uuid())
+  CouponDiscount    CouponDiscount  @relation(fields: [couponDiscountId], references: [id])
+  couponDiscountId  String
+  DiscountsWallet   DiscountsWallet @relation(fields: [discountsWalletId], references: [id])
+  discountsWalletId String
+  isUsed            Boolean         @default(false)
+  expiredAt         DateTime
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@map("discountTransactions")
 }
