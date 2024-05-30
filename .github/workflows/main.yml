@@ -41,4 +41,4 @@ jobs:
             cd ${{ secrets.SSH_FOLDER }}
             npm install
             npx prisma migrate dev --schema=./apps/api/prisma/schema.prisma
-            pm2 start npm --name "JCWD-TRY-4004" -- run serve
+            pm2 start npm --name "${{ secrets.PROJECT_NAME }}" -- run serve
