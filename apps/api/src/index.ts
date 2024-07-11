@@ -1,10 +1,12 @@
 import App from './app';
 
-const main = () => {
+const main = async() => {
   // init db here
 
   const app = new App();
   app.start();
 };
 
-main();
+main().catch(error => {
+  console.error('Error starting the app', error)
+});

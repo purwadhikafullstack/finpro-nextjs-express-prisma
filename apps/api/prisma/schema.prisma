@@ -1,21 +1,216 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mysql" // or your preferred database
   url      = env("DATABASE_URL")
 }
 
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model User {
+  id          String        @id @default(cuid())
+  firstName   String
+  lastName    String
+  phoneNumber String?        @unique
+  email       String        @unique
+  password    String
+  verified    Boolean       @default(false)
+  role        Role          @default(CUSTOMER)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+  MyTicket    MyTicket[]
+  Review      Review[]
+  Transaction Transaction[]
+  Referral    Referral[]
+}
 
-  @@map("samples") // if you want to use snake_case format
+model Location {
+  id        Int       @id @default(autoincrement())
+  city      String
+  venue     String
+  regionId  Int
+  region    Region    @relation(fields: [regionId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  Event     Event[]
+}
+
+model Region {
+  id        Int        @id @default(autoincrement())
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+  Location  Location[]
+}
+
+model Event {
+  id           Int            @id @default(autoincrement())
+  title        String
+  details      String
+  locationId   Int
+  location     Location       @relation(fields: [locationId], references: [id])
+  genreId      Int
+  genre        Genre          @relation(fields: [genreId], references: [id])
+  scheduleId   Int
+  schedule     Schedule       @relation(fields: [scheduleId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime?
+  EventPicture EventPicture[]
+  MyTicket     MyTicket[]
+  Review       Review[]
+  EventTicket  EventTicket[]
+  Transaction  Transaction[]
+}
+
+model Genre {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  Event     Event[]
+}
+
+model EventPicture {
+  id        Int       @id @default(autoincrement())
+  eventId   Int
+  event     Event     @relation(fields: [eventId], references: [id])
+  link      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Review {
+  id         Int       @id @default(autoincrement())
+  eventId    Int
+  event      Event     @relation(fields: [eventId], references: [id])
+  customerId String
+  customer   User      @relation(fields: [customerId], references: [id])
+  comment    String
+  rating     Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+}
+
+model Schedule {
+  id        Int       @id @default(autoincrement())
+  date      DateTime
+  startTime DateTime
+  endTime   DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  Event     Event[]
+}
+
+model MyTicket {
+  id           String      @id @default(cuid())
+  customerId   String
+  customer     User        @relation(fields: [customerId], references: [id])
+  eventId      Int
+  event        Event       @relation(fields: [eventId], references: [id])
+  ticketId     Int
+  eventTicket  EventTicket @relation(fields: [ticketId], references: [id])
+  expiryDate   DateTime
+  redeemedDate DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  deletedAt    DateTime?
+}
+
+model EventTicket {
+  id          Int           @id @default(autoincrement())
+  name        String
+  eventId     Int
+  event       Event         @relation(fields: [eventId], references: [id])
+  className   String
+  price       Int
+  type        TicketType
+  quantity    Int
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+  MyTicket    MyTicket[]
+  Transaction Transaction[]
+}
+
+model Transaction {
+  id                 Int               @id @default(autoincrement())
+  eventId            Int
+  event              Event             @relation(fields: [eventId], references: [id])
+  ticketId           Int
+  eventTicket        EventTicket       @relation(fields: [ticketId], references: [id])
+  customerId         String
+  customer           User              @relation(fields: [customerId], references: [id])
+  paymentMethod      String
+  totalPrice         Int
+  totalDiscount      Int
+  couponId           Int?
+  coupon             Coupon?           @relation(fields: [couponId], references: [id])
+  totalPointsUsed    Int
+  taxPercentage      Int
+  totalTax           Int
+  totalPriceAfterCut Int
+  ticketQty          Int
+  statusId           Int
+  status             TransactionStatus @relation(fields: [statusId], references: [id])
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  deletedAt          DateTime?
+}
+
+model TransactionStatus {
+  id          Int           @id @default(autoincrement())
+  name        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+  Transaction Transaction[]
+}
+
+model Coupon {
+  id                 Int           @id @default(autoincrement())
+  name               String      
+    details          String 
+  code               String        @unique
+  discountPercentage Float
+  priceCut           Float
+  activeDate         DateTime
+  expirationDate     DateTime
+
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  deletedAt          DateTime?
+  Transaction        Transaction[]
+  Referral           Referral[]
+}
+
+model Referral {
+  id             Int       @id @default(autoincrement())
+  customerId     String
+  customer       User      @relation(fields: [customerId], references: [id])
+  couponId       Int
+  coupon         Coupon    @relation(fields: [couponId], references: [id])
+  expirationDate DateTime
+  totalPoints    Int       @default(0)
+  totalTimesUsed Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+}
+
+enum TicketType {
+  PHYSICAL
+  DIGITAL
+}
+
+enum Role {
+  CUSTOMER
+  EVENT_ORGANIZER
 }
