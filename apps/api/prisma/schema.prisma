@@ -8,17 +8,21 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(cuid())
+  id          String  @id @default(cuid())
   firstName   String
   lastName    String
-  phoneNumber String?        @unique
-  email       String        @unique
+  phoneNumber String? @unique
+  email       String  @unique
   password    String
-  verified    Boolean       @default(false)
-  role        Role          @default(CUSTOMER)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  deletedAt   DateTime?
+  verified    Boolean @default(false)
+  roleId      Int
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  role Role @relation(fields: [roleId], references: [id])
+
   MyTicket    MyTicket[]
   Review      Review[]
   Transaction Transaction[]
@@ -26,191 +30,235 @@ model User {
 }
 
 model Location {
-  id        Int       @id @default(autoincrement())
-  city      String
-  venue     String
-  regionId  Int
-  region    Region    @relation(fields: [regionId], references: [id])
+  id       Int    @id @default(autoincrement())
+  city     String
+  venue    String
+  regionId Int
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  Event     Event[]
+
+  region Region @relation(fields: [regionId], references: [id])
+
+  Event Event[]
 }
 
 model Region {
-  id        Int        @id @default(autoincrement())
-  name      String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id   Int    @id @default(autoincrement())
+  name String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  Location  Location[]
+
+  Location Location[]
 }
 
 model Event {
-  id           Int            @id @default(autoincrement())
-  title        String
-  details      String
-  locationId   Int
-  location     Location       @relation(fields: [locationId], references: [id])
-  genreId      Int
-  genre        Genre          @relation(fields: [genreId], references: [id])
-  scheduleId   Int
-  schedule     Schedule       @relation(fields: [scheduleId], references: [id])
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  deletedAt    DateTime?
+  id         Int    @id @default(autoincrement())
+  title      String
+  details    String
+  locationId Int
+  genreId    Int
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  genre    Genre    @relation(fields: [genreId], references: [id])
+  location Location @relation(fields: [locationId], references: [id])
+
   EventPicture EventPicture[]
-  MyTicket     MyTicket[]
   Review       Review[]
   EventTicket  EventTicket[]
   Transaction  Transaction[]
+  Coupon       Coupon[]
+  Schedule Schedule[]
 }
 
 model Genre {
-  id        Int       @id @default(autoincrement())
-  name      String
+  id   Int    @id @default(autoincrement())
+  name String
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  Event     Event[]
+
+  Event  Event[]
+  Coupon Coupon[]
 }
 
 model EventPicture {
-  id        Int       @id @default(autoincrement())
-  eventId   Int
-  event     Event     @relation(fields: [eventId], references: [id])
-  link      String
+  id      Int    @id @default(autoincrement())
+  eventId Int
+  link    String
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+
+  event Event @relation(fields: [eventId], references: [id])
 }
 
 model Review {
-  id         Int       @id @default(autoincrement())
+  id         Int    @id @default(autoincrement())
   eventId    Int
-  event      Event     @relation(fields: [eventId], references: [id])
   customerId String
-  customer   User      @relation(fields: [customerId], references: [id])
   comment    String
   rating     Int
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime?
-}
 
-model Schedule {
-  id        Int       @id @default(autoincrement())
-  date      DateTime
-  startTime DateTime
-  endTime   DateTime
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  Event     Event[]
+
+  customer User  @relation(fields: [customerId], references: [id])
+  event    Event @relation(fields: [eventId], references: [id])
+}
+
+model Schedule {
+  id        Int      @id @default(autoincrement())
+  eventId   Int
+  startDate DateTime
+  endDate   DateTime
+  startTime DateTime
+  endTime   DateTime
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  event Event @relation(fields: [eventId], references: [id])
+
+  EventTicket EventTicket[]
 }
 
 model MyTicket {
-  id           String      @id @default(cuid())
-  customerId   String
-  customer     User        @relation(fields: [customerId], references: [id])
-  eventId      Int
-  event        Event       @relation(fields: [eventId], references: [id])
-  ticketId     Int
-  eventTicket  EventTicket @relation(fields: [ticketId], references: [id])
-  expiryDate   DateTime
-  redeemedDate DateTime?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  deletedAt    DateTime?
+  id            String    @id @default(cuid())
+  customerId    String
+  EventTicketId Int
+  expiryDate    DateTime
+  redeemedDate  DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  customer    User        @relation(fields: [customerId], references: [id])
+  eventTicket EventTicket @relation(fields: [EventTicketId], references: [id])
 }
 
 model EventTicket {
-  id          Int           @id @default(autoincrement())
-  name        String
-  eventId     Int
-  event       Event         @relation(fields: [eventId], references: [id])
-  className   String
-  price       Int
-  type        TicketType
-  quantity    Int
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  deletedAt   DateTime?
+  id         Int        @id @default(autoincrement())
+  name       String
+  eventId    Int
+  scheduleId Int
+  className  String
+  price      Int
+  type       TicketType
+  totalQty   Int
+  qty        Int
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  event    Event    @relation(fields: [eventId], references: [id])
+  schedule Schedule @relation(fields: [scheduleId], references: [id])
+
   MyTicket    MyTicket[]
   Transaction Transaction[]
 }
 
 model Transaction {
-  id                 Int               @id @default(autoincrement())
+  id                 Int    @id @default(autoincrement())
   eventId            Int
-  event              Event             @relation(fields: [eventId], references: [id])
   ticketId           Int
-  eventTicket        EventTicket       @relation(fields: [ticketId], references: [id])
   customerId         String
-  customer           User              @relation(fields: [customerId], references: [id])
   paymentMethod      String
   totalPrice         Int
   totalDiscount      Int
   couponId           Int?
-  coupon             Coupon?           @relation(fields: [couponId], references: [id])
   totalPointsUsed    Int
   taxPercentage      Int
   totalTax           Int
   totalPriceAfterCut Int
   ticketQty          Int
   statusId           Int
-  status             TransactionStatus @relation(fields: [statusId], references: [id])
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
-  deletedAt          DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  event       Event             @relation(fields: [eventId], references: [id])
+  eventTicket EventTicket       @relation(fields: [ticketId], references: [id])
+  customer    User              @relation(fields: [customerId], references: [id])
+  coupon      Coupon?           @relation(fields: [couponId], references: [id])
+  status      TransactionStatus @relation(fields: [statusId], references: [id])
 }
 
 model TransactionStatus {
-  id          Int           @id @default(autoincrement())
-  name        String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  deletedAt   DateTime?
+  id   Int    @id @default(autoincrement())
+  name String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
   Transaction Transaction[]
 }
 
 model Coupon {
-  id                 Int           @id @default(autoincrement())
-  name               String      
-    details          String 
-  code               String        @unique
-  discountPercentage Float
-  priceCut           Float
-  activeDate         DateTime
-  expirationDate     DateTime
+  id                      Int      @id @default(autoincrement())
+  name                    String
+  details                 String
+  code                    String   @unique
+  discountPercentage      Float?
+  priceCut                Float?
+  includedEventId         Int?
+  includedEventCategoryId Int?
+  activeDate              DateTime
+  expirationDate          DateTime
 
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
-  deletedAt          DateTime?
-  Transaction        Transaction[]
-  Referral           Referral[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  event Event? @relation(fields: [includedEventId], references: [id])
+  genre Genre? @relation(fields: [includedEventCategoryId], references: [id])
+
+  Transaction Transaction[]
+  Referral    Referral[]
 }
 
 model Referral {
-  id             Int       @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   customerId     String
-  customer       User      @relation(fields: [customerId], references: [id])
   couponId       Int
-  coupon         Coupon    @relation(fields: [couponId], references: [id])
   expirationDate DateTime
-  totalPoints    Int       @default(0)
-  totalTimesUsed Int       @default(0)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  deletedAt      DateTime?
+  totalPoints    Int      @default(0)
+  totalTimesUsed Int      @default(0)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  customer User   @relation(fields: [customerId], references: [id])
+  coupon   Coupon @relation(fields: [couponId], references: [id])
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  User User[]
 }
 
 enum TicketType {
   PHYSICAL
   DIGITAL
-}
-
-enum Role {
-  CUSTOMER
-  EVENT_ORGANIZER
 }
