@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 const chalk = require('chalk');
 
 const prisma = new PrismaClient();
-const saltRounds = 10;
 
+// Pasword Hasher
+const saltRounds = 10;
 const hashPassword = async (password) => {
   try {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -359,6 +360,7 @@ const coupons = [
   },
 ];
 async function main() {
+  // Counters to validate if table is created
   let userCount = await prisma.user.count();
   let locationCount = await prisma.location.count();
   let regionCount = await prisma.region.count();
@@ -378,7 +380,11 @@ async function main() {
     for (const item of users) {
       try {
         await prisma.user.create({
-          data: item,
+          data: {
+            ...item,
+            // Hash User Password
+            password: await hashPassword(item.password),  
+          },
         });
       } catch (error) {
         console.log('Error inserting user:', error);
@@ -542,7 +548,7 @@ async function main() {
     console.log('Coupons have not been inserted');
   }
 
-  // Refresh counts after inserting data
+  // Refresh counts for validation
   userCount = await prisma.user.count();
   locationCount = await prisma.location.count();
   regionCount = await prisma.region.count();
@@ -576,9 +582,7 @@ async function main() {
   }
 }
 
-const green = '\x1b[32m%s\x1b[0m';
-const yellow = '\x1b[33m%s\x1b[0m';
-
+// Error handler
 main()
   .catch((error) => {
     console.error(chalk.red('Main script error:', error));

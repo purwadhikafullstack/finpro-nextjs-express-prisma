@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import App from './app';
 
 const main = async() => {
@@ -8,5 +9,5 @@ const main = async() => {
 };
 
 main().catch(error => {
-  console.error('Error starting the app', error)
+  console.error(chalk.red('Error starting the app', error))
 });
