@@ -1,21 +1,34 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model User {
+  user_id         Int      @id @default(autoincrement())
+  first_name      String
+  last_name       String
+  email           String   @unique
+  password        String
+  phone_number    String
+  profile_picture Bytes?
+  is_verified     Boolean  @default(false)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+}
 
-  @@map("samples") // if you want to use snake_case format
+model Order {
+  order_id     Int      @id @default(autoincrement())
+  customer_id  Int
+  outlet_id    Int
+  driver_id    Int
+  status       String
+  total_weight Float
+  total_cost   Float
+  created_at   DateTime @default(now())
+  updated_at   DateTime
 }
