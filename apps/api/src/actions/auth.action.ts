@@ -106,7 +106,7 @@ class AuthAction {
         );
       }
 
-      const isPassValid = await compare(password, user.password);
+      const isPassValid = await compare(password, user.password || '');
       if (!isPassValid)
         throw new HttpException(500, 'Incorrect email or password');
 
