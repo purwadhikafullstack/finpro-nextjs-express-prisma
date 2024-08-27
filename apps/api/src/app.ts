@@ -8,10 +8,13 @@ import express, {
   Router,
 } from 'express';
 import cors from 'cors';
+import session from 'express-session';
+import passport from 'passport';
 import { PORT } from './config';
 import { AuthRouter } from './routers/auth.router';
 import { ErrorMiddleware } from './middlewares/error.middleware';
 import { UserRouter } from './routers/user.router';
+import './libs/passport'; // Import konfigurasi Passport
 
 export default class App {
   private app: Express;
@@ -27,6 +30,19 @@ export default class App {
     this.app.use(cors());
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
+
+    // Setup session middleware
+    this.app.use(
+      session({
+        secret: 'your_secret_key', // Ganti dengan secret key yang lebih aman di production
+        resave: false,
+        saveUninitialized: true,
+      }),
+    );
+
+    // Initialize passport
+    this.app.use(passport.initialize());
+    this.app.use(passport.session());
   }
 
   private handleError(): void {
