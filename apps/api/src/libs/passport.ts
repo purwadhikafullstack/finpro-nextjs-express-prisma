@@ -3,7 +3,7 @@ import {
   Strategy as GoogleStrategy,
   VerifyCallback,
 } from 'passport-google-oauth20';
-import prisma from '@/prisma'; // Pastikan path ini sesuai dengan struktur proyek Anda
+import prisma from '@/prisma';
 
 passport.serializeUser((user: any, done: (err: any, id?: any) => void) => {
   done(null, user);
@@ -40,14 +40,14 @@ passport.use(
             email,
             first_name: profile.name?.givenName || '',
             last_name: profile.name?.familyName || '',
-            password: '', // Jika tidak ada, bisa diisi dengan string kosong
-            phone_number: null, // Jika tidak ada, bisa diisi dengan null
+            password: '',
+            phone_number: null,
             googleId: profile.id,
           },
         });
-        return done(undefined, user); // Gunakan undefined bukan null
+        return done(undefined, user);
       } catch (error) {
-        return done(error, undefined); // Gunakan undefined bukan null
+        return done(error, undefined);
       }
     },
   ),

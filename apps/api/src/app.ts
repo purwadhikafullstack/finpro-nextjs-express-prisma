@@ -1,12 +1,4 @@
-import express, {
-  json,
-  urlencoded,
-  Express,
-  Request,
-  Response,
-  NextFunction,
-  Router,
-} from 'express';
+import express, { json, urlencoded, Express } from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
@@ -34,7 +26,7 @@ export default class App {
     // Setup session middleware
     this.app.use(
       session({
-        secret: 'your_secret_key', // Ganti dengan secret key yang lebih aman di production
+        secret: String(process.env.API_KEY),
         resave: false,
         saveUninitialized: true,
       }),
