@@ -30,7 +30,9 @@ export class AuthMiddleware {
     next: NextFunction,
   ) => {
     try {
-      const token = req.query.token as string;
+      const token =
+        (req.query.token as string) ||
+        req.header('Authorization')?.replace('Bearer ', '');
       if (!token) throw new HttpException(400, 'Missing Token');
 
       const decoded = verify(token, String(process.env.JWT_SECRET));

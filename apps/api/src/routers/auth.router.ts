@@ -41,6 +41,17 @@ export class AuthRouter {
       `${this.path}/resend-verification`,
       this.auth.resendVerificationController,
     );
+    this.router.post(
+      `${this.path}/register-email`,
+      validateRegister,
+      this.auth.registerWithEmailController, // Controller baru
+    );
+
+    this.router.post(
+      `${this.path}/set-password`,
+      this.guard.verifyEmailToken, // Middleware untuk memverifikasi token
+      this.auth.setPasswordController, // Controller baru untuk set password
+    );
 
     // Google login routes
     this.router.get(

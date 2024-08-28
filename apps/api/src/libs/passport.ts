@@ -4,6 +4,7 @@ import {
   VerifyCallback,
 } from 'passport-google-oauth20';
 import prisma from '@/prisma';
+import { sendEmail, sendVerificationEmail } from '@/utils/emailUtil';
 
 passport.serializeUser((user: any, done: (err: any, id?: any) => void) => {
   done(null, user);
@@ -40,11 +41,15 @@ passport.use(
             email,
             first_name: profile.name?.givenName || '',
             last_name: profile.name?.familyName || '',
-            password: '',
-            phone_number: null,
             googleId: profile.id,
           },
         });
+
+        // To ensure the email is only sent once
+        if (!user.is_verified) {
+          await sendVerificationEmail(user);
+        }
+
         return done(undefined, user);
       } catch (error) {
         return done(error, undefined);

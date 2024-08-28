@@ -2,7 +2,7 @@ import prisma from '@/prisma';
 import { HttpException } from '@/exceptions/http.exception';
 import userAction from './user.action';
 import { genSalt, hash, compare } from 'bcrypt';
-import { sendEmail } from '@/utils/emailUtil';
+import { sendVerificationEmail } from '@/utils/emailUtil';
 import { generateToken } from '@/utils/tokenUtil';
 
 interface JwtPayload {
@@ -16,7 +16,7 @@ class AuthAction {
     password: string,
     first_name: string,
     last_name: string,
-    phone_number: number,
+    phone_number: string,
     avatarFilename: string,
   ) => {
     try {
@@ -35,7 +35,7 @@ class AuthAction {
             password: hashedPass,
             first_name,
             last_name,
-            phone_number: Number(phone_number),
+            phone_number,
             avatarFilename,
           },
         });
@@ -44,36 +44,6 @@ class AuthAction {
       return newUser;
     } catch (error) {
       throw error;
-    }
-  };
-
-  sendVerificationEmail = async (user: any) => {
-    try {
-      const token = generateToken(
-        { userId: user.user_id, email: user.email },
-        `30m`,
-        String(process.env.JWT_SECRET),
-      );
-      const baseUrl = process.env.BE_BASE_URL;
-      const verificationLink = `${baseUrl}/auth/verify?token=${token}`;
-
-      //jangan lupa apus
-      console.log(verificationLink);
-
-      await sendEmail(
-        user.email,
-        'Email Verification - LaundryXpert',
-        'emailVerification',
-        {
-          name: user.first_name,
-          url: verificationLink,
-        },
-      );
-    } catch (error) {
-      throw new HttpException(
-        500,
-        `Error sending verification email: ${(error as Error).message}`,
-      );
     }
   };
 
@@ -174,11 +144,60 @@ class AuthAction {
         throw new HttpException(400, 'User is already verified');
       }
 
-      await this.sendVerificationEmail(user);
+      await sendVerificationEmail(user);
     } catch (error) {
       throw new HttpException(
         500,
         `Error resending verification email: ${(error as Error).message}`,
+      );
+    }
+  };
+
+  registerWithEmailAction = async (
+    email: string,
+    first_name: string,
+    last_name: string,
+    phone_number: string,
+  ) => {
+    try {
+      const isEmailRegisterd = await userAction.findUserByEmail(email);
+
+      if (isEmailRegisterd)
+        throw new HttpException(500, 'Email is already registered');
+
+      const newUser = await prisma.$transaction(async (transaction: any) => {
+        return await transaction.user.create({
+          data: {
+            email,
+            first_name,
+            last_name,
+            phone_number,
+            is_verified: false,
+          },
+        });
+      });
+
+      return newUser;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  setPassword = async (userId: number, password: string) => {
+    try {
+      const salt = await genSalt(10);
+      const hashedPass = await hash(password, salt);
+
+      const updatedUser = await prisma.user.update({
+        where: { user_id: userId },
+        data: { password: hashedPass },
+      });
+
+      return updatedUser;
+    } catch (error) {
+      throw new HttpException(
+        500,
+        `Error setting password: ${(error as Error).message}`,
       );
     }
   };

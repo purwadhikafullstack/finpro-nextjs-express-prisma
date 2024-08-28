@@ -10,11 +10,11 @@ export const validateRegister = [
     .withMessage('Must be a valid email address')
     .toLowerCase(),
   body('password')
-    .trim()
-    .notEmpty()
-    .withMessage('Password is required')
-    .isLength({ min: 5 })
-    .withMessage('Password must be at least 5 characters long'),
+    .trim(),
+    // .notEmpty()
+    // .withMessage('Password is required')
+    // .isLength({ min: 5 })
+    // .withMessage('Password must be at least 5 characters long'),
   body('first_name').trim().notEmpty().withMessage('First Name is required'),
   body('last_name').trim().notEmpty().withMessage('First Name is required'),
   body('phone_number')
