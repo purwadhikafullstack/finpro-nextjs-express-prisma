@@ -7,6 +7,7 @@ import { AuthRouter } from './routers/auth.router';
 import { ErrorMiddleware } from './middlewares/error.middleware';
 import { UserRouter } from './routers/user.router';
 import './libs/passport';
+import { OrderRouter } from './routers/order.router';
 
 export default class App {
   private app: Express;
@@ -42,7 +43,7 @@ export default class App {
   }
 
   private routes(): void {
-    const routers = [new AuthRouter(), new UserRouter()];
+    const routers = [new AuthRouter(), new UserRouter(), new OrderRouter()];
 
     routers.forEach((router) => {
       this.app.use('/api', router.getRouter());

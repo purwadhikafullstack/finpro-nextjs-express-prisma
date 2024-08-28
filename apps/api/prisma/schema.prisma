@@ -45,13 +45,38 @@ model UserAddress {
 }
 
 model Order {
-  order_id     Int      @id @default(autoincrement())
+  order_id     Int         @id @default(autoincrement())
   customer_id  Int
   outlet_id    Int
   driver_id    Int
   status       String
   total_weight Float
   total_cost   Float
-  created_at   DateTime @default(now())
-  updated_at   DateTime
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
+  OrderItems   OrderItem[]
+  Payments     Payment[]
+}
+
+model OrderItem {
+  order_item_id Int      @id @default(autoincrement())
+  order_id      Int
+  item_id       Int
+  quantity      Int
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  Order         Order    @relation(fields: [order_id], references: [order_id])
+}
+
+model Payment {
+  payment_id     Int      @id @default(autoincrement())
+  order_id       Int
+  payment_method String
+  payment_status String
+  transaction_id String
+  amount         Float
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  Order Order @relation(fields: [order_id], references: [order_id])
 }

@@ -28,7 +28,7 @@ class AuthAction {
       const salt = await genSalt(10);
       const hashedPass = await hash(password, salt);
 
-      const newUser = await prisma.$transaction(async (transaction) => {
+      const newUser = await prisma.$transaction(async (transaction: any) => {
         return await transaction.user.create({
           data: {
             email,
