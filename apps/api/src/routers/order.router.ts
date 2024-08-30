@@ -11,11 +11,14 @@ export class OrderRouter {
 
   private initializeRoutes(): void {
     // Order routes
-    this.router.post('/order/pickupRequest', this.orderController.createPickupRequest);
-    this.router.post('/order/pickupOrder', this.orderController.pickupOrder);
+    this.router.post(
+      '/order/pickup-request',
+      this.orderController.createPickupRequest,
+    );
+    this.router.post('/order/pickup', this.orderController.pickupOrder);
     this.router.post('/order/process', this.orderController.processOrder);
     this.router.get(
-      '/orders/:customer_id',
+      '/customers/:customer_id/orders',
       this.orderController.getOrdersForCustomer,
     );
     this.router.post(
@@ -23,7 +26,7 @@ export class OrderRouter {
       this.orderController.autoConfirmOrder,
     );
     this.router.get(
-      '/orders/status/:customer_id',
+      '/customers/:customer_id/order-statuses',
       this.orderController.getOrderStatusList,
     );
   }
