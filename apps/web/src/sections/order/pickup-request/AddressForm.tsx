@@ -1,136 +1,171 @@
 // material-ui
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Divider from '@mui/material/Divider';
 
 // third-party
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+
+// next.js
+import { useRouter } from 'next/navigation';
 
 // project-imports
 import AnimateButton from 'components/@extended/AnimateButton';
+import MainCard from 'components/MainCard'; // Import MainCard for styling
 
+// Validation schema
 const validationSchema = yup.object({
-  firstName: yup.string().required('First Name is required'),
-  lastName: yup.string().required('Last Name is required')
+  address: yup.string().required('Address is required'),
 });
 
-// ==============================|| VALIDATION WIZARD - ADDRESS  ||============================== //
-
 export type ShippingData = {
-  firstName?: string;
-  lastName?: string;
+  address?: string;
 };
 
 interface AddressFormProps {
+  userId: number;
   shippingData: ShippingData;
   setShippingData: (d: ShippingData) => void;
   handleNext: () => void;
   setErrorIndex: (i: number | null) => void;
 }
 
-export default function AddressForm({ shippingData, setShippingData, handleNext, setErrorIndex }: AddressFormProps) {
+export default function AddressForm({
+  userId,
+  shippingData,
+  setShippingData,
+  handleNext,
+  setErrorIndex,
+}: AddressFormProps) {
+  const router = useRouter();
+  const [addresses, setAddresses] = useState<{ id: string; name: string }[]>([]);
+  const [closestOutlet, setClosestOutlet] = useState<string>('Retrieving...');
+  const [cost, setCost] = useState<string>('Calculating...');
+
+  useEffect(() => {
+    // Fetch addresses from API
+    const fetchAddresses = async () => {
+      try {
+        const response = await axios.get(`/api/users/${userId}/addresses`);
+        setAddresses(response.data);
+      } catch (error) {
+        console.error('Failed to fetch addresses:', error);
+      }
+    };
+
+    fetchAddresses();
+  }, [userId]);
+
+  const calculateClosestOutletAndCost = (addressId: string) => {
+    // Simulate calculation of closest outlet and cost
+    // Replace with real calculation logic based on selected address
+    const closestOutlet = 'Outlet 1'; // Placeholder value
+    const cost = '$10.00'; // Placeholder value
+
+    setClosestOutlet(closestOutlet);
+    setCost(cost);
+  };
+
+  const handleAddressChange = (event: any) => {
+    const value = event.target.value;
+    if (value === 'add-new') {
+      router.push('/auth/address'); // Navigate to the add new address page
+    } else {
+      formik.handleChange(event);
+      calculateClosestOutletAndCost(value);
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
-      firstName: shippingData.firstName || '',
-      lastName: shippingData.lastName || ''
+      address: shippingData.address || '',
     },
     validationSchema,
     onSubmit: (values) => {
       setShippingData({
-        firstName: values.firstName,
-        lastName: values.lastName
+        address: values.address,
       });
       handleNext();
-    }
+    },
   });
 
   return (
     <>
-      <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
-        Shipping address
+      <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>
+        New Pickup Request
       </Typography>
-      <form onSubmit={formik.handleSubmit} id="validation-forms">
+      <form onSubmit={formik.handleSubmit}>
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>First Name</InputLabel>
-              <TextField
-                id="firstName"
-                name="firstName"
-                placeholder="First Name *"
-                value={formik.values.firstName}
-                onChange={formik.handleChange}
-                error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-                helperText={formik.touched.firstName && formik.errors.firstName}
-                fullWidth
-                autoComplete="given-name"
-              />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Last Name</InputLabel>
-              <TextField
-                id="lastName"
-                name="lastName"
-                placeholder="Last Name *"
-                value={formik.values.lastName}
-                onChange={formik.handleChange}
-                error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-                helperText={formik.touched.lastName && formik.errors.lastName}
-                fullWidth
-                autoComplete="family-name"
-              />
-            </Stack>
-          </Grid>
+          {/* Select Address */}
           <Grid item xs={12}>
             <Stack spacing={1}>
-              <InputLabel>Address 1</InputLabel>
-              <TextField id="address1" name="address1" placeholder="Address line 1" fullWidth autoComplete="shipping address-line1" />
+              <FormControl fullWidth>
+                <InputLabel>Select Your Address</InputLabel>
+                <Select
+                  id="address"
+                  name="address"
+                  value={formik.values.address}
+                  onChange={handleAddressChange}
+                  error={formik.touched.address && Boolean(formik.errors.address)}
+                >
+                  {/* Add New Address option */}
+                  <MenuItem value="add-new">
+                    <em>Add New Address</em>
+                  </MenuItem>
+                  <MenuItem value="address1">Address 1</MenuItem> {/* NEED TO BE COMMENTED */}
+                  {/* Dynamic addresses */}
+                  {addresses.map((address) => (
+                    <MenuItem key={address.id} value={address.id}>
+                      {address.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {formik.touched.address && formik.errors.address && (
+                  <Typography variant="caption" color="error">
+                    {formik.errors.address}
+                  </Typography>
+                )}
+              </FormControl>
             </Stack>
           </Grid>
+
+          {/* Display Closest Outlet */}
           <Grid item xs={12}>
-            <Stack spacing={1}>
-              <InputLabel>Address 2</InputLabel>
-              <TextField id="address2" name="address2" placeholder="Address line 2" fullWidth autoComplete="shipping address-line2" />
-            </Stack>
+            <MainCard content={false} sx={{ padding: 2 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                Closest Outlet
+              </Typography>
+              <Divider sx={{ my: 1 }} /> {/* This adds a line separator */}
+              <Typography variant="body1">
+                {closestOutlet}
+              </Typography>
+            </MainCard>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Enter City</InputLabel>
-              <TextField id="city" name="city" placeholder="City" fullWidth autoComplete="shipping address-level2" />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Enter State</InputLabel>
-              <TextField id="state" name="state" placeholder="State/Province/Region" fullWidth />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Zip Code</InputLabel>
-              <TextField id="zip" name="zip" placeholder="Zip / Postal code" fullWidth autoComplete="shipping postal-code" />
-            </Stack>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={1}>
-              <InputLabel>Enter Country</InputLabel>
-              <TextField id="country" name="country" placeholder="Country" fullWidth autoComplete="shipping country" />
-            </Stack>
-          </Grid>
+
+          {/* Pickup/Delivery Cost */}
           <Grid item xs={12}>
-            <FormControlLabel
-              control={<Checkbox color="primary" name="saveAddress" value="yes" />}
-              label="Use this address for payment details"
-            />
+            <MainCard content={false} sx={{ padding: 2 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                  Pickup/Delivery Cost
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                  {cost}
+                </Typography>
+              </Stack>
+            </MainCard>
           </Grid>
+
+          {/* Request Pickup Button */}
           <Grid item xs={12}>
             <Stack direction="row" justifyContent="flex-end">
               <AnimateButton>

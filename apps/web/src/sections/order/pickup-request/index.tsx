@@ -18,8 +18,9 @@ import MainCard from 'components/MainCard';
 import AnimateButton from 'components/@extended/AnimateButton';
 
 // step options
-const steps = ['Shipping address', 'Payment details', 'Review your order'];
+const steps = ['Order details', 'Payment details', 'Review your order'];
 
+// Helper function to render the content for each step
 function getStepContent(
   step: number,
   handleNext: () => void,
@@ -28,12 +29,19 @@ function getStepContent(
   shippingData: ShippingData,
   setShippingData: (d: ShippingData) => void,
   paymentData: PaymentData,
-  setPaymentData: (d: PaymentData) => void
+  setPaymentData: (d: PaymentData) => void,
+  userId: number
 ) {
   switch (step) {
     case 0:
       return (
-        <AddressForm handleNext={handleNext} setErrorIndex={setErrorIndex} shippingData={shippingData} setShippingData={setShippingData} />
+        <AddressForm
+          userId={userId}
+          handleNext={handleNext}
+          setErrorIndex={setErrorIndex}
+          shippingData={shippingData}
+          setShippingData={setShippingData}
+        />
       );
     case 1:
       return (
@@ -60,6 +68,9 @@ export default function PickupRequest() {
   const [paymentData, setPaymentData] = useState({});
   const [errorIndex, setErrorIndex] = useState<number | null>(null);
 
+  // Assuming userId is available from context, props, or another source
+  const userId = 1; // Replace with actual userId
+
   const handleNext = () => {
     setActiveStep(activeStep + 1);
     setErrorIndex(null);
@@ -70,7 +81,7 @@ export default function PickupRequest() {
   };
 
   return (
-    <MainCard title="Validation">
+    <MainCard title="Pickup Request">
       <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
         {steps.map((label, index) => {
           const labelProps: { error?: boolean; optional?: ReactNode } = {};
@@ -121,7 +132,7 @@ export default function PickupRequest() {
           </>
         ) : (
           <>
-            {getStepContent(activeStep, handleNext, handleBack, setErrorIndex, shippingData, setShippingData, paymentData, setPaymentData)}
+            {getStepContent(activeStep, handleNext, handleBack, setErrorIndex, shippingData, setShippingData, paymentData, setPaymentData, userId)}
             {activeStep === steps.length - 1 && (
               <Stack direction="row" justifyContent={activeStep !== 0 ? 'space-between' : 'flex-end'}>
                 {activeStep !== 0 && (

@@ -29,6 +29,7 @@ model UserAddress {
   UserAddress_id Int      @id @default(autoincrement())
   user_id        Int
   is_primary     Boolean
+  name           String
   street_address String
   city           String
   province       String
