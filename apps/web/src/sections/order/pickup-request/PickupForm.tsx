@@ -27,22 +27,22 @@ const validationSchema = yup.object({
   address: yup.string().required('Address is required'),
 });
 
-export type ShippingData = {
+export type UserAddressData = {
   address?: string;
 };
 
 interface AddressFormProps {
   userId: number;
-  shippingData: ShippingData;
-  setShippingData: (d: ShippingData) => void;
+  userAddressData: UserAddressData;
+  setUserAddressData: (d: UserAddressData) => void;
   handleNext: () => void;
   setErrorIndex: (i: number | null) => void;
 }
 
 export default function AddressForm({
   userId,
-  shippingData,
-  setShippingData,
+  userAddressData,
+  setUserAddressData,
   handleNext,
   setErrorIndex,
 }: AddressFormProps) {
@@ -69,7 +69,7 @@ export default function AddressForm({
     // Simulate calculation of closest outlet and cost
     // Replace with real calculation logic based on selected address
     const closestOutlet = 'Outlet 1'; // Placeholder value
-    const cost = '$10.00'; // Placeholder value
+    const cost = '$0'; // Placeholder value
 
     setClosestOutlet(closestOutlet);
     setCost(cost);
@@ -87,11 +87,11 @@ export default function AddressForm({
 
   const formik = useFormik({
     initialValues: {
-      address: shippingData.address || '',
+      address: userAddressData.address || '',
     },
     validationSchema,
     onSubmit: (values) => {
-      setShippingData({
+      setUserAddressData({
         address: values.address,
       });
       handleNext();
@@ -121,7 +121,7 @@ export default function AddressForm({
                   <MenuItem value="add-new">
                     <em>Add New Address</em>
                   </MenuItem>
-                  <MenuItem value="address1">Address 1</MenuItem> {/* NEED TO BE COMMENTED */}
+                  <MenuItem value="0" >Address 1</MenuItem> {/* NEED TO BE COMMENTED */}
                   {/* Dynamic addresses */}
                   {addresses.map((address) => (
                     <MenuItem key={address.id} value={address.id}>
@@ -140,15 +140,17 @@ export default function AddressForm({
 
           {/* Display Closest Outlet */}
           <Grid item xs={12}>
-            <MainCard content={false} sx={{ padding: 2 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                Closest Outlet
-              </Typography>
-              <Divider sx={{ my: 1 }} /> {/* This adds a line separator */}
-              <Typography variant="body1">
-                {closestOutlet}
-              </Typography>
-            </MainCard>
+            <Stack spacing={1}>
+              <MainCard content={false} sx={{ padding: 2 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                  Closest Outlet
+                </Typography>
+                <Divider sx={{ my: 1 }} /> {/* This adds a line separator */}
+                <Typography variant="body1">
+                  {closestOutlet}
+                </Typography>
+              </MainCard>
+            </Stack>
           </Grid>
 
           {/* Pickup/Delivery Cost */}
@@ -165,8 +167,8 @@ export default function AddressForm({
             </MainCard>
           </Grid>
 
-          {/* Request Pickup Button */}
-          <Grid item xs={12}>
+          {/* Next Button */}
+          <Grid item xs={12} >
             <Stack direction="row" justifyContent="flex-end">
               <AnimateButton>
                 <Button variant="contained" sx={{ my: 3, ml: 1 }} type="submit" onClick={() => setErrorIndex(0)}>

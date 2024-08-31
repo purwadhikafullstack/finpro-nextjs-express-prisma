@@ -1,91 +1,122 @@
-import { Fragment } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 // material-ui
-import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
 
-// ==============================|| VALIDATION WIZARD - REVIEW  ||============================== //
+// Types
+import { UserAddressData } from './PickupForm';
 
-const products = [
-  {
-    name: 'Product 1',
-    desc: 'A nice thing',
-    price: '$9.99'
-  },
-  {
-    name: 'Product 2',
-    desc: 'Another thing',
-    price: '$3.45'
-  },
-  {
-    name: 'Product 3',
-    desc: 'Something else',
-    price: '$6.51'
-  },
-  {
-    name: 'Product 4',
-    desc: 'Best thing of all',
-    price: '$14.11'
-  },
-  { name: 'Shipping', desc: '', price: 'Free' }
-];
+interface ReviewProps {
+  userAddressData: UserAddressData;
+  closestOutlet: string; // This should be the outlet ID or name
+  cost: string;
+}
 
-const addresses = ['1 Material-UI Drive', 'Reactville', 'Anytown', '99999', 'USA'];
-const payments = [
-  { name: 'Card type', detail: 'Visa' },
-  { name: 'Card holder', detail: 'Mr John Smith' },
-  { name: 'Card number', detail: 'xxxx-xxxx-xxxx-1234' },
-  { name: 'Expiry date', detail: '04/2024' }
-];
+interface AddressDetails {
+  name?: string; // Optional, used for outlets
+  street_address: string;
+  city: string;
+  province: string;
+  postal_code: string;
+}
 
-export default function Review() {
+export default function Review({ userAddressData, closestOutlet, cost }: ReviewProps) {
+  const [addressDetails, setAddressDetails] = useState<AddressDetails | null>(null);
+  const [outletAddressDetails, setOutletAddressDetails] = useState<AddressDetails | null>(null);
+
+  useEffect(() => {
+    const fetchAddressDetails = async () => {
+      try {
+        if (userAddressData.address) {
+          const response = await axios.get(`/api/useraddresses/${userAddressData.address}`);
+          setAddressDetails(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch address details:', error);
+      }
+    };
+
+    fetchAddressDetails();
+  }, [userAddressData.address]);
+
+  useEffect(() => {
+    const fetchOutletAddressDetails = async () => {
+      try {
+        if (closestOutlet) {
+          const response = await axios.get(`/api/outletaddresses/${closestOutlet}`);
+          setOutletAddressDetails(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch outlet address details:', error);
+      }
+    };
+
+    fetchOutletAddressDetails();
+  }, [closestOutlet]);
+
   return (
     <>
       <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
-        Order summary
+        Review Your Order
       </Typography>
       <List disablePadding>
-        {products.map((product) => (
-          <ListItem sx={{ py: 1, px: 0 }} key={product.name}>
-            <ListItemText primary={product.name} secondary={product.desc} />
-            <Typography variant="body2">{product.price}</Typography>
+        {/* Review Address */}
+        {addressDetails ? (
+          <ListItem sx={{ py: 1, px: 0, flexDirection: 'column', alignItems: 'flex-start' }}>
+            <ListItemText primary="Selected Address" />
+            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+              {addressDetails.name}
+            </Typography>
+            <Typography variant="body2">{addressDetails.street_address}</Typography>
+            <Typography variant="body2">
+              {addressDetails.city}, {addressDetails.province}
+            </Typography>
+            <Typography variant="body2">{addressDetails.postal_code}</Typography>
           </ListItem>
-        ))}
+        ) : (
+          <ListItem sx={{ py: 1, px: 0, flexDirection: 'column', alignItems: 'flex-start' }}>
+            <ListItemText primary="Selected Address" />
+            <Typography variant="body2">Loading address details...</Typography>
+          </ListItem>
+        )}
+        <Divider sx={{ my: 2 }} />
 
+        {/* Review Closest Outlet */}
+        {outletAddressDetails ? (
+          <ListItem sx={{ py: 1, px: 0, flexDirection: 'column', alignItems: 'flex-start' }}>
+            <ListItemText primary="Closest Outlet" />
+            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+              {outletAddressDetails.name}
+            </Typography>
+            <Typography variant="body2">{outletAddressDetails.street_address}</Typography>
+            <Typography variant="body2">
+              {outletAddressDetails.city}, {outletAddressDetails.province}
+            </Typography>
+            <Typography variant="body2">{outletAddressDetails.postal_code}</Typography>
+          </ListItem>
+        ) : (
+          <ListItem sx={{ py: 1, px: 0, flexDirection: 'column', alignItems: 'flex-start' }}>
+            <ListItemText primary="Closest Outlet" />
+            <Typography variant="body2">Loading outlet details...</Typography>
+          </ListItem>
+        )}
+        <Divider sx={{ my: 2 }} />
+
+        {/* Review Pickup/Delivery Cost */}
         <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText primary="Total" />
-          <Typography variant="subtitle1">$34.06</Typography>
+          <ListItemText primary="Pickup/Delivery Cost" />
+          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+            {cost}
+          </Typography>
         </ListItem>
       </List>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-            Shipping
-          </Typography>
-          <Typography gutterBottom>John Smith</Typography>
-          <Typography gutterBottom>{addresses.join(', ')}</Typography>
-        </Grid>
-        <Grid item container direction="column" xs={12} sm={6}>
-          <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-            Payment details
-          </Typography>
-          <Grid container>
-            {payments.map((payment) => (
-              <Fragment key={payment.name}>
-                <Grid item xs={6}>
-                  <Typography gutterBottom>{payment.name}</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography gutterBottom>{payment.detail}</Typography>
-                </Grid>
-              </Fragment>
-            ))}
-          </Grid>
-        </Grid>
-      </Grid>
+
+      <Divider sx={{ my: 2 }} />
     </>
   );
 }

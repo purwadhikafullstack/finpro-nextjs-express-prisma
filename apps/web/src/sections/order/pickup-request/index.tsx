@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, ReactNode } from 'react';
+import { useState, ReactNode, CSSProperties } from 'react';
+import { useRouter } from 'next/navigation';
 
 // material-ui
 import Button from '@mui/material/Button';
@@ -11,14 +12,13 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 // project-imports
-import AddressForm, { ShippingData } from './AddressForm';
-import PaymentForm, { PaymentData } from './PaymentForm';
+import AddressForm, { UserAddressData } from './PickupForm';
 import Review from './Review';
 import MainCard from 'components/MainCard';
 import AnimateButton from 'components/@extended/AnimateButton';
 
 // step options
-const steps = ['Order details', 'Payment details', 'Review your order'];
+const steps = ['Order details', 'Review your order'];
 
 // Helper function to render the content for each step
 function getStepContent(
@@ -26,49 +26,54 @@ function getStepContent(
   handleNext: () => void,
   handleBack: () => void,
   setErrorIndex: (i: number | null) => void,
-  shippingData: ShippingData,
-  setShippingData: (d: ShippingData) => void,
-  paymentData: PaymentData,
-  setPaymentData: (d: PaymentData) => void,
+  userAddressData: UserAddressData,
+  setUserAddressData: (d: UserAddressData) => void,
+  closestOutlet: string,
+  cost: string,
   userId: number
 ) {
+  const stepContentStyle: CSSProperties = {
+    padding: '5px', // consistent padding
+  };
+
   switch (step) {
     case 0:
       return (
-        <AddressForm
-          userId={userId}
-          handleNext={handleNext}
-          setErrorIndex={setErrorIndex}
-          shippingData={shippingData}
-          setShippingData={setShippingData}
-        />
+        <div style={stepContentStyle}>
+          <AddressForm
+            userId={userId}
+            handleNext={handleNext}
+            setErrorIndex={setErrorIndex}
+            userAddressData={userAddressData}
+            setUserAddressData={setUserAddressData}
+          />
+        </div>
       );
     case 1:
       return (
-        <PaymentForm
-          handleNext={handleNext}
-          handleBack={handleBack}
-          setErrorIndex={setErrorIndex}
-          paymentData={paymentData}
-          setPaymentData={setPaymentData}
-        />
+        <div style={stepContentStyle}>
+          <Review
+            userAddressData={userAddressData}
+            closestOutlet={closestOutlet}
+            cost={cost}
+          />
+        </div>
       );
-    case 2:
-      return <Review />;
     default:
       throw new Error('Unknown step');
   }
 }
 
-// ==============================|| FORMS WIZARD - VALIDATION ||============================== //
-
 export default function PickupRequest() {
   const [activeStep, setActiveStep] = useState(0);
-  const [shippingData, setShippingData] = useState({});
-  const [paymentData, setPaymentData] = useState({});
+  const [userAddressData, setUserAddressData] = useState<UserAddressData>({});
   const [errorIndex, setErrorIndex] = useState<number | null>(null);
 
-  // Assuming userId is available from context, props, or another source
+  const router = useRouter(); // Initialize useRouter for navigation
+
+  const closestOutlet = 'Retrieving...'; // Replace with actual closest outlet logic
+  const cost = 'Calculating...'; // Replace with actual cost calculation logic
+
   const userId = 1; // Replace with actual userId
 
   const handleNext = () => {
@@ -82,7 +87,7 @@ export default function PickupRequest() {
 
   return (
     <MainCard title="Pickup Request">
-      <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
+      <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5, direction: "row", maxWidth: '600px', mx: 'auto'}}>
         {steps.map((label, index) => {
           const labelProps: { error?: boolean; optional?: ReactNode } = {};
 
@@ -110,29 +115,23 @@ export default function PickupRequest() {
               Thank you for your order.
             </Typography>
             <Typography variant="subtitle1">
-              Your order number is #2001539. We have emailed your order confirmation, and will send you an update when your order has
-              shipped.
+              Your order number is #2001539 {/* Replace with dynamic transaction ID */}
             </Typography>
             <Stack direction="row" justifyContent="flex-end">
               <AnimateButton>
                 <Button
                   variant="contained"
-                  color="error"
-                  onClick={() => {
-                    setShippingData({});
-                    setPaymentData({});
-                    setActiveStep(0);
-                  }}
+                  onClick={() => router.push('/order/order-status')} // Navigate to order status
                   sx={{ my: 3, ml: 1 }}
                 >
-                  Reset
+                  Go to Order Status
                 </Button>
               </AnimateButton>
             </Stack>
           </>
         ) : (
           <>
-            {getStepContent(activeStep, handleNext, handleBack, setErrorIndex, shippingData, setShippingData, paymentData, setPaymentData, userId)}
+            {getStepContent(activeStep, handleNext, handleBack, setErrorIndex, userAddressData, setUserAddressData, closestOutlet, cost, userId)}
             {activeStep === steps.length - 1 && (
               <Stack direction="row" justifyContent={activeStep !== 0 ? 'space-between' : 'flex-end'}>
                 {activeStep !== 0 && (
