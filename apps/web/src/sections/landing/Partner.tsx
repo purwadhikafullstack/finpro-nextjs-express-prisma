@@ -13,14 +13,11 @@ import { motion } from 'framer-motion';
 // project-imports
 import FadeInWhenVisible from './Animation';
 
-const client1 = '/assets/images/landing/client-eagames.svg';
-const client2 = '/assets/images/landing/client-vodafone.svg';
-const client3 = '/assets/images/landing/client-crystal-1.svg';
-const client4 = '/assets/images/landing/client-haswent-2.svg';
-const client5 = '/assets/images/landing/client-haxter-3.svg';
-const client6 = '/assets/images/landing/client-montecito-4.svg';
-const client7 = '/assets/images/landing/client-slingshot.svg';
-const client8 = '/assets/images/landing/client-totalstudio-5.svg';
+const client1 = '/assets/images/landing/partner-01.png';
+const client2 = '/assets/images/landing/partner-02.png';
+const client3 = '/assets/images/landing/partner-03.png';
+const client4 = '/assets/images/landing/partner-04.png';
+const client5 = '/assets/images/landing/partner-05.png';
 
 // ==============================|| LANDING - PARTNER PAGE ||============================== //
 export default function PartnerPage() {
@@ -30,9 +27,6 @@ export default function PartnerPage() {
     { image: client3 },
     { image: client4 },
     { image: client5 },
-    { image: client6 },
-    { image: client7 },
-    { image: client8 },
   ];
   return (
     <Container>
@@ -61,7 +55,7 @@ export default function PartnerPage() {
                   delay: 0.2,
                 }}
               >
-                <Typography variant="h2">Trusted By</Typography>
+                <Typography variant="h2">Partnering With</Typography>
               </motion.div>
             </Grid>
             <Grid item xs={12} md={7}>
@@ -76,8 +70,8 @@ export default function PartnerPage() {
                 }}
               >
                 <Typography>
-                  From Startups to Fortune 500 companies using our Template for
-                  their product.
+                  Collaborating with leading brands to bring you exceptional
+                  laundry solutions.
                 </Typography>
               </motion.div>
             </Grid>

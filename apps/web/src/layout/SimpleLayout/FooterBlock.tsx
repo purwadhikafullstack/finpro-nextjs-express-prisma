@@ -15,7 +15,7 @@ import { motion } from 'framer-motion';
 import Logo from 'components/logo';
 
 // assets
-import { Dribbble, Facebook, Link2, Youtube, Xrp } from 'iconsax-react';
+import { Facebook, Link2, Youtube, Xrp } from 'iconsax-react';
 
 // link - custom style
 const FooterLink = styled(Link)(({ theme }) => ({
@@ -75,10 +75,10 @@ export default function FooterBlock({ isFull }: showProps) {
                       variant="subtitle1"
                       sx={{ fontWeight: 400, maxWidth: 320 }}
                     >
-                      Phoenixcoded has gained the trust of over 5.5K customers
-                      since 2015, thanks to our commitment to delivering
-                      high-quality products. Our experienced team players are
-                      responsible for managing Able Pro.
+                      LaundryXpert is trusted by thousands for delivering
+                      reliable and high-quality laundry services. Our dedicated
+                      team ensures your clothes are treated with the utmost
+                      care, providing fresh, clean results every time.
                     </Typography>
                   </Grid>
                 </Grid>
@@ -90,32 +90,16 @@ export default function FooterBlock({ isFull }: showProps) {
                   <Stack spacing={3}>
                     <Typography variant="h5">Company</Typography>
                     <Stack spacing={{ xs: 1.5, md: 2.5 }}>
-                      <FooterLink
-                        href="https://1.envato.market/xk3bQd"
-                        target="_blank"
-                        underline="none"
-                      >
+                      <FooterLink href="/#" target="_blank" underline="none">
                         Profile
                       </FooterLink>
-                      <FooterLink
-                        href="https://1.envato.market/Qyre4x"
-                        target="_blank"
-                        underline="none"
-                      >
-                        Portfolio
+                      <FooterLink href="/#" target="_blank" underline="none">
+                        Career
                       </FooterLink>
-                      <FooterLink
-                        href="https://1.envato.market/Py9k4X"
-                        target="_blank"
-                        underline="none"
-                      >
+                      <FooterLink href="/#" target="_blank" underline="none">
                         Follow Us
                       </FooterLink>
-                      <FooterLink
-                        href="https://phoenixcoded.net"
-                        target="_blank"
-                        underline="none"
-                      >
+                      <FooterLink href="/#" target="_blank" underline="none">
                         Website
                       </FooterLink>
                     </Stack>
@@ -125,39 +109,16 @@ export default function FooterBlock({ isFull }: showProps) {
                   <Stack spacing={3}>
                     <Typography variant="h5">Help & Support</Typography>
                     <Stack spacing={{ xs: 1.5, md: 2.5 }}>
-                      <FooterLink
-                        href="https://phoenixcoded.gitbook.io/able-pro"
-                        target="_blank"
-                        underline="none"
-                      >
-                        Documentation
+                      <FooterLink href="/#" target="_blank" underline="none">
+                        Customer Service
                       </FooterLink>
-                      <FooterLink
-                        href="https://phoenixcoded.gitbook.io/able-pro/v/nextjs/roadmap/"
-                        target="_blank"
-                        underline="none"
-                      >
-                        Feature Request
+                      <FooterLink href="/#" target="_blank" underline="none">
+                        FAQ
                       </FooterLink>
-                      <FooterLink
-                        href="https://phoenixcoded.gitbook.io/able-pro/v/nextjs/roadmap"
-                        target="_blank"
-                        underline="none"
-                      >
-                        RoadMap
-                      </FooterLink>
-                      <FooterLink
-                        href="https://phoenixcoded.authordesk.app/"
-                        target="_blank"
-                        underline="none"
-                      >
+                      <FooterLink href="/#" target="_blank" underline="none">
                         Support
                       </FooterLink>
-                      <FooterLink
-                        href="https://themeforest.net/user/phoenixcoded#contact"
-                        target="_blank"
-                        underline="none"
-                      >
+                      <FooterLink href="/#" target="_blank" underline="none">
                         Email Us
                       </FooterLink>
                     </Stack>
@@ -165,20 +126,12 @@ export default function FooterBlock({ isFull }: showProps) {
                 </Grid>
                 <Grid item xs={6} sm={4}>
                   <Stack spacing={3}>
-                    <Typography variant="h5">Useful Resources</Typography>
+                    <Typography variant="h5">Terms & Conditions</Typography>
                     <Stack spacing={{ xs: 1.5, md: 2.5 }}>
-                      <FooterLink
-                        href="https://themeforest.net/page/item_support_policy"
-                        target="_blank"
-                        underline="none"
-                      >
+                      <FooterLink href="/#" target="_blank" underline="none">
                         Support Policy
                       </FooterLink>
-                      <FooterLink
-                        href="https://themeforest.net/licenses/standard"
-                        target="_blank"
-                        underline="none"
-                      >
+                      <FooterLink href="/#" target="_blank" underline="none">
                         Licenses Term
                       </FooterLink>
                     </Stack>
@@ -201,9 +154,9 @@ export default function FooterBlock({ isFull }: showProps) {
             <Grid item xs={12} sm={8}>
               <Typography>
                 © Handcrafted by Team{' '}
-                <Link href="https://1.envato.market/xk3bQd" underline="none">
+                <Link href="/#" underline="none">
                   {' '}
-                  Phoenixcoded
+                  FINPRO-05
                 </Link>
               </Typography>
             </Grid>
@@ -217,7 +170,7 @@ export default function FooterBlock({ isFull }: showProps) {
                 <Grid item>
                   <Tooltip title="Linkedin">
                     <Link
-                      href="https://in.linkedin.com/company/phoenixcoded"
+                      href="/#"
                       underline="none"
                       target="_blank"
                       sx={linkSX}
@@ -229,7 +182,7 @@ export default function FooterBlock({ isFull }: showProps) {
                 <Grid item>
                   <Tooltip title="Twitter">
                     <Link
-                      href="https://twitter.com/phoenixcoded?lang=en"
+                      href="/#"
                       underline="none"
                       target="_blank"
                       sx={linkSX}
@@ -241,7 +194,7 @@ export default function FooterBlock({ isFull }: showProps) {
                 <Grid item>
                   <Tooltip title="Facebook">
                     <Link
-                      href="https://www.facebook.com/Phoenixcoded/"
+                      href="/#"
                       underline="none"
                       target="_blank"
                       sx={linkSX}
@@ -251,21 +204,9 @@ export default function FooterBlock({ isFull }: showProps) {
                   </Tooltip>
                 </Grid>
                 <Grid item>
-                  <Tooltip title="Dribbble">
-                    <Link
-                      href="https://dribbble.com/Phoenixcoded"
-                      underline="none"
-                      target="_blank"
-                      sx={linkSX}
-                    >
-                      <Dribbble variant="Bold" size={20} />
-                    </Link>
-                  </Tooltip>
-                </Grid>
-                <Grid item>
                   <Tooltip title="Youtube">
                     <Link
-                      href="https://www.youtube.com/@Phoenixcodedwebsolution?app=desktop"
+                      href="/#"
                       underline="none"
                       target="_blank"
                       sx={linkSX}

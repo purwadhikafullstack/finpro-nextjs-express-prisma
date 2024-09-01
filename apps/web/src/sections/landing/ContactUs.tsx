@@ -31,7 +31,7 @@ export default function ContactUsPage() {
                 <Grid item xs={12}>
                   <Typography>
                     Simply submit your email, we share you the top news related
-                    to Able Pro feature updates, roadmap, and news.
+                    to LaundryXpert feature updates, roadmap, and news.
                   </Typography>
                 </Grid>
               </Grid>

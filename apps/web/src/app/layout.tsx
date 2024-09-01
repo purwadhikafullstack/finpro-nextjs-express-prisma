@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 import ProviderWrapper from './ProviderWrapper';
+import StoreProvider from './StoreProvider';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -16,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ProviderWrapper>{children}</ProviderWrapper>
+        <ProviderWrapper>
+          <StoreProvider>{children}</StoreProvider>
+        </ProviderWrapper>
       </body>
     </html>
   );

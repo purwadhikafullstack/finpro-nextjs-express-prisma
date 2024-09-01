@@ -46,9 +46,28 @@ export class AuthController {
 
       const user = await authAction.loginAction(email, password);
 
-      res.status(200).json({
+      res.status(200).cookie('access-token', user).json({
         message: 'Successfully logged in',
         data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  refreshTokenController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { email } = req.user as JwtPayload;
+
+      const result = await authAction.refreshTokenAction(email);
+
+      res.status(200).json({
+        message: 'Refresh token success',
+        data: result,
       });
     } catch (error) {
       next(error);

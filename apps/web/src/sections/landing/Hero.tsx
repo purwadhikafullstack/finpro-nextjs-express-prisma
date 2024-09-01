@@ -14,32 +14,27 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Menu from '@mui/material/Menu';
-import Rating from '@mui/material/Rating';
 import Tooltip from '@mui/material/Tooltip';
 import Container from '@mui/material/Container';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Rating from '@mui/material/Rating';
 
 // third-party
 import { motion } from 'framer-motion';
 
 // assets
 import AnimateButton from 'components/@extended/AnimateButton';
-const techBootstrap = '/assets/images/landing/tech-bootstrap.svg';
-const techReact = '/assets/images/landing/tech-react.svg';
-const techCodeigniter = '/assets/images/landing/tech-codeigniter.svg';
-const techNet = '/assets/images/landing/tech-net.svg';
-const techFigma = '/assets/images/landing/tech-figma.svg';
-const techVue = 'assets/images/landing/tech-vuetify.svg';
-const techAngular = 'assets/images/landing/tech-angular.svg';
-const techNextJS = 'assets/images/landing/tech-nextjs.svg';
-const techVuelaravel = 'assets/images/landing/tech-l+v.svg';
-const techLaravelBootstrap = 'assets/images/landing/tech-Laravel+Bootstrap.svg';
-const techDjango = 'assets/images/landing/tech-Django.svg';
-const techFlask = 'assets/images/landing/tech-Flask.svg';
-const techNodeJs = 'assets/images/landing/tech-Node-js.svg';
-const techSvelteKit = 'assets/images/landing/tech-SvelteKit.svg';
+import { items } from 'static/cityItems';
+
+const handleScroll = (event: React.MouseEvent<HTMLButtonElement>) => {
+  event.preventDefault();
+  const element = document.getElementById('howItWorks');
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 
 // ==============================|| LANDING - HERO PAGE ||============================== //
 
@@ -48,123 +43,12 @@ export default function HeroPage() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  let value: string = window.location.search;
-  const params = new URLSearchParams(value);
-  const ispValue = params.get('isp');
-
-  const items = [
-    {
-      label: 'Bootstrap',
-      image: techBootstrap,
-      url: 'https://ableproadmin.com/dashboard/index.html',
-      target: '_blank',
-      tooltipTitle: 'Bootstrap',
-    },
-    {
-      label: 'React MUI',
-      image: techReact,
-      url: 'https://ableproadmin.com/react/dashboard/default',
-      target: '_blank',
-      tooltipTitle: 'React MUI',
-    },
-    {
-      label: 'Angular',
-      image: techAngular,
-      url: 'https://ableproadmin.com/angular/default/dashboard/default',
-      target: '_blank',
-      tooltipTitle: 'Angular',
-    },
-    {
-      label: 'CodeIgniter',
-      image: techCodeigniter,
-      url: 'https://ableproadmin.com/codeigniter/default/public/dashboard-default',
-      target: '_blank',
-      tooltipTitle: 'CodeIgniter',
-    },
-    {
-      label: 'ASP.net',
-      image: techNet,
-      url: 'https://able-pro.azurewebsites.net/Dashboard/Index',
-      target: '_blank',
-      tooltipTitle: 'ASP.net',
-    },
-    {
-      label: 'Next js',
-      image: techNextJS,
-      url: '/login',
-      target: '_blank',
-      tooltipTitle: 'Next js',
-    },
-    {
-      label: 'Vue',
-      image: techVue,
-      url: 'https://ableproadmin.com/vue/dashboard/default',
-      target: '_blank',
-      tooltipTitle: 'Vue',
-    },
-    {
-      label: 'Vuetify Laravel',
-      image: techVuelaravel,
-      url: 'https://phplaravel-207002-4524103.cloudwaysapps.com/build/dashboards/default',
-      target: '_blank',
-      tooltipTitle: 'Vuetify Laravel',
-    },
-    {
-      label: 'Laravel Bootstrap',
-      image: techLaravelBootstrap,
-      url: '#!',
-      target: '_self',
-      tooltipTitle: 'Live Preview Not Available',
-    },
-    {
-      label: 'Django',
-      image: techDjango,
-      url: '#!',
-      target: '_self',
-      tooltipTitle: 'Live Preview Not Available',
-    },
-    {
-      label: 'Node JS',
-      image: techNodeJs,
-      url: '#!',
-      target: '_self',
-      tooltipTitle: 'Live Preview Not Available',
-    },
-    {
-      label: 'Flask',
-      image: techFlask,
-      url: '#!',
-      target: '_self',
-      tooltipTitle: 'Live Preview Not Available',
-    },
-    {
-      label: 'SvelteKit',
-      image: techSvelteKit,
-      url: '#!',
-      target: '_self',
-      tooltipTitle: 'Live Preview Not Available',
-    },
-    {
-      label: 'Figma',
-      image: techFigma,
-      url: 'https://www.figma.com/file/6XqmRhRmkr33w0EFD49acY/Able-Pro--v9.0-Figma-Preview?type=design&mode=design&t=4FS2Lw6WxsmJ3RLm-0',
-      target: '_blank',
-      tooltipTitle: 'Figma',
-    },
-  ];
-
   const listItems = items.map((item, index) => {
-    // Construct the final URL
-    const finalUrl =
-      item.url !== '#!' && ispValue !== null && parseInt(ispValue) === 1
-        ? `${item.url}?isp=1`
-        : item.url;
-
     return (
       <ListItemButton
         key={index}
         component="a"
-        href={finalUrl}
+        href={item.url}
         target={item.target}
       >
         <Tooltip title={item.tooltipTitle} placement="bottom">
@@ -182,10 +66,21 @@ export default function HeroPage() {
               <CardMedia
                 component="img"
                 image={item.image}
-                sx={{ width: '30px' }}
+                sx={{ width: '100px', height: '100px' }}
               />
             </ListItemAvatar>
-            <ListItemText primary={item.label} />
+            <ListItemText
+              primary={item.label}
+              secondary="CITY"
+              primaryTypographyProps={{
+                fontWeight: 'bold',
+                color: theme.palette.text.primary,
+              }}
+              secondaryTypographyProps={{
+                color: theme.palette.text.secondary,
+                fontSize: '0.875rem',
+              }}
+            />
           </div>
         </Tooltip>
       </ListItemButton>
@@ -193,10 +88,6 @@ export default function HeroPage() {
   });
 
   const techBottom = items.map((item, index) => {
-    const finalUrl =
-      item.url !== '#!' && ispValue !== null && parseInt(ispValue) === 1
-        ? `${item.url}?isp=1`
-        : item.url;
     return (
       <Grid item key={index}>
         <motion.div
@@ -205,11 +96,11 @@ export default function HeroPage() {
           transition={{ type: 'spring', stiffness: 150, damping: 30, delay: 1 }}
         >
           <Tooltip title={item.tooltipTitle}>
-            <Links component={Link} href={finalUrl} target={item.target}>
+            <Links component={Link} href={item.url} target={item.target}>
               <CardMedia
                 component="img"
                 image={item.image}
-                sx={{ width: 'auto' }}
+                sx={{ width: '85px', height: '90px' }}
               />
             </Links>
           </Tooltip>
@@ -325,13 +216,12 @@ export default function HeroPage() {
                     <Grid item>
                       <AnimateButton>
                         <Button
-                          component={Link}
-                          href="/components-overview/buttons"
                           size="large"
                           color="secondary"
                           variant="outlined"
+                          onClick={handleScroll}
                         >
-                          Explore Components
+                          How it works
                         </Button>
                       </AnimateButton>
                     </Grid>
@@ -346,7 +236,7 @@ export default function HeroPage() {
                           color="primary"
                           variant="contained"
                         >
-                          Live Preview
+                          Premium Features
                         </Button>
                       </AnimateButton>
                       <Menu
@@ -403,7 +293,7 @@ export default function HeroPage() {
                     >
                       <Rating
                         name="read-only"
-                        value={4.5}
+                        value={4.7}
                         size="small"
                         readOnly
                       />
@@ -430,10 +320,10 @@ export default function HeroPage() {
                             color: theme.palette.text.secondary,
                           }}
                         >
-                          Sales
+                          Downloads
                         </span>
                       </Typography>
-                      <Typography variant="h4">2.5K+</Typography>
+                      <Typography variant="h4">1M+</Typography>
                     </Grid>
                   </Grid>
                 </motion.div>
@@ -458,7 +348,7 @@ export default function HeroPage() {
           <Grid
             container
             spacing={0}
-            justifyContent={{ xs: 'start', lg: 'center' }}
+            justifyContent={{ xs: 'start', md: 'center', lg: 'center' }}
             wrap="nowrap"
             sx={{
               overflowX: 'auto',
@@ -468,6 +358,7 @@ export default function HeroPage() {
                   borderLeft: `1px solid ${theme.palette.divider}`,
                 },
                 '& img': { padding: 1.3 },
+                px: { xs: 0, sm: 6, md: 8, lg: 9 },
               },
             }}
           >

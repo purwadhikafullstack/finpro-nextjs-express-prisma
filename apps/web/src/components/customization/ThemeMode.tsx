@@ -28,11 +28,27 @@ export default function ThemeModeLayout() {
   };
 
   return (
-    <RadioGroup row aria-label="payment-card" name="payment-card" value={mode} onChange={handleModeChange}>
-      <Stack direction="row" alignItems="center" spacing={2.5} sx={{ width: '100%' }}>
+    <RadioGroup
+      row
+      aria-label="payment-card"
+      name="payment-card"
+      value={mode}
+      onChange={handleModeChange}
+    >
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={2.5}
+        sx={{ width: '100%' }}
+      >
         <FormControlLabel
           control={<Radio value={ThemeMode.LIGHT} sx={{ display: 'none' }} />}
-          sx={{ width: '100%', m: 0, display: 'flex', '& .MuiFormControlLabel-label': { flex: 1 } }}
+          sx={{
+            width: '100%',
+            m: 0,
+            display: 'flex',
+            '& .MuiFormControlLabel-label': { flex: 1 },
+          }}
           label={
             <Stack alignItems="center" spacing={0.5}>
               <MainCard
@@ -41,10 +57,17 @@ export default function ThemeModeLayout() {
                   width: '100%',
                   borderWidth: 2,
                   p: 1,
-                  ...(mode === ThemeMode.LIGHT && { borderColor: theme.palette.primary.main })
+                  ...(mode === ThemeMode.LIGHT && {
+                    borderColor: theme.palette.primary.main,
+                  }),
                 }}
               >
-                <Stack direction="row" alignItems="center" justifyContent="center" sx={{ height: 44 }}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                  sx={{ height: 44 }}
+                >
                   <Sun1 variant="Bold" color={theme.palette.warning.main} />
                 </Stack>
               </MainCard>
@@ -54,7 +77,12 @@ export default function ThemeModeLayout() {
         />
         <FormControlLabel
           control={<Radio value={ThemeMode.DARK} sx={{ display: 'none' }} />}
-          sx={{ width: '100%', m: 0, display: 'flex', '& .MuiFormControlLabel-label': { flex: 1 } }}
+          sx={{
+            width: '100%',
+            m: 0,
+            display: 'flex',
+            '& .MuiFormControlLabel-label': { flex: 1 },
+          }}
           label={
             <Stack alignItems="center" spacing={0.5}>
               <MainCard
@@ -63,10 +91,17 @@ export default function ThemeModeLayout() {
                   width: '100%',
                   borderWidth: 2,
                   p: 1,
-                  ...(mode === ThemeMode.DARK && { borderColor: theme.palette.primary.main })
+                  ...(mode === ThemeMode.DARK && {
+                    borderColor: theme.palette.primary.main,
+                  }),
                 }}
               >
-                <Stack direction="row" alignItems="center" justifyContent="center" sx={{ height: 44 }}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                  sx={{ height: 44 }}
+                >
                   <Moon variant="Bold" />
                 </Stack>
               </MainCard>
@@ -76,14 +111,32 @@ export default function ThemeModeLayout() {
         />
         <FormControlLabel
           control={<Radio value={ThemeMode.AUTO} sx={{ display: 'none' }} />}
-          sx={{ width: '100%', height: 60, m: 0, display: 'flex', '& .MuiFormControlLabel-label': { flex: 1 } }}
+          sx={{
+            width: '100%',
+            height: 60,
+            m: 0,
+            display: 'flex',
+            '& .MuiFormControlLabel-label': { flex: 1 },
+          }}
           label={
             <Stack alignItems="center" spacing={0.5}>
               <MainCard
                 content={false}
-                sx={{ width: '100%', borderWidth: 2, p: 1, ...(mode === ThemeMode.AUTO && { borderColor: theme.palette.primary.main }) }}
+                sx={{
+                  width: '100%',
+                  borderWidth: 2,
+                  p: 1,
+                  ...(mode === ThemeMode.AUTO && {
+                    borderColor: theme.palette.primary.main,
+                  }),
+                }}
               >
-                <Stack direction="row" alignItems="center" justifyContent="center" sx={{ height: 44 }}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                  sx={{ height: 44 }}
+                >
                   <Setting2 variant="Bold" />
                 </Stack>
               </MainCard>

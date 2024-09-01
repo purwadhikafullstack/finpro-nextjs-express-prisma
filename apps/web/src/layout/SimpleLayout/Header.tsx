@@ -10,7 +10,6 @@ import { alpha, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import Container from '@mui/material/Container';
 import Drawer from '@mui/material/Drawer';
 import Links from '@mui/material/Link';
@@ -74,7 +73,7 @@ export default function Header() {
     setDrawerToggle(open);
   };
 
-  const url = 'sign in URL';
+  const url = '/login';
 
   const linksSx = {
     textDecoration: 'none',
@@ -91,7 +90,9 @@ export default function Header() {
         }}
       >
         <Container maxWidth="xl" disableGutters={matchDownMd}>
-          <Toolbar sx={{ px: { xs: 1.5, sm: 4, md: 0, lg: 0 }, py: 1 }}>
+          <Toolbar
+            sx={{ height: '64px', px: { xs: 1.5, sm: 4, md: 0, lg: 0 }, py: 0 }}
+          >
             <Stack
               direction="row"
               sx={{ flexGrow: 1, display: { xs: 'none', md: 'block' } }}
@@ -100,19 +101,6 @@ export default function Header() {
               <Box sx={{ display: 'inline-block' }}>
                 <Logo reverse to="/" />
               </Box>
-              <Chip
-                label={process.env.NEXT_APP_VERSION}
-                variant="outlined"
-                size="small"
-                color="secondary"
-                sx={{
-                  mt: 0.5,
-                  ml: 1,
-                  fontSize: '0.725rem',
-                  height: 20,
-                  '& .MuiChip-label': { px: 0.5 },
-                }}
-              />
             </Stack>
             <Stack
               direction="row"
@@ -131,7 +119,7 @@ export default function Header() {
                 sx={{ ml: theme.direction === ThemeDirection.RTL ? 3 : 0 }}
                 color="secondary.main"
                 component={Link}
-                href="/login"
+                href="/#"
                 target="_blank"
                 underline="none"
               >
@@ -149,7 +137,7 @@ export default function Header() {
               <Links
                 className="header-link"
                 color="secondary.main"
-                href="https://phoenixcoded.gitbook.io/able-pro"
+                href="/#"
                 target="_blank"
                 underline="none"
               >
@@ -181,7 +169,7 @@ export default function Header() {
               }}
             >
               <Box sx={{ display: 'inline-block' }}>
-                <Logo reverse to="/" />
+                <Logo reverse to="/" sx={{ paddingTop: 1.5 }} />
               </Box>
               <Stack direction="row" spacing={2}>
                 <Button
@@ -221,7 +209,7 @@ export default function Header() {
                   onKeyDown={drawerToggler(false)}
                 >
                   <List>
-                    <Links sx={linksSx} href="/login" target="_blank">
+                    <Links sx={linksSx} href="/#" target="_blank">
                       <ListItemButton>
                         <ListItemIcon>
                           <Minus color={theme.palette.secondary.main} />
@@ -235,47 +223,7 @@ export default function Header() {
                         />
                       </ListItemButton>
                     </Links>
-                    <Links
-                      sx={linksSx}
-                      href="/components-overview/buttons"
-                      target="_blank"
-                    >
-                      <ListItemButton>
-                        <ListItemIcon>
-                          <Minus color={theme.palette.secondary.main} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="All Components"
-                          primaryTypographyProps={{
-                            variant: 'h6',
-                            color: 'secondary.main',
-                          }}
-                        />
-                      </ListItemButton>
-                    </Links>
-                    <Links
-                      sx={linksSx}
-                      href="https://codedthemes.com/?s=able+pro"
-                      target="_blank"
-                    >
-                      <ListItemButton>
-                        <ListItemIcon>
-                          <Minus color={theme.palette.secondary.main} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="Free Version"
-                          primaryTypographyProps={{
-                            variant: 'h6',
-                            color: 'secondary.main',
-                          }}
-                        />
-                      </ListItemButton>
-                    </Links>
-                    <Links
-                      sx={linksSx}
-                      href="https://phoenixcoded.gitbook.io/able-pro"
-                      target="_blank"
-                    >
+                    <Links sx={linksSx} href="/#" target="_blank">
                       <ListItemButton>
                         <ListItemIcon>
                           <Minus color={theme.palette.secondary.main} />
@@ -289,11 +237,7 @@ export default function Header() {
                         />
                       </ListItemButton>
                     </Links>
-                    <Links
-                      sx={linksSx}
-                      href="https://phoenixcoded.authordesk.app/"
-                      target="_blank"
-                    >
+                    <Links sx={linksSx} href="/#" target="_blank">
                       <ListItemButton>
                         <ListItemIcon>
                           <Minus color={theme.palette.secondary.main} />
@@ -307,11 +251,7 @@ export default function Header() {
                         />
                       </ListItemButton>
                     </Links>
-                    <Links
-                      sx={linksSx}
-                      href="https://1.envato.market/c/1289604/275988/4415?subId1=phoenixcoded&u=https%3A%2F%2Fthemeforest.net%2Fitem%2Fable-pro-responsive-bootstrap-4-admin-template%2F19300403"
-                      target="_blank"
-                    >
+                    <Links sx={linksSx} href={url} target="_blank">
                       <ListItemButton>
                         <ListItemIcon>
                           <Minus color={theme.palette.secondary.main} />
@@ -323,7 +263,6 @@ export default function Header() {
                             color: 'secondary.main',
                           }}
                         />
-                        <Chip color="primary" label="v1.0" size="small" />
                       </ListItemButton>
                     </Links>
                   </List>

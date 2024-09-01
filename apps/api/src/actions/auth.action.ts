@@ -90,9 +90,56 @@ class AuthAction {
         isVerified: user.is_verified,
       };
 
-      const token = generateToken(payload, '2h', String(process.env.API_KEY));
+      const accessToken = generateToken(
+        payload,
+        '2h',
+        String(process.env.API_KEY),
+      );
 
-      return token;
+      return accessToken;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  refreshTokenAction = async (email: string) => {
+    try {
+      const user = await prisma.user.findFirst({
+        select: {
+          user_id: true,
+          first_name: true,
+          last_name: true,
+          email: true,
+          password: true,
+          phone_number: true,
+          avatarFilename: true,
+          is_verified: true,
+        },
+
+        where: {
+          email,
+        },
+      });
+
+      if (!user) throw new HttpException(500, 'Incorrect email or password');
+
+      const payload = {
+        userId: user.user_id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        phoneNumber: user.phone_number,
+        avatarFilename: user.avatarFilename,
+        isVerified: user.is_verified,
+      };
+
+      const refreshToken = generateToken(
+        payload,
+        '2h',
+        String(process.env.API_KEY),
+      );
+
+      return refreshToken;
     } catch (error) {
       throw error;
     }

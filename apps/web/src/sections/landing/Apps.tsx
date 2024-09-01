@@ -18,39 +18,39 @@ import { ThemeDirection } from 'config';
 // third-party
 import Slider, { Settings } from 'react-slick';
 
-const featureChat = '/assets/images/landing/chat.png';
-const featureEcommerce = '/assets/images/landing/e-commerce.png';
-const featureMail = '/assets/images/landing/mail.png';
-const featureSocial = '/assets/images/landing/social.png';
+const servicesAndSchedule = '/assets/images/landing/step-01.png';
+const pickUp = '/assets/images/landing/step-02.png';
+const invoice = '/assets/images/landing/step-03.png';
+const delivery = '/assets/images/landing/step-04.png';
 
-const Technologies = [
+const Steps = [
   {
-    image: featureChat,
-    title: 'Chat',
+    image: servicesAndSchedule,
+    title: '01 Select Services and Schedule',
     href: 'chat',
     description:
-      'Power your web apps with the conceptual chat app of Able Pro Dashboard Template.',
+      'Our priority is to make it easy for you to access to our services. Schedule for service, pick-up and delivery anytime, anywhere! ',
   },
   {
-    image: featureEcommerce,
-    title: 'E-commerce',
+    image: pickUp,
+    title: '02 Prepare for Pick-up',
     href: 'ecommerce',
     description:
-      'Collection, Filter, Product Detail, Add New Product, and Checkout pages makes your e-commerce app complete.',
+      'Make sure that the clothes that you want to do laundry are collected in one container at the time of pickup by our courier. That will help your clothes not to be scattered and left behind at the time of pickup.',
   },
   {
-    image: featureMail,
-    title: 'Inbox',
-    href: 'mail',
+    image: invoice,
+    title: '03 Detailed Itemization and Invoice',
+    href: '/',
     description:
-      'Compose Message, List Message (email), Detailed Inbox pages well suited for any conversation based web apps.',
+      'We will immediately process your order and provide invoice via WhatApp service. You can confirm and make Payment via M-Banking, Qris, Virtual Account, and E-Wallet',
   },
   {
-    image: featureSocial,
-    title: 'User Management',
+    image: delivery,
+    title: '04 Freshly Cleaned Delivery',
     href: 'social',
     description:
-      'Detailed pages for User Management like Profile settings, role, account settings, social profile and more to explore.',
+      'We will make the delivery according to the schedule you requested! No need to worry about being late, we guarantee punctuality of delivery. You can enjoy your perfectly clean clothes the way you want!',
   },
 ];
 // ==============================|| LANDING - APPS PAGE ||============================== //
@@ -90,6 +90,7 @@ export default function AppsPage() {
 
   return (
     <Box
+      id="howItWorks"
       sx={{
         bgcolor: theme.palette.primary.main,
         overflow: 'hidden',
@@ -107,13 +108,12 @@ export default function AppsPage() {
             >
               <Grid item xs={12}>
                 <Typography variant="h2" color="white">
-                  Working Conceptual Apps
+                  How it works
                 </Typography>
               </Grid>
               <Grid item xs={12} md={7}>
                 <Typography color="white">
-                  Each App is carefully crafted to achieve the best feature rich
-                  working concept for your project
+                  Book Your Laundry Delivery in 4 Simple Steps
                 </Typography>
               </Grid>
             </Grid>
@@ -133,7 +133,7 @@ export default function AppsPage() {
               <Grid item xs={12} md={6}>
                 <Box pb={{ xs: 0, md: 10 }}>
                   <Grid container spacing={1.5} alignItems="center">
-                    {Technologies.map((tech, index) => (
+                    {Steps.map((tech, index) => (
                       <Grid item xs={12} key={index}>
                         <FadeInWhenVisible>
                           <Button
@@ -196,7 +196,7 @@ export default function AppsPage() {
                   }}
                 >
                   <Slider ref={sliderRef} {...settings}>
-                    {Technologies.map((tech, index) => (
+                    {Steps.map((tech, index) => (
                       <Box key={index + state}>
                         <CardMedia
                           component="img"

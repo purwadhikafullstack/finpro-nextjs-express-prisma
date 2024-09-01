@@ -1,9 +1,7 @@
 'use client';
 
 // material-ui
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
 import CardMedia from '@mui/material/CardMedia';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -16,32 +14,28 @@ import FadeInWhenVisible from './Animation';
 import MainCard from 'components/MainCard';
 
 // assets
-import { ExportSquare } from 'iconsax-react';
-const featureFigma = '/assets/images/landing/feature-figma.png';
-const featureComponents = '/assets/images/landing/feature-components.png';
-const featureDocumentation = '/assets/images/landing/feature-documentation.png';
+const laundryPickup = '/assets/images/landing/laundry-pickup.png';
+const expressWash = '/assets/images/landing/express-wash.png';
+const dryCleaning = '/assets/images/landing/dry-cleaning.png';
 
 const Technologies = [
   {
-    icon: featureFigma,
-    title: 'Figma Design System',
+    icon: laundryPickup,
+    title: 'Laundry Pickup Service',
     description:
-      'Check the live preview of Able Pro Figma design file. Figma file included in all licenses.',
-    preview: 'https://links.codedthemes.com/mQZrX',
+      'We provide door-to-door laundry pickup and delivery without any minimum spend. Just schedule a pickup, and we’ll handle the rest.',
   },
   {
-    icon: featureComponents,
-    title: 'Explore Components',
+    icon: expressWash,
+    title: 'Express Wash & Fold',
     description:
-      'Access all components of Able Pro in one place to make your development work easier.',
-    preview: '/components-overview/buttons',
+      'Need your laundry done in a hurry? Our Express Wash & Fold service guarantees a 24-hour turnaround time.',
   },
   {
-    icon: featureDocumentation,
-    title: 'Documentation',
+    icon: dryCleaning,
+    title: 'Dry Cleaning Service',
     description:
-      'Find solutions and navigate through our helper guide with ease.',
-    preview: 'https://phoenixcoded.gitbook.io/able-pro',
+      'Keep your delicate garments pristine with our premium dry cleaning service, expertly handling everything from suits to silk dresses with care and precision.',
   },
 ];
 
@@ -75,7 +69,9 @@ export default function ComboPage() {
                   delay: 0.2,
                 }}
               >
-                <Typography variant="h2">Complete Combo</Typography>
+                <Typography variant="h2">
+                  What's Included in the Service?
+                </Typography>
               </motion.div>
             </Grid>
             <Grid item xs={12} md={7}>
@@ -90,8 +86,8 @@ export default function ComboPage() {
                 }}
               >
                 <Typography>
-                  Able Pro caters to the needs of both developers and designers,
-                  whether they are beginners or experts.
+                  LaundryXpert provides easy pickup, expert care, and delivery.
+                  Simple, reliable laundry services tailored to you.
                 </Typography>
               </motion.div>
             </Grid>
@@ -116,25 +112,6 @@ export default function ComboPage() {
                           image={tech.icon}
                           sx={{ width: '100%' }}
                         />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          size="large"
-                          startIcon={<ExportSquare />}
-                          component={Link}
-                          href={tech.preview}
-                          target="_blank"
-                          sx={{
-                            fontWeight: 500,
-                            bgcolor: 'secondary.light',
-                            color: 'secondary.darker',
-                            '&:hover': { color: 'secondary.lighter' },
-                          }}
-                        >
-                          Reference
-                        </Button>
                       </Grid>
                     </Grid>
                   </MainCard>

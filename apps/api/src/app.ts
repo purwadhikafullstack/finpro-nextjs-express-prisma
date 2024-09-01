@@ -1,7 +1,7 @@
 import express, { json, urlencoded, Express } from 'express';
 import cors from 'cors';
 import session from 'express-session';
-import passport from 'passport';
+import passport, { initialize } from 'passport';
 import { PORT } from './config';
 import { AuthRouter } from './routers/auth.router';
 import { ErrorMiddleware } from './middlewares/error.middleware';
@@ -20,7 +20,12 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors());
+    this.app.use(
+      cors({
+        origin: String(process.env.FE_BASE_URL),
+        credentials: true,
+      }),
+    );
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
 
