@@ -11,13 +11,11 @@ interface JwtPayload {
 }
 
 class AuthAction {
-  registerAction = async (
+  registerWithEmailAction = async (
     email: string,
-    password: string,
     first_name: string,
     last_name: string,
     phone_number: string,
-    avatarFilename: string,
   ) => {
     try {
       const isEmailRegisterd = await userAction.findUserByEmail(email);
@@ -25,18 +23,14 @@ class AuthAction {
       if (isEmailRegisterd)
         throw new HttpException(500, 'Email is already registered');
 
-      const salt = await genSalt(10);
-      const hashedPass = await hash(password, salt);
-
       const newUser = await prisma.$transaction(async (transaction: any) => {
         return await transaction.user.create({
           data: {
             email,
-            password: hashedPass,
             first_name,
             last_name,
             phone_number,
-            avatarFilename,
+            is_verified: false,
           },
         });
       });
@@ -44,6 +38,38 @@ class AuthAction {
       return newUser;
     } catch (error) {
       throw error;
+    }
+  };
+
+  activateUserEmail = async (req: any) => {
+    try {
+      const { userId } = req.user as JwtPayload;
+
+      // checking user apakah udah verified
+      const user = await prisma.user.findUnique({
+        where: { user_id: userId },
+      });
+
+      if (!user) {
+        throw new HttpException(404, 'User not found');
+      }
+
+      if (user.is_verified) {
+        return { message: 'Email has already been verified' };
+      }
+
+      // Update status kalau blm verified
+      const updatedUser = await prisma.user.update({
+        where: { user_id: userId },
+        data: { is_verified: true },
+      });
+
+      return { user: updatedUser };
+    } catch (error) {
+      throw new HttpException(
+        500,
+        `Error during email verification: ${(error as Error).message}`,
+      );
     }
   };
 
@@ -145,38 +171,6 @@ class AuthAction {
     }
   };
 
-  activateUserEmail = async (req: any) => {
-    try {
-      const { userId } = req.user as JwtPayload;
-
-      // checking user apakah udah verified
-      const user = await prisma.user.findUnique({
-        where: { user_id: userId },
-      });
-
-      if (!user) {
-        throw new HttpException(404, 'User not found');
-      }
-
-      if (user.is_verified) {
-        return { message: 'Email has already been verified' };
-      }
-
-      // Update status kalau blm verified
-      const updatedUser = await prisma.user.update({
-        where: { user_id: userId },
-        data: { is_verified: true },
-      });
-
-      return { user: updatedUser };
-    } catch (error) {
-      throw new HttpException(
-        500,
-        `Error during email verification: ${(error as Error).message}`,
-      );
-    }
-  };
-
   resendVerificationEmail = async (email: string) => {
     try {
       const user = await prisma.user.findUnique({
@@ -197,36 +191,6 @@ class AuthAction {
         500,
         `Error resending verification email: ${(error as Error).message}`,
       );
-    }
-  };
-
-  registerWithEmailAction = async (
-    email: string,
-    first_name: string,
-    last_name: string,
-    phone_number: string,
-  ) => {
-    try {
-      const isEmailRegisterd = await userAction.findUserByEmail(email);
-
-      if (isEmailRegisterd)
-        throw new HttpException(500, 'Email is already registered');
-
-      const newUser = await prisma.$transaction(async (transaction: any) => {
-        return await transaction.user.create({
-          data: {
-            email,
-            first_name,
-            last_name,
-            phone_number,
-            is_verified: false,
-          },
-        });
-      });
-
-      return newUser;
-    } catch (error) {
-      throw error;
     }
   };
 

@@ -5,7 +5,6 @@ import { useState, SyntheticEvent } from 'react';
 // next
 import Link from 'next/link';
 import Image from 'next/legacy/image';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 // material-ui
@@ -31,13 +30,11 @@ import { Formik } from 'formik';
 import IconButton from 'components/@extended/IconButton';
 import AnimateButton from 'components/@extended/AnimateButton';
 import FirebaseSocial from './FirebaseSocial';
-import { APP_DEFAULT_PATH } from 'config';
 import { useAppDispatch } from 'libs/hooks';
+import { login } from 'libs/auth/authSlices';
 
 // assets
 import { Eye, EyeSlash } from 'iconsax-react';
-import { login, googleLogin } from 'libs/auth/authSlices';
-
 const Google = '/assets/images/icons/google.svg';
 
 // ============================|| JWT - LOGIN ||============================ //

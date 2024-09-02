@@ -9,23 +9,19 @@ interface JwtPayload {
 }
 
 export class AuthController {
-  registerController = async (
+  registerWithEmailController = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const { file } = req;
-      const { email, password, first_name, last_name, phone_number } = req.body;
-      const avatarFileName = file?.filename ? file.filename : 'avatarempty.jpg';
+      const { email, first_name, last_name, phone_number } = req.body;
 
-      const user = await authAction.registerAction(
+      const user = await authAction.registerWithEmailAction(
         email,
-        password,
         first_name,
         last_name,
         phone_number,
-        avatarFileName,
       );
 
       await sendVerificationEmail(user);
@@ -88,10 +84,11 @@ export class AuthController {
         });
       }
 
-      res.status(200).json({
-        message: 'Email verification successful',
-        data: result.user,
-      });
+      // Redirect user to /set-password with the token as a query parameter
+      const token = req.query.token;
+      const setPasswordUrl = `${process.env.FE_BASE_URL}/set-password?token=${token}`;
+
+      return res.redirect(setPasswordUrl);
     } catch (error) {
       next(error);
     }
@@ -109,33 +106,6 @@ export class AuthController {
 
       res.status(200).json({
         message: 'Verification email resent, please check your email',
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  registerWithEmailController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
-    try {
-      const { email, first_name, last_name, phone_number } = req.body;
-
-      const user = await authAction.registerWithEmailAction(
-        email,
-        first_name,
-        last_name,
-        phone_number,
-      );
-
-      await sendVerificationEmail(user);
-
-      res.status(201).json({
-        message:
-          'User registration success, please check your email to verify your account',
-        data: user,
       });
     } catch (error) {
       next(error);

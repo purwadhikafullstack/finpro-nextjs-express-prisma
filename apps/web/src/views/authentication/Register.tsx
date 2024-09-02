@@ -36,6 +36,7 @@ export default function Register() {
           </Stack>
         </Grid>
         <Grid item xs={12}>
+          {/* Jangan lupa nanti ganti nama komponen register nya */}
           <FirebaseRegister />
         </Grid>
       </Grid>

@@ -23,34 +23,31 @@ export class AuthRouter {
   private intitalizeRoutes(): void {
     this.router.post(
       `${this.path}/register`,
-      uploader('avatar', '/avatar').single('file'),
       validateRegister,
-      this.auth.registerController,
+      this.auth.registerWithEmailController,
     );
+
     this.router.post(
       `${this.path}/login`,
       validateLogin,
       this.auth.loginController,
     );
+
     this.router.get(
       `${this.path}/verify`,
       this.guard.verifyEmailToken,
       this.auth.verifyEmailController,
     );
+
     this.router.post(
       `${this.path}/resend-verification`,
       this.auth.resendVerificationController,
-    );
-    this.router.post(
-      `${this.path}/register-email`,
-      validateRegister,
-      this.auth.registerWithEmailController, // Controller baru
     );
 
     this.router.post(
       `${this.path}/set-password`,
       this.guard.verifyEmailToken, // Middleware untuk memverifikasi token
-      this.auth.setPasswordController, // Controller baru untuk set password
+      this.auth.setPasswordController, // Controller untuk set password
     );
 
     // Google login routes
@@ -62,7 +59,7 @@ export class AuthRouter {
     this.router.get(
       `${this.path}/google/callback`,
       passport.authenticate('google', {
-        successRedirect: '/dashboard', // Redirect jika sukses
+        successRedirect: process.env.FE_BASE_URL, // Redirect jika sukses
         failureRedirect: '/login', // Redirect jika gagal
       }),
     );

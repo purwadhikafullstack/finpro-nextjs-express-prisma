@@ -46,7 +46,7 @@ export const sendVerificationEmail = async (user: any) => {
 
     await sendEmail(
       user.email,
-      'Email Verification - LaundryXpert',
+      'Complete Your Account Setup - Verify Your Email and Set Your Password',
       'emailVerification',
       {
         name: user.first_name,

@@ -27,6 +27,10 @@ export default function FirebaseSocial() {
         variant="outlined"
         color="secondary"
         fullWidth
+        onClick={() => {
+          const googleAuthUrl = 'http://localhost:8000/api/auth/google';
+          window.open(googleAuthUrl, '_blank');
+        }}
         startIcon={
           <Image
             src={Google}

@@ -68,25 +68,59 @@ export const authSlice = createSlice({
   },
 });
 
+// Handle error function from API (to consume the error to display it in the FE)
+const handleError = (
+  err: unknown,
+  defaultMessage: string,
+): { error: string } => {
+  const error = err as { response?: { data: string } };
+  return {
+    error: error.response?.data || defaultMessage,
+  };
+};
+
 export const register =
   (params: {
     email: string;
     firstName: string;
     lastName: string;
-    password: string;
+    phone: string;
   }) =>
-  async (dispacth: Dispatch) => {
+  async (dispacth: Dispatch): Promise<{ error?: string }> => {
     try {
-      const { email, firstName, lastName, password } = params;
+      const { email, firstName, lastName, phone } = params;
 
       await instance().post('/auth/register', {
         email,
         first_name: firstName,
         last_name: lastName,
-        password,
+        phone_number: String(phone),
       });
-    } catch (error) {
-      throw error;
+      return {};
+    } catch (err) {
+      return handleError(err, 'An error occurred during registration');
+    }
+  };
+
+export const setPassword =
+  (params: { token: string; password: string }) =>
+  async (dispatch: Dispatch): Promise<{ error?: string }> => {
+    try {
+      const { token, password } = params;
+
+      await instance().post(
+        '/auth/set-password',
+        { password },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      return {};
+    } catch (err) {
+      return handleError(err, 'Failed to set password. Please try again.');
     }
   };
 
@@ -115,8 +149,8 @@ export const login =
       localStorage.setItem('user', JSON.stringify(payload));
       localStorage.setItem('token', String(data?.data));
       return {};
-    } catch (error) {
-      throw error;
+    } catch (err) {
+      return handleError(err, 'An error occurred during login');
     }
   };
 
