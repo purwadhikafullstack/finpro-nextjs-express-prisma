@@ -5,7 +5,6 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Divider from '@mui/material/Divider';
 
@@ -13,7 +12,6 @@ import Divider from '@mui/material/Divider';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 
 // next.js
 import { useRouter } from 'next/navigation';
@@ -21,42 +19,103 @@ import { useRouter } from 'next/navigation';
 // project-imports
 import AnimateButton from 'components/@extended/AnimateButton';
 import MainCard from 'components/MainCard'; // Import MainCard for styling
+import instance from 'utils/axiosIntance';
 
 // Validation schema
 const validationSchema = yup.object({
-  address: yup.string().required('Address is required'),
+  chosenAddress: yup.object({
+    user_address_id: yup
+      .number()
+      .typeError('Address is required') // Handles cases where the value might not be a number
+      .required('Address is required')
+      .min(1, 'Address is required'),
+  }),
 });
 
-export type UserAddressData = {
-  address?: string;
+export type ClosestOutletAddressData = { 
+  closest_outlet_id: number,
+  closest_outlet_name: string,
+  street_address: string,
+  city: string,
+  province: string,
+  postal_code: string};
+
+export type UserAddressData = { 
+  user_address_id: number,
+  user_address_name: string,
+  street_address: string,
+  city: string,
+  province: string,
+  postal_code: string};
+
+export const initialUserAddressData: UserAddressData = {
+  user_address_id: 0,
+  user_address_name: '',
+  street_address: '',
+  city: '',
+  province: '',
+  postal_code: ''
+};
+
+export const initialClosestOutletData: ClosestOutletAddressData = {
+  closest_outlet_id: 0,
+  closest_outlet_name: 'Retrieving...',
+  street_address: '',
+  city: '',
+  province: '',
+  postal_code: ''
 };
 
 interface AddressFormProps {
   userId: number;
-  userAddressData: UserAddressData;
-  setUserAddressData: (d: UserAddressData) => void;
+  chosenAddress: UserAddressData;
+  setChosenAddress: (d: UserAddressData) => void;
   handleNext: () => void;
   setErrorIndex: (i: number | null) => void;
+  closestOutlet: ClosestOutletAddressData;
+  setClosestOutlet: (d: ClosestOutletAddressData) => void,
+  cost: string,
+  setCost: (d: string) => void,
 }
 
 export default function AddressForm({
   userId,
-  userAddressData,
-  setUserAddressData,
+  chosenAddress,
+  setChosenAddress,
+  closestOutlet,
+  setClosestOutlet,
+  cost,
+  setCost,
   handleNext,
   setErrorIndex,
 }: AddressFormProps) {
   const router = useRouter();
-  const [addresses, setAddresses] = useState<{ id: string; name: string }[]>([]);
-  const [closestOutlet, setClosestOutlet] = useState<string>('Retrieving...');
-  const [cost, setCost] = useState<string>('Calculating...');
+  const [addresses, setAddresses] = useState<UserAddressData[]>([]);
 
   useEffect(() => {
     // Fetch addresses from API
     const fetchAddresses = async () => {
       try {
-        const response = await axios.get(`/api/users/${userId}/addresses`);
-        setAddresses(response.data);
+        // const response = await instance().get('/users/${userId}/addresses');
+        // setAddresses(response.data.data);
+        setAddresses([
+            {
+              user_address_id: 1,
+              user_address_name: 'addressNico1',
+              street_address: '123 Main St',
+              city: 'City1',
+              province: 'Province1',
+              postal_code: '12345',
+            },
+            {
+              user_address_id: 2,
+              user_address_name: 'addressNico2',
+              street_address: '456 Elm St',
+              city: 'City2',
+              province: 'Province2',
+              postal_code: '67890',
+            }
+        ])   // COMMENT THIS AND UNCOMMENT ABOVE
       } catch (error) {
         console.error('Failed to fetch addresses:', error);
       }
@@ -65,11 +124,33 @@ export default function AddressForm({
     fetchAddresses();
   }, [userId]);
 
-  const calculateClosestOutletAndCost = (addressId: string) => {
+  const calculateClosestOutletAndCost = (user_address_id: number) => {
     // Simulate calculation of closest outlet and cost
-    // Replace with real calculation logic based on selected address
-    const closestOutlet = 'Outlet 1'; // Placeholder value
-    const cost = '$0'; // Placeholder value
+    // REPLACE with real calculation logic based on selected address
+    let closestOutlet = initialClosestOutletData;
+    let cost = '$0';
+    
+    if (user_address_id===1) {
+      closestOutlet = {
+          closest_outlet_id: 1,
+          closest_outlet_name: 'Outlet Terdekat 1',
+          street_address: 'Jl1',
+          city: 'C1',
+          province: 'P1',
+          postal_code: 'PC123'
+        };
+      cost = '$5';
+    } else if (user_address_id===2) {
+      closestOutlet = {
+          closest_outlet_id: 2,
+          closest_outlet_name: 'Outlet Terdekat 2',
+          street_address: 'Jl2',
+          city: 'C1',
+          province: 'P1',
+          postal_code: 'PC123'
+        };
+      cost = '$99';
+    }
 
     setClosestOutlet(closestOutlet);
     setCost(cost);
@@ -78,22 +159,25 @@ export default function AddressForm({
   const handleAddressChange = (event: any) => {
     const value = event.target.value;
     if (value === 'add-new') {
-      router.push('/auth/address'); // Navigate to the add new address page
+      router.push('/address'); // Navigate to the add new address page
     } else {
-      formik.handleChange(event);
-      calculateClosestOutletAndCost(value);
+      const selectedAddressId = parseInt(value, 10);
+      const selectedAddress = addresses.find(address => address.user_address_id === selectedAddressId) || initialUserAddressData;
+      
+      formik.setFieldValue("chosenAddress", selectedAddress);
+      calculateClosestOutletAndCost(selectedAddress.user_address_id);
     }
   };
 
   const formik = useFormik({
     initialValues: {
-      address: userAddressData.address || '',
+      chosenAddress: chosenAddress,
     },
     validationSchema,
     onSubmit: (values) => {
-      setUserAddressData({
-        address: values.address,
-      });
+      setChosenAddress(
+        values.chosenAddress,
+      );
       handleNext();
     },
   });
@@ -104,34 +188,37 @@ export default function AddressForm({
         New Pickup Request
       </Typography>
       <form onSubmit={formik.handleSubmit}>
-        <Grid container spacing={3}>
+        <Grid container spacing={2.5}>
           {/* Select Address */}
           <Grid item xs={12}>
             <Stack spacing={1}>
               <FormControl fullWidth>
-                <InputLabel>Select Your Address</InputLabel>
+                {/* <InputLabel>Select Your Address</InputLabel> */}
                 <Select
-                  id="address"
-                  name="address"
-                  value={formik.values.address}
+                  displayEmpty
+                  id="chosenAddress"
+                  name="chosenAddress.user_address_id"
+                  value={formik.values.chosenAddress.user_address_id}
                   onChange={handleAddressChange}
-                  error={formik.touched.address && Boolean(formik.errors.address)}
+                  error={formik.touched.chosenAddress?.user_address_id && Boolean(formik.errors.chosenAddress?.user_address_id)}
                 >
+                  <MenuItem disabled value="0" sx={{ color: 'text.secondary' }}>
+                    Select Your Address
+                  </MenuItem>
                   {/* Add New Address option */}
                   <MenuItem value="add-new">
                     <em>Add New Address</em>
                   </MenuItem>
-                  <MenuItem value="0" >Address 1</MenuItem> {/* NEED TO BE COMMENTED */}
                   {/* Dynamic addresses */}
                   {addresses.map((address) => (
-                    <MenuItem key={address.id} value={address.id}>
-                      {address.name}
+                    <MenuItem key={address.user_address_id} value={address.user_address_id}>
+                      {address.user_address_name}
                     </MenuItem>
                   ))}
                 </Select>
-                {formik.touched.address && formik.errors.address && (
+                {formik.touched.chosenAddress?.user_address_id && formik.errors.chosenAddress?.user_address_id && (
                   <Typography variant="caption" color="error">
-                    {formik.errors.address}
+                    {formik.errors.chosenAddress.user_address_id}
                   </Typography>
                 )}
               </FormControl>
@@ -147,7 +234,7 @@ export default function AddressForm({
                 </Typography>
                 <Divider sx={{ my: 1 }} /> {/* This adds a line separator */}
                 <Typography variant="body1">
-                  {closestOutlet}
+                  {closestOutlet.closest_outlet_name}
                 </Typography>
               </MainCard>
             </Stack>

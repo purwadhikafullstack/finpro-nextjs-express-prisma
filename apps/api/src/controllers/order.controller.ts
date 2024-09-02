@@ -10,10 +10,11 @@ export class OrderController {
     next: NextFunction,
   ) => {
     try {
-      const { user_id, nearestOutlet }: ICreateOrder = req.body;
+      const { user_id, user_address_id, nearestOutlet }: ICreateOrder = req.body;
 
       const newOrder = await OrderAction.createPickupRequest({
         user_id,
+        user_address_id,
         nearestOutlet,
       });
 

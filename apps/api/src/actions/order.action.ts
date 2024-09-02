@@ -10,12 +10,13 @@ class OrderAction {
   // Create a new pickup request
   createPickupRequest = async (order: ICreateOrder) => {
     try {
-      const { user_id, nearestOutlet } = order;
+      const { user_id, nearestOutlet, user_address_id } = order;
 
       // Create a new order in pending status
       const newOrder = await prisma.order.create({
         data: {
           customer_id: user_id,
+          user_address_id: user_address_id,
           outlet_id: nearestOutlet,
           driver_id: 0,
           status: 'Menunggu Penjemputan Driver',

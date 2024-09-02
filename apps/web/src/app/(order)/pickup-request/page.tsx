@@ -1,8 +1,6 @@
 // project-imports
 import PickupRequestPage from 'views/order/PickupRequest';
 
-// ==============================|| FORMS WIZARD ||============================== //
-
-export default function FormsWizard() {
+export default function PickupRequest() {
   return <PickupRequestPage />;
 }

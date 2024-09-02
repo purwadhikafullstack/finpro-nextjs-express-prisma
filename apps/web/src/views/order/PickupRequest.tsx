@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 // project-imports
 import PickupRequest from 'sections/order/pickup-request';
 
-// ==============================|| FORMS WIZARD ||============================== //
+// ==============================|| Pickup Request ||============================== //
 
 export default function PickupRequestPage() {
   return (

@@ -6,6 +6,7 @@ export interface IOrderItem {
 export interface ICreateOrder {
   user_id: number;
   nearestOutlet: number;
+  user_address_id: number;
 }
 
 export interface IProcessOrder {

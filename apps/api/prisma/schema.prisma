@@ -23,10 +23,11 @@ model User {
 
   // Relation with UserAddress model
   addresses UserAddress[] // A user can have multiple addresses
+  orders    Order[]       
 }
 
 model UserAddress {
-  UserAddress_id Int      @id @default(autoincrement())
+  user_address_id Int      @id @default(autoincrement())
   user_id        Int
   is_primary     Boolean
   name           String
@@ -40,23 +41,28 @@ model UserAddress {
   updated_at     DateTime @updatedAt
 
   // Relation with User model
-  user User @relation(fields: [user_id], references: [user_id])
+  user   User    @relation(fields: [user_id], references: [user_id])
+  // Relation with Order model (One UserAddress can have multiple Orders)
+  orders Order[]
 
   @@index([user_id])
 }
 
 model Order {
-  order_id     Int         @id @default(autoincrement())
-  customer_id  Int
-  outlet_id    Int
-  driver_id    Int
-  status       String
-  total_weight Float
-  total_cost   Float
-  created_at   DateTime    @default(now())
-  updated_at   DateTime    @updatedAt
-  OrderItems   OrderItem[]
-  Payments     Payment[]
+  order_id       Int         @id @default(autoincrement())
+  customer_id    Int
+  user_address_id Int
+  outlet_id      Int
+  driver_id      Int
+  status         String
+  total_weight   Float
+  total_cost     Float
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+  OrderItems     OrderItem[]
+  Payments       Payment[]
+  UserAddress    UserAddress @relation(fields: [user_address_id], references: [user_address_id])
+  Customer       User        @relation(fields: [customer_id], references: [user_id])
 }
 
 model OrderItem {
