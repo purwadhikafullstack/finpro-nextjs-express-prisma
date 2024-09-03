@@ -1,4 +1,5 @@
 import prisma from '@/prisma';
+import { v4 as uuidv4 } from 'uuid'; // Import UUID library for generating transaction_id
 import {
   ICreateOrder,
   IProcessOrder,
@@ -11,10 +12,12 @@ class OrderAction {
   createPickupRequest = async (order: ICreateOrder) => {
     try {
       const { user_id, nearestOutlet, user_address_id } = order;
-
+      // Generate a unique transaction ID
+      const transaction_id = '#tx'+ uuidv4(); // You can replace this with any custom logic for generating the transaction ID
       // Create a new order in pending status
       const newOrder = await prisma.order.create({
         data: {
+          transaction_id: transaction_id,
           customer_id: user_id,
           user_address_id: user_address_id,
           outlet_id: nearestOutlet,

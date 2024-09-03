@@ -50,6 +50,7 @@ model UserAddress {
 
 model Order {
   order_id       Int         @id @default(autoincrement())
+  transaction_id String      @unique
   customer_id    Int
   user_address_id Int
   outlet_id      Int
@@ -77,10 +78,10 @@ model OrderItem {
 
 model Payment {
   payment_id     Int      @id @default(autoincrement())
+  invoice_id     String   @unique
   order_id       Int
   payment_method String
   payment_status String
-  transaction_id String
   amount         Float
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt

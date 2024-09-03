@@ -17,7 +17,6 @@ import Review from './ReviewOrder';
 import MainCard from 'components/MainCard';
 import AnimateButton from 'components/@extended/AnimateButton';
 import instance from 'utils/axiosIntance';
-import axios from 'axios';
 
 // step options
 const steps = ['Order details', 'Review your order'];
@@ -87,7 +86,6 @@ export default function PickupRequest() {
     if (activeStep === steps.length - 1) {
       try {
         const response = await instance().post('/order/pickup-request', {
-        // const response = await axios.post('http://localhost:8000/api/order/pickup-request', {
           user_id: userId,
           user_address_id: chosenAddress.user_address_id, // Assuming address holds the selected address ID
           nearestOutlet: closestOutlet.closest_outlet_id, // Assuming closestOutlet holds the outlet ID
@@ -145,7 +143,7 @@ export default function PickupRequest() {
               Thank you for your order.
             </Typography>
             <Typography variant="subtitle1">
-              We are processing your laundry pickup request.
+              We are processing your request. We will send you an update when your driver has arrived to pickup your laundry.
             </Typography>
             <Stack direction="row" justifyContent="flex-end">
               <AnimateButton>
