@@ -149,7 +149,7 @@ export default function PickupRequest() {
               <AnimateButton>
                 <Button
                   variant="contained"
-                  onClick={() => router.push('/order/order-status')} // Navigate to order status
+                  onClick={() => router.push('/order-details')} // Navigate to order status
                   sx={{ my: 3, ml: 1 }}
                 >
                   Go to Order Status

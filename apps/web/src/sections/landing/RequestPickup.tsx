@@ -5,7 +5,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import { Truck } from 'iconsax-react';
 
 const RequestPickup = () => {
-  const url = '/#';
+  const url = '/pickup-request';
 
   return (
     <Links style={{ textDecoration: 'none' }} href={url} target="_blank">
