@@ -3,7 +3,7 @@
 import { ReactElement } from 'react';
 
 // next
-import { SessionProvider } from 'next-auth/react';
+// import { SessionProvider } from 'next-auth/react';
 
 // project-imports
 import ThemeCustomization from 'themes';
@@ -22,10 +22,12 @@ export default function ProviderWrapper({
     <ConfigProvider>
       <ThemeCustomization>
         <ScrollTop>
-          <SessionProvider refetchInterval={0}>
+          {/* <SessionProvider refetchInterval={0}> */}
+          <>
             {children}
             <Customization />
-          </SessionProvider>
+          </>
+          {/* </SessionProvider> */}
         </ScrollTop>
       </ThemeCustomization>
     </ConfigProvider>

@@ -1,4 +1,5 @@
 import { createSlice, Dispatch, PayloadAction } from '@reduxjs/toolkit';
+import { deleteCookie, getCookie } from 'cookies-next';
 import parseJWT from 'utils/parseJwt';
 import instance from 'utils/axiosIntance';
 
@@ -8,15 +9,22 @@ type User = {
   firstName: string;
   lastName: string;
   isVerified: boolean;
+  avatarFilename: string;
 };
 
 type LoginStatus = {
   isLogin: boolean;
 };
 
+type Location = {
+  latitude: number | null;
+  longitude: number | null;
+};
+
 interface Auth {
   user: User;
   loginStatus: LoginStatus;
+  location: Location;
 }
 
 const initialState: Auth = {
@@ -26,9 +34,15 @@ const initialState: Auth = {
     firstName: '',
     lastName: '',
     isVerified: false,
+    avatarFilename: '',
   },
   loginStatus: {
     isLogin: false,
+  },
+  location: {
+    // Initialize location state
+    latitude: null,
+    longitude: null,
   },
 };
 
@@ -45,6 +59,13 @@ export const authSlice = createSlice({
     logOutState: (state: Auth) => {
       state.user = initialState.user;
       state.loginStatus = initialState.loginStatus;
+      deleteCookie('access-token');
+      deleteCookie('refresh-token');
+    },
+
+    setLocation: (state: Auth, action: PayloadAction<Location>) => {
+      console.log('Action payload in setLocation:', action.payload);
+      state.location = action.payload;
     },
 
     tokenValidState: (state: Auth, action: PayloadAction<User>) => {
@@ -57,10 +78,10 @@ export const authSlice = createSlice({
       state.user = { ...state.user, ...action.payload };
     },
 
-    // untuk handle nyimpen value user
-    loadUserFromLocalStorage: (state: Auth, action: PayloadAction<User>) => {
-      const user = action.payload;
-      if (user) {
+    loadUserFromToken: (state: Auth) => {
+      const accessToken = getCookie('access-token') as string;
+      if (accessToken) {
+        const user = parseJWT(accessToken) as User;
         state.user = user;
         state.loginStatus.isLogin = true;
       }
@@ -68,7 +89,17 @@ export const authSlice = createSlice({
   },
 });
 
-// Handle error function from API (to consume the error to display it in the FE)
+// Export actions
+export const {
+  loginState,
+  logOutState,
+  tokenValidState,
+  updateUserProfile,
+  loadUserFromToken,
+  setLocation,
+} = authSlice.actions;
+
+// Handle error function from API
 const handleError = (
   err: unknown,
   defaultMessage: string,
@@ -130,26 +161,22 @@ export const login =
     try {
       const { email, password } = params;
 
-      const { data } = await instance().post('/auth/login', {
-        email,
-        password,
-      });
+      await instance().post('/auth/login', { email, password });
+      const accessToken = getCookie('access-token') || '';
+      console.log('Access Token after login:', accessToken); // Logging token
 
-      const payload = await parseJWT(data?.data);
+      if (!accessToken) throw new Error('Login failed, please retry again.');
 
-      dispatch(
-        loginState({
-          userId: payload?.userId,
-          email: payload?.email,
-          firstName: payload?.first_name,
-          lastName: payload?.last_name,
-          isVerified: payload?.isVerified,
-        }),
-      );
-      localStorage.setItem('user', JSON.stringify(payload));
-      localStorage.setItem('token', String(data?.data));
+      console.log('Access Token:', accessToken); // Debugging token
+
+      if (accessToken) {
+        const user: User = parseJWT(accessToken);
+        console.log('Parsed User Data:', user); // Debugging parsed user
+        dispatch(loginState(user));
+      }
       return {};
     } catch (err) {
+      console.error('Login Error:', err); // Logging error for debugging
       return handleError(err, 'An error occurred during login');
     }
   };
@@ -157,11 +184,8 @@ export const login =
 export const googleLogin = () => async (dispatch: Dispatch) => {
   try {
     const { data } = await instance().get('/auth/google');
+    const payload = parseJWT(data?.data);
 
-    // Handle the data from the API response as needed.
-    const payload = await parseJWT(data?.data);
-
-    // Dispatch an action to update the auth state
     dispatch(
       loginState({
         userId: payload?.userId,
@@ -169,10 +193,9 @@ export const googleLogin = () => async (dispatch: Dispatch) => {
         firstName: payload?.first_name,
         lastName: payload?.last_name,
         isVerified: payload?.isVerified,
+        avatarFilename: payload?.avatarFilename,
       }),
     );
-    localStorage.setItem('user', JSON.stringify(payload));
-    localStorage.setItem('token', String(data?.data));
   } catch (error) {
     throw error;
   }
@@ -181,8 +204,6 @@ export const googleLogin = () => async (dispatch: Dispatch) => {
 export const logout = () => async (dispatch: Dispatch) => {
   try {
     dispatch(logOutState());
-    localStorage.removeItem('user'); // Hapus user dari localStorage
-    localStorage.removeItem('token');
   } catch (error) {
     console.log(error);
   }
@@ -195,7 +216,7 @@ export const checkToken = (token: string) => async (dispatch: Dispatch) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    const payload = await parseJWT(data?.data);
+    const payload = parseJWT(data?.data);
     dispatch(
       tokenValidState({
         userId: payload?.userId,
@@ -203,10 +224,9 @@ export const checkToken = (token: string) => async (dispatch: Dispatch) => {
         firstName: payload?.first_name,
         lastName: payload?.last_name,
         isVerified: payload?.isVerified,
+        avatarFilename: payload?.avatarFilename,
       }),
     );
-    localStorage.setItem('user', JSON.stringify(payload)); // Simpan user ke localStorage
-    localStorage.setItem('token', String(data?.data));
   } catch (error) {
     console.log(error);
   }
@@ -228,19 +248,7 @@ export const updateUser =
 
 // tambahan
 export const loadUser = () => (dispatch: Dispatch) => {
-  const user = localStorage.getItem('user');
-  if (user) {
-    dispatch(loadUserFromLocalStorage(JSON.parse(user)));
-  }
+  dispatch(loadUserFromToken()); // Muat user dari access-token
 };
-
-export const {
-  loginState,
-  logOutState,
-  tokenValidState,
-  updateUserProfile,
-  //tambahan
-  loadUserFromLocalStorage,
-} = authSlice.actions;
 
 export default authSlice.reducer;

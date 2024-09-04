@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import authAction from '@/actions/auth.action';
 import { HttpException } from '@/exceptions/http.exception';
 import { sendVerificationEmail } from '@/utils/emailUtil';
+import passport from 'passport';
+import { generateToken } from '@/utils/tokenUtil';
 
 interface JwtPayload {
   userId: number;
@@ -42,11 +44,26 @@ export class AuthController {
 
       const user = await authAction.loginAction(email, password);
 
-      res.status(200).cookie('access-token', user).json({
-        message: 'Successfully logged in',
-        data: user,
-      });
+      res
+        .status(200)
+        .cookie('access-token', user?.accessToken, {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 1000, // 1 jam
+        })
+        .cookie('refresh-token', user?.refreshToken, {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 1000, // 1 jam
+        })
+        .json({
+          message: 'Successfully logged in',
+          data: user,
+        });
     } catch (error) {
+      console.error('Login Error:', error); // Logging untuk debugging
       next(error);
     }
   };
@@ -58,14 +75,15 @@ export class AuthController {
   ) => {
     try {
       const { email } = req.user as JwtPayload;
-
-      const result = await authAction.refreshTokenAction(email);
+      const tokens = await authAction.refreshTokenAction(email);
 
       res.status(200).json({
-        message: 'Refresh token success',
-        data: result,
+        message: 'Token refreshed successfully',
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
       });
     } catch (error) {
+      console.error('Refresh Token Error:', error);
       next(error);
     }
   };
@@ -134,5 +152,67 @@ export class AuthController {
     } catch (error) {
       next(error);
     }
+  };
+
+  googleCallbackController = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    passport.authenticate('google', async (err: any, user: any) => {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        return res.redirect('/login');
+      }
+
+      try {
+        // Generate tokens like you do in loginAction
+        const accessPayload = {
+          userId: user.user_id,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          email: user.email,
+          phoneNumber: user.phone_number,
+          avatarFilename: user.avatarFilename,
+          isVerified: user.is_verified,
+        };
+
+        const refreshPayload = {
+          email: user.email,
+        };
+
+        const accessToken = generateToken(
+          accessPayload,
+          '1h', // dibuat 1 menit di development agar proses testing lebih mudah
+          String(process.env.API_KEY),
+        );
+
+        const refreshToken = generateToken(
+          refreshPayload,
+          '1h', //dibuat 1 jam di development agar proses testing lebih mudah
+          String(process.env.API_KEY),
+        );
+
+        // Set the cookies
+        res
+          .cookie('access-token', accessToken, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 1000, // 1 jam
+          })
+          .cookie('refresh-token', refreshToken, {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 1000, // 1 jam
+          })
+          .redirect(`${process.env.FE_BASE_URL}`);
+      } catch (err) {
+        next(err);
+      }
+    })(req, res, next);
   };
 }

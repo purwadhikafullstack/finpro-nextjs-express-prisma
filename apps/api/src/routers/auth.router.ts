@@ -50,6 +50,26 @@ export class AuthRouter {
       this.auth.setPasswordController, // Controller untuk set password
     );
 
+    this.router.post(
+      `${this.path}/refresh`,
+      this.guard.verifyAccessToken2,
+      this.auth.refreshTokenController,
+    );
+
+    // // Google login routes
+    // this.router.get(
+    //   `${this.path}/google`,
+    //   passport.authenticate('google', { scope: ['profile', 'email'] }),
+    // );
+
+    // this.router.get(
+    //   `${this.path}/google/callback`,
+    //   passport.authenticate('google', {
+    //     successRedirect: process.env.FE_BASE_URL, // Redirect jika sukses
+    //     failureRedirect: '/login', // Redirect jika gagal
+    //   }),
+    // );
+
     // Google login routes
     this.router.get(
       `${this.path}/google`,
@@ -58,10 +78,7 @@ export class AuthRouter {
 
     this.router.get(
       `${this.path}/google/callback`,
-      passport.authenticate('google', {
-        successRedirect: process.env.FE_BASE_URL, // Redirect jika sukses
-        failureRedirect: '/login', // Redirect jika gagal
-      }),
+      this.auth.googleCallbackController,
     );
   }
 

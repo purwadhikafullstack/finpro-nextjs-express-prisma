@@ -1,5 +1,7 @@
 // project-imports
 import Hero from 'sections/landing/Hero';
+import RequestPickupButton from 'sections/landing/RequestPickup';
+
 // import Technologies from 'sections/landing/Technologies';
 import Combo from 'sections/landing/Combo';
 import Apps from 'sections/landing/Apps';
@@ -20,6 +22,7 @@ export default function Landing() {
       <Testimonial />
       <Partner />
       <ContactUs />
+      <RequestPickupButton />
     </SimpleLayout>
   );
 }

@@ -26,28 +26,28 @@ const delivery = '/assets/images/landing/step-04.png';
 const Steps = [
   {
     image: servicesAndSchedule,
-    title: '01 Select Services and Schedule',
+    title: '01. Select Services and Schedule',
     href: 'chat',
     description:
       'Our priority is to make it easy for you to access to our services. Schedule for service, pick-up and delivery anytime, anywhere! ',
   },
   {
     image: pickUp,
-    title: '02 Prepare for Pick-up',
+    title: '02. Prepare for Pick-up',
     href: 'ecommerce',
     description:
       'Make sure that the clothes that you want to do laundry are collected in one container at the time of pickup by our courier. That will help your clothes not to be scattered and left behind at the time of pickup.',
   },
   {
     image: invoice,
-    title: '03 Detailed Itemization and Invoice',
+    title: '03. Detailed Itemization and Invoice',
     href: '/',
     description:
       'We will immediately process your order and provide invoice via WhatApp service. You can confirm and make Payment via M-Banking, Qris, Virtual Account, and E-Wallet',
   },
   {
     image: delivery,
-    title: '04 Freshly Cleaned Delivery',
+    title: '04. Freshly Cleaned Delivery',
     href: 'social',
     description:
       'We will make the delivery according to the schedule you requested! No need to worry about being late, we guarantee punctuality of delivery. You can enjoy your perfectly clean clothes the way you want!',

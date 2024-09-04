@@ -2,6 +2,7 @@ import express, { json, urlencoded, Express } from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import passport, { initialize } from 'passport';
+import path from 'path';
 import { PORT } from './config';
 import { AuthRouter } from './routers/auth.router';
 import { ErrorMiddleware } from './middlewares/error.middleware';
@@ -41,6 +42,9 @@ export default class App {
     // Initialize passport
     this.app.use(passport.initialize());
     this.app.use(passport.session());
+
+    // Tambahan middleware untuk menyajikan file statis
+    this.app.use('/static', express.static(path.join(__dirname, '../public')));
   }
 
   private handleError(): void {

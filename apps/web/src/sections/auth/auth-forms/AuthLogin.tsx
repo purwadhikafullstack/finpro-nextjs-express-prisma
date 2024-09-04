@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, SyntheticEvent } from 'react';
+import { useState, SyntheticEvent, useEffect } from 'react';
 
 // next
 import Link from 'next/link';
@@ -31,7 +31,7 @@ import IconButton from 'components/@extended/IconButton';
 import AnimateButton from 'components/@extended/AnimateButton';
 import FirebaseSocial from './FirebaseSocial';
 import { useAppDispatch } from 'libs/hooks';
-import { login } from 'libs/auth/authSlices';
+import { login, setLocation } from 'libs/auth/authSlices';
 
 // assets
 import { Eye, EyeSlash } from 'iconsax-react';
@@ -53,11 +53,34 @@ export default function AuthLogin({ providers }: any) {
     event.preventDefault();
   };
 
+  const handleGoogleLogin = () => {
+    const googleAuthUrl = 'http://localhost:8000/api/auth/google';
+    window.open(googleAuthUrl, '_blank');
+  };
+
+  useEffect(() => {
+    // Cek apakah ada data lokasi di localStorage
+    const storedLocation = localStorage.getItem('userLocation');
+
+    if (storedLocation) {
+      const { latitude, longitude } = JSON.parse(storedLocation);
+
+      // Muat data lokasi ke Redux jika ditemukan di localStorage
+      if (latitude && longitude) {
+        dispatch(setLocation({ latitude, longitude }));
+        console.log('Loaded location from localStorage:', {
+          latitude,
+          longitude,
+        });
+      }
+    }
+  }, [dispatch]);
+
   return (
     <>
       <Formik
         initialValues={{
-          email: 'nicoprasetiawan@gmail.com',
+          email: 'nicoprasetiawan28@gmail.com',
           password: 'jojoba',
           submit: null,
         }}
@@ -258,11 +281,7 @@ export default function AuthLogin({ providers }: any) {
                     startIcon={
                       <Image src={Google} alt="Google" width={16} height={16} />
                     }
-                    onClick={() => {
-                      const googleAuthUrl =
-                        'http://localhost:8000/api/auth/google';
-                      window.open(googleAuthUrl, '_blank');
-                    }}
+                    onClick={handleGoogleLogin}
                   >
                     Google
                   </Button>

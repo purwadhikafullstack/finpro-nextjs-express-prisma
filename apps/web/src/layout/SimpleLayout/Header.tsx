@@ -1,72 +1,69 @@
-'use client';
-
-import { useState, cloneElement, ReactElement } from 'react';
-
-// next
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import Link from 'next/link';
-
-// material-ui
-import { alpha, useTheme } from '@mui/material/styles';
+import { useTheme, alpha } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Drawer from '@mui/material/Drawer';
-import Links from '@mui/material/Link';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
-import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Box from '@mui/material/Box';
-
-// project-imports
+import { getCookie } from 'cookies-next';
+import Links from '@mui/material/Link';
 import IconButton from 'components/@extended/IconButton';
+import { ExportSquare, HambergerMenu } from 'iconsax-react';
+
+// project imports
 import AnimateButton from 'components/@extended/AnimateButton';
 import Logo from 'components/logo';
+import { useAppDispatch } from 'libs/hooks';
+import { logout, loadUser } from 'libs/auth/authSlices';
 import { ThemeDirection } from 'config';
+import { isTokenExpired } from 'utils/authUtils/isTokenExpired';
+import { refreshToken } from 'utils/authUtils/refreshToken';
 
-// assets
-import { ExportSquare, HambergerMenu, Minus } from 'iconsax-react';
-
-interface ElevationScrollProps {
-  children: ReactElement;
-  window?: Window | Node;
-}
-
-// elevation scroll
-function ElevationScroll({ children, window }: ElevationScrollProps) {
-  const theme = useTheme();
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 10,
-    target: window ? window : undefined,
-  });
-
-  return cloneElement(children, {
-    style: {
-      boxShadow: trigger ? '0 8px 6px -10px rgba(0, 0, 0, 0.5)' : 'none',
-      backgroundColor: trigger
-        ? alpha(theme.palette.background.default, 0.8)
-        : alpha(theme.palette.background.default, 0.1),
-    },
-  });
-}
-
-// ==============================|| COMPONENTS - APP BAR ||============================== //
+// components
+import ElevationScroll from 'components/header/ElevationScroll';
+import HeaderMenu from 'components/header/HeaderMenu';
+import DrawerMenu from 'components/header/DrawerMenu';
+import Notification from 'components/header/Notification';
 
 export default function Header() {
   const theme = useTheme();
-
   const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
+  const dispatch = useAppDispatch();
+  const { user, loginStatus } = useSelector((state: any) => state.auth);
+
   const [drawerToggle, setDrawerToggle] = useState<boolean>(false);
+
+  const avatarUrl = `http://localhost:8000/static/avatar/${user.avatarFilename}`;
+
+  useEffect(() => {
+    const accessToken = getCookie('access-token') as string;
+    console.log('Access Token on page load:', accessToken);
+
+    if (accessToken) {
+      if (isTokenExpired(accessToken)) {
+        refreshToken().then((newToken) => {
+          if (newToken) {
+            dispatch(loadUser());
+          } else {
+            dispatch(logout());
+          }
+        });
+      } else {
+        dispatch(loadUser());
+      }
+    } else {
+      dispatch(logout());
+    }
+  }, [dispatch]);
 
   const drawerToggler = (open: boolean) => (event: any) => {
     if (
-      event.type! === 'keydown' &&
-      (event.key! === 'Tab' || event.key! === 'Shift')
+      event.type === 'keydown' &&
+      (event.key === 'Tab' || event.key === 'Shift')
     ) {
       return;
     }
@@ -120,19 +117,36 @@ export default function Header() {
                 color="secondary.main"
                 component={Link}
                 href="/#"
+                underline="none"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const faqElement = document.getElementById('services');
+                  if (faqElement) {
+                    faqElement.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                Our Services
+              </Links>
+              <Links
+                className="header-link"
+                sx={{ ml: theme.direction === ThemeDirection.RTL ? 3 : 0 }}
+                color="secondary.main"
+                component={Link}
+                href="/#"
                 target="_blank"
                 underline="none"
               >
-                Dashboard
+                Locations
               </Links>
               <Links
                 className="header-link"
                 color="secondary.main"
                 component={Link}
-                href="/components-overview/buttons"
+                href="/#"
                 underline="none"
               >
-                Components
+                FAQ
               </Links>
               <Links
                 className="header-link"
@@ -141,24 +155,41 @@ export default function Header() {
                 target="_blank"
                 underline="none"
               >
-                Documentation
+                Promotions
               </Links>
-              <Box sx={{ display: 'inline-block' }}>
-                <AnimateButton>
-                  <Button
-                    component={Links}
-                    href={url}
-                    target="_blank"
-                    disableElevation
-                    startIcon={<ExportSquare />}
-                    color="success"
-                    size="large"
-                    variant="contained"
-                  >
-                    SIGN IN
-                  </Button>
-                </AnimateButton>
-              </Box>
+              <Links
+                className="header-link"
+                color="secondary.main"
+                href="/#"
+                target="_blank"
+                underline="none"
+              >
+                Contact Us
+              </Links>
+
+              {loginStatus.isLogin ? (
+                <>
+                  <Notification />
+                  <HeaderMenu user={user} avatarUrl={avatarUrl} />
+                </>
+              ) : (
+                <Box sx={{ display: 'inline-block' }}>
+                  <AnimateButton>
+                    <Button
+                      component={Links}
+                      href={url}
+                      target="_blank"
+                      disableElevation
+                      startIcon={<ExportSquare />}
+                      color="success"
+                      size="large"
+                      variant="contained"
+                    >
+                      SIGN IN
+                    </Button>
+                  </AnimateButton>
+                </Box>
+              )}
             </Stack>
             <Box
               sx={{
@@ -172,15 +203,22 @@ export default function Header() {
                 <Logo reverse to="/" sx={{ paddingTop: 1.5 }} />
               </Box>
               <Stack direction="row" spacing={2}>
-                <Button
-                  variant="contained"
-                  color="success"
-                  component={Link}
-                  href={url}
-                  sx={{ mt: 0.25 }}
-                >
-                  SIGN IN
-                </Button>
+                {loginStatus.isLogin ? (
+                  <>
+                    <Notification />
+                    <HeaderMenu user={user} avatarUrl={avatarUrl} />
+                  </>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="success"
+                    component={Link}
+                    href={url}
+                    sx={{ mt: 0.25 }}
+                  >
+                    SIGN IN
+                  </Button>
+                )}
 
                 <IconButton
                   size="large"
@@ -191,83 +229,12 @@ export default function Header() {
                   <HambergerMenu />
                 </IconButton>
               </Stack>
-              <Drawer
-                anchor="top"
-                open={drawerToggle}
-                onClose={drawerToggler(false)}
-                sx={{ '& .MuiDrawer-paper': { backgroundImage: 'none' } }}
-              >
-                <Box
-                  sx={{
-                    width: 'auto',
-                    '& .MuiListItemIcon-root': {
-                      fontSize: '1rem',
-                      minWidth: 32,
-                    },
-                  }}
-                  role="presentation"
-                  onKeyDown={drawerToggler(false)}
-                >
-                  <List>
-                    <Links sx={linksSx} href="/#" target="_blank">
-                      <ListItemButton>
-                        <ListItemIcon>
-                          <Minus color={theme.palette.secondary.main} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="Dashboard"
-                          primaryTypographyProps={{
-                            variant: 'h6',
-                            color: 'secondary.main',
-                          }}
-                        />
-                      </ListItemButton>
-                    </Links>
-                    <Links sx={linksSx} href="/#" target="_blank">
-                      <ListItemButton>
-                        <ListItemIcon>
-                          <Minus color={theme.palette.secondary.main} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="Documentation"
-                          primaryTypographyProps={{
-                            variant: 'h6',
-                            color: 'secondary.main',
-                          }}
-                        />
-                      </ListItemButton>
-                    </Links>
-                    <Links sx={linksSx} href="/#" target="_blank">
-                      <ListItemButton>
-                        <ListItemIcon>
-                          <Minus color={theme.palette.secondary.main} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="Support"
-                          primaryTypographyProps={{
-                            variant: 'h6',
-                            color: 'secondary.main',
-                          }}
-                        />
-                      </ListItemButton>
-                    </Links>
-                    <Links sx={linksSx} href={url} target="_blank">
-                      <ListItemButton>
-                        <ListItemIcon>
-                          <Minus color={theme.palette.secondary.main} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="SIGN IN"
-                          primaryTypographyProps={{
-                            variant: 'h6',
-                            color: 'secondary.main',
-                          }}
-                        />
-                      </ListItemButton>
-                    </Links>
-                  </List>
-                </Box>
-              </Drawer>
+              <DrawerMenu
+                drawerToggle={drawerToggle}
+                drawerToggler={drawerToggler}
+                linksSx={linksSx}
+                url={url}
+              />
             </Box>
           </Toolbar>
         </Container>

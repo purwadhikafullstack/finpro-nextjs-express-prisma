@@ -3,6 +3,11 @@ import { verify, TokenExpiredError } from 'jsonwebtoken';
 import { User } from '@/types/express';
 import { HttpException } from '@/exceptions/http.exception';
 
+interface JwtPayload {
+  userId: number;
+  email: string;
+}
+
 export class AuthMiddleware {
   verifyAccessToken = async (
     req: Request,
@@ -11,13 +16,32 @@ export class AuthMiddleware {
   ) => {
     try {
       const token = req.header('Authorization')?.replace('Bearer ', '');
-      if (!token) throw new HttpException(500, 'Missing Token');
+      if (!token) throw new HttpException(401, 'Token is missing or invalid');
 
       const isTokenValid = verify(token, String(process.env.API_KEY));
       if (!isTokenValid) throw new HttpException(500, 'Unauthorized');
 
       req.user = isTokenValid as User;
 
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  verifyAccessToken2 = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const token = req.header('Authorization')?.replace('Bearer ', '');
+      if (!token) throw new HttpException(401, 'Missing Token');
+
+      const decodedToken = verify(token, String(process.env.API_KEY));
+      if (!decodedToken) throw new HttpException(401, 'Unauthorized');
+
+      req.user = decodedToken as User;
       next();
     } catch (error) {
       next(error);
