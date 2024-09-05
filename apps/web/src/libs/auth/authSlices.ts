@@ -163,11 +163,8 @@ export const login =
 
       await instance().post('/auth/login', { email, password });
       const accessToken = getCookie('access-token') || '';
-      console.log('Access Token after login:', accessToken); // Logging token
 
       if (!accessToken) throw new Error('Login failed, please retry again.');
-
-      console.log('Access Token:', accessToken); // Debugging token
 
       if (accessToken) {
         const user: User = parseJWT(accessToken);

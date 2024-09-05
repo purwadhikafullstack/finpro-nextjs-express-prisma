@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import { useTheme, alpha } from '@mui/material/styles';
@@ -11,37 +11,31 @@ import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import { getCookie } from 'cookies-next';
 import Links from '@mui/material/Link';
-import IconButton from 'components/@extended/IconButton';
-import { ExportSquare, HambergerMenu } from 'iconsax-react';
+import { ExportSquare } from 'iconsax-react';
 
 // project imports
 import AnimateButton from 'components/@extended/AnimateButton';
 import Logo from 'components/logo';
 import { useAppDispatch } from 'libs/hooks';
 import { logout, loadUser } from 'libs/auth/authSlices';
-import { ThemeDirection } from 'config';
 import { isTokenExpired } from 'utils/authUtils/isTokenExpired';
 import { refreshToken } from 'utils/authUtils/refreshToken';
 
 // components
 import ElevationScroll from 'components/header/ElevationScroll';
 import HeaderMenu from 'components/header/HeaderMenu';
-import DrawerMenu from 'components/header/DrawerMenu';
 import Notification from 'components/header/Notification';
 
-export default function Header() {
+export default function SimpleHeader() {
   const theme = useTheme();
   const matchDownMd = useMediaQuery(theme.breakpoints.down('md'));
   const dispatch = useAppDispatch();
   const { user, loginStatus } = useSelector((state: any) => state.auth);
 
-  const [drawerToggle, setDrawerToggle] = useState<boolean>(false);
-
   const avatarUrl = `http://localhost:8000/static/avatar/${user.avatarFilename}`;
 
   useEffect(() => {
     const accessToken = getCookie('access-token') as string;
-    console.log('Access Token on page load:', accessToken);
 
     if (accessToken) {
       if (isTokenExpired(accessToken)) {
@@ -60,21 +54,7 @@ export default function Header() {
     }
   }, [dispatch]);
 
-  const drawerToggler = (open: boolean) => (event: any) => {
-    if (
-      event.type === 'keydown' &&
-      (event.key === 'Tab' || event.key === 'Shift')
-    ) {
-      return;
-    }
-    setDrawerToggle(open);
-  };
-
   const url = '/login';
-
-  const linksSx = {
-    textDecoration: 'none',
-  };
 
   return (
     <ElevationScroll>
@@ -94,6 +74,7 @@ export default function Header() {
               direction="row"
               sx={{ flexGrow: 1, display: { xs: 'none', md: 'block' } }}
               alignItems="center"
+              justifyItems="center"
             >
               <Box sx={{ display: 'inline-block' }}>
                 <Logo reverse to="/" />
@@ -111,62 +92,6 @@ export default function Header() {
               }}
               spacing={3}
             >
-              <Links
-                className="header-link"
-                sx={{ ml: theme.direction === ThemeDirection.RTL ? 3 : 0 }}
-                color="secondary.main"
-                component={Link}
-                href="/#"
-                underline="none"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const faqElement = document.getElementById('services');
-                  if (faqElement) {
-                    faqElement.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-              >
-                Our Services
-              </Links>
-              <Links
-                className="header-link"
-                sx={{ ml: theme.direction === ThemeDirection.RTL ? 3 : 0 }}
-                color="secondary.main"
-                component={Link}
-                href="/#"
-                target="_blank"
-                underline="none"
-              >
-                Locations
-              </Links>
-              <Links
-                className="header-link"
-                color="secondary.main"
-                component={Link}
-                href="/#"
-                underline="none"
-              >
-                FAQ
-              </Links>
-              <Links
-                className="header-link"
-                color="secondary.main"
-                href="/#"
-                target="_blank"
-                underline="none"
-              >
-                Promotions
-              </Links>
-              <Links
-                className="header-link"
-                color="secondary.main"
-                href="/#"
-                target="_blank"
-                underline="none"
-              >
-                Contact Us
-              </Links>
-
               {loginStatus.isLogin ? (
                 <>
                   <Notification />
@@ -200,7 +125,7 @@ export default function Header() {
               }}
             >
               <Box sx={{ display: 'inline-block' }}>
-                <Logo reverse to="/" sx={{ paddingTop: 1.5 }} />
+                <Logo reverse to="/" sx={{ paddingTop: 0 }} />
               </Box>
               <Stack direction="row" spacing={2}>
                 {loginStatus.isLogin ? (
@@ -219,22 +144,7 @@ export default function Header() {
                     SIGN IN
                   </Button>
                 )}
-
-                <IconButton
-                  size="large"
-                  color="secondary"
-                  onClick={drawerToggler(true)}
-                  sx={{ p: 1 }}
-                >
-                  <HambergerMenu />
-                </IconButton>
               </Stack>
-              <DrawerMenu
-                drawerToggle={drawerToggle}
-                drawerToggler={drawerToggler}
-                linksSx={linksSx}
-                url={url}
-              />
             </Box>
           </Toolbar>
         </Container>

@@ -169,7 +169,7 @@ export default function HeroPage() {
                         },
                       }}
                     >
-                      LaundryXpert
+                      LaundryXpert.
                     </Typography>{' '}
                     Experience the Difference
                   </Typography>

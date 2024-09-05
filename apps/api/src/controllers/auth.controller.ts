@@ -63,10 +63,11 @@ export class AuthController {
           data: user,
         });
     } catch (error) {
-      console.error('Login Error:', error); // Logging untuk debugging
       next(error);
     }
   };
+
+  // auth.controller.ts
 
   refreshTokenController = async (
     req: Request,
@@ -77,13 +78,28 @@ export class AuthController {
       const { email } = req.user as JwtPayload;
       const tokens = await authAction.refreshTokenAction(email);
 
-      res.status(200).json({
-        message: 'Token refreshed successfully',
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
-      });
+      res
+        .cookie('access-token', tokens.accessToken, {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 1000, // 1 jam
+        })
+        .cookie('refresh-token', tokens.refreshToken, {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
+        })
+        .status(200)
+        .json({
+          message: 'Token refreshed successfully',
+          result: {
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+          },
+        });
     } catch (error) {
-      console.error('Refresh Token Error:', error);
       next(error);
     }
   };
@@ -168,7 +184,6 @@ export class AuthController {
       }
 
       try {
-        // Generate tokens like you do in loginAction
         const accessPayload = {
           userId: user.user_id,
           firstName: user.first_name,
@@ -185,13 +200,13 @@ export class AuthController {
 
         const accessToken = generateToken(
           accessPayload,
-          '1h', // dibuat 1 menit di development agar proses testing lebih mudah
+          '1h',
           String(process.env.API_KEY),
         );
 
         const refreshToken = generateToken(
           refreshPayload,
-          '1h', //dibuat 1 jam di development agar proses testing lebih mudah
+          '7d',
           String(process.env.API_KEY),
         );
 
@@ -207,7 +222,7 @@ export class AuthController {
             httpOnly: false,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60 * 60 * 1000, // 1 jam
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
           })
           .redirect(`${process.env.FE_BASE_URL}`);
       } catch (err) {

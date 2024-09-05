@@ -7,7 +7,9 @@ import { usePathname } from 'next/navigation';
 
 // material-ui
 const Header = lazy(() => import('./Header'));
+const SimpleHeader = lazy(() => import('./SimpleHeader'));
 const FooterBlock = lazy(() => import('./FooterBlock'));
+const SimpleFooter = lazy(() => import('./SimpleFooter'));
 
 // project-imports
 import Loader from 'components/Loader';
@@ -19,19 +21,18 @@ interface Props {
   children: ReactNode;
 }
 
-export default function SimpleLayout({ children }: Props) {
+export default function AppLayout({ children }: Props) {
   const { menuMasterLoading } = useGetMenuMaster();
 
   const pathname = usePathname();
-  const layout: string = pathname === 'landing' || '/' ? 'landing' : 'simple';
 
   if (menuMasterLoading) return <Loader />;
 
   return (
     <>
-      <Header />
+      {pathname === '/' ? <Header /> : <SimpleHeader />}
       {children}
-      <FooterBlock isFull={layout === 'landing'} />
+      {pathname === '/' ? <FooterBlock /> : <SimpleFooter />}
     </>
   );
 }

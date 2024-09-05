@@ -25,22 +25,25 @@ export class AuthMiddleware {
 
       next();
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        return res.status(401).json({
+          message: 'Token expired, please refresh token',
+        });
+      }
       next(error);
     }
   };
 
-  verifyAccessToken2 = async (
+  verifyRefreshToken = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const token = req.header('Authorization')?.replace('Bearer ', '');
-      if (!token) throw new HttpException(401, 'Missing Token');
+      const refreshToken = req.cookies['refresh-token'];
+      if (!refreshToken) throw new HttpException(401, 'Missing refresh token');
 
-      const decodedToken = verify(token, String(process.env.API_KEY));
-      if (!decodedToken) throw new HttpException(401, 'Unauthorized');
-
+      const decodedToken = verify(refreshToken, String(process.env.API_KEY));
       req.user = decodedToken as User;
       next();
     } catch (error) {

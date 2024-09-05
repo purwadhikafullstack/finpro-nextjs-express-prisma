@@ -38,9 +38,9 @@ export default function ProfileTab({ handleLogout }: Props) {
   useEffect(() => {
     const pathToIndex: { [key: string]: number } = {
       '/apps/profiles/user/personal': 0,
-      '/apps/profiles/account/basic': 1,
-      '/apps/profiles/account/personal': 3,
-      '/apps/invoice/details/1': 4,
+      '/profile/account/personal': 1,
+      '/profile/account/basic': 2,
+      '/apps/invoice/details/1': 3,
     };
 
     setSelectedIndex(pathToIndex[pathname] ?? undefined);
@@ -62,10 +62,11 @@ export default function ProfileTab({ handleLogout }: Props) {
         </ListItemIcon>
         <ListItemText primary="Order Tracking " />
       </ListItemButton>
+
       <ListItemButton
-        selected={selectedIndex === 0}
+        selected={selectedIndex === 1}
         onClick={(event: MouseEvent<HTMLDivElement>) =>
-          handleListItemClick(event, 0, '/#')
+          handleListItemClick(event, 1, '/profile/account/personal')
         }
       >
         <ListItemIcon>
@@ -73,10 +74,11 @@ export default function ProfileTab({ handleLogout }: Props) {
         </ListItemIcon>
         <ListItemText primary="Edit Profile" />
       </ListItemButton>
+
       <ListItemButton
-        selected={selectedIndex === 1}
+        selected={selectedIndex === 2}
         onClick={(event: MouseEvent<HTMLDivElement>) =>
-          handleListItemClick(event, 1, '/#')
+          handleListItemClick(event, 2, '/profile/account/basic')
         }
       >
         <ListItemIcon>
@@ -84,10 +86,11 @@ export default function ProfileTab({ handleLogout }: Props) {
         </ListItemIcon>
         <ListItemText primary="View Profile" />
       </ListItemButton>
+
       <ListItemButton
-        selected={selectedIndex === 2}
+        selected={selectedIndex === 3}
         onClick={(event: MouseEvent<HTMLDivElement>) =>
-          handleListItemClick(event, 2, '/#')
+          handleListItemClick(event, 3, '/#')
         }
       >
         <ListItemIcon>
@@ -95,7 +98,8 @@ export default function ProfileTab({ handleLogout }: Props) {
         </ListItemIcon>
         <ListItemText primary="Addresses" />
       </ListItemButton>
-      <ListItemButton selected={selectedIndex === 2} onClick={handleLogout}>
+
+      <ListItemButton selected={selectedIndex === 4} onClick={handleLogout}>
         <ListItemIcon>
           <Logout variant="Bulk" size={18} />
         </ListItemIcon>

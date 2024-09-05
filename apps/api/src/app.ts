@@ -9,6 +9,7 @@ import { ErrorMiddleware } from './middlewares/error.middleware';
 import { UserRouter } from './routers/user.router';
 import './libs/passport';
 import { OrderRouter } from './routers/order.router';
+import cookieParser from 'cookie-parser';
 
 export default class App {
   private app: Express;
@@ -29,6 +30,8 @@ export default class App {
     );
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
+
+    this.app.use(cookieParser());
 
     // Setup session middleware
     this.app.use(

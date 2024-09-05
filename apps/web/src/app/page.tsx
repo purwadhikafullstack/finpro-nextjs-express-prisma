@@ -8,13 +8,13 @@ import Apps from 'sections/landing/Apps';
 import Testimonial from 'sections/landing/Testimonial';
 import Partner from 'sections/landing/Partner';
 import ContactUs from 'sections/landing/ContactUs';
-import SimpleLayout from 'layout/SimpleLayout';
+import AppLayout from 'layout/AppLayout';
 
 // ==============================|| LANDING PAGE ||============================== //
 
 export default function Landing() {
   return (
-    <SimpleLayout>
+    <AppLayout>
       <Hero />
       {/* <Technologies /> */}
       <Combo />
@@ -23,6 +23,6 @@ export default function Landing() {
       <Partner />
       <ContactUs />
       <RequestPickupButton />
-    </SimpleLayout>
+    </AppLayout>
   );
 }

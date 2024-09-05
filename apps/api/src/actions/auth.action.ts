@@ -122,13 +122,13 @@ class AuthAction {
 
       const accessToken = generateToken(
         accessPayload,
-        '1h', // dibuat 1 menit di development agar proses testing lebih mudah
+        '1h',
         String(process.env.API_KEY),
       );
 
       const refreshToken = generateToken(
         refreshPayload,
-        '1h', //dibuat 1 jam di development agar proses testing lebih mudah
+        '7d',
         String(process.env.API_KEY),
       );
 
@@ -139,6 +139,7 @@ class AuthAction {
   };
 
   refreshTokenAction = async (email: string) => {
+    console.log('Request hit verifyRefreshToken middleware');
     try {
       const user = await prisma.user.findFirst({ where: { email } });
 
@@ -161,7 +162,7 @@ class AuthAction {
       );
       const refreshToken = generateToken(
         accessPayload,
-        '1h',
+        '7d',
         String(process.env.API_KEY),
       );
 
