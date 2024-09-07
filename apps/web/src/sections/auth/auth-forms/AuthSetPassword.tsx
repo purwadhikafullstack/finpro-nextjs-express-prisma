@@ -21,7 +21,6 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 
 // project-imports
-import useUser from 'hooks/useUser';
 import IconButton from 'components/@extended/IconButton';
 import AnimateButton from 'components/@extended/AnimateButton';
 import { useAppDispatch } from 'libs/hooks';
@@ -44,8 +43,6 @@ export default function AuthSetPassword() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const dispatch = useAppDispatch();
-
-  const user = useUser();
 
   const [level, setLevel] = useState<StringColorProps>();
   const [showPassword, setShowPassword] = useState(false);
@@ -111,7 +108,7 @@ export default function AuthSetPassword() {
               },
             } as SnackbarProps);
             setTimeout(() => {
-              router.push(user ? '/auth/login' : '/login');
+              router.push('/login');
             }, 1500);
           }
         } catch (err: any) {

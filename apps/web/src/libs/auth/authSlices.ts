@@ -4,7 +4,7 @@ import parseJWT from 'utils/parseJwt';
 import instance from 'utils/axiosIntance';
 
 type User = {
-  userId: number | null;
+  user_id: number | null;
   email: string;
   firstName: string;
   lastName: string;
@@ -29,7 +29,7 @@ interface Auth {
 
 const initialState: Auth = {
   user: {
-    userId: null,
+    user_id: null,
     email: '',
     firstName: '',
     lastName: '',
@@ -185,7 +185,7 @@ export const googleLogin = () => async (dispatch: Dispatch) => {
 
     dispatch(
       loginState({
-        userId: payload?.userId,
+        user_id: payload?.user_id,
         email: payload?.email,
         firstName: payload?.first_name,
         lastName: payload?.last_name,
@@ -216,7 +216,7 @@ export const checkToken = (token: string) => async (dispatch: Dispatch) => {
     const payload = parseJWT(data?.data);
     dispatch(
       tokenValidState({
-        userId: payload?.userId,
+        user_id: payload?.user_id,
         email: payload?.email,
         firstName: payload?.first_name,
         lastName: payload?.last_name,
@@ -230,9 +230,10 @@ export const checkToken = (token: string) => async (dispatch: Dispatch) => {
 };
 
 export const updateUser =
-  (userId: number, updateData: Partial<User>) => async (dispatch: Dispatch) => {
+  (user_id: number, updateData: Partial<User>) =>
+  async (dispatch: Dispatch) => {
     try {
-      await instance().patch(`/user/profile/${userId}`, updateData, {
+      await instance().patch(`/user/profile/${user_id}`, updateData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },

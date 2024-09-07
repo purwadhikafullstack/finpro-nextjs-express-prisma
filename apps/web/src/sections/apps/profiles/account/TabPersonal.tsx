@@ -5,13 +5,19 @@ import { useTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
 import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import {
+  Edit as EditIcon,
+  Check as CheckIcon,
+  Close as CancelIcon,
+} from '@mui/icons-material';
 
 // third-party
 import { PatternFormat } from 'react-number-format';
@@ -20,22 +26,10 @@ import { PatternFormat } from 'react-number-format';
 import Avatar from 'components/@extended/Avatar';
 import MainCard from 'components/MainCard';
 import { ThemeMode } from 'config';
+import instance from 'utils/axiosIntance';
 
 // assets
-import {Camera } from 'iconsax-react';
-
-const avatarImage = '/assets/images/users';
-
-// styles & constant
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-    },
-  },
-};
+import { Camera } from 'iconsax-react';
 
 // ==============================|| ACCOUNT PROFILE - PERSONAL ||============================== //
 
@@ -44,31 +38,141 @@ export default function TabPersonal() {
   const [selectedImage, setSelectedImage] = useState<File | undefined>(
     undefined,
   );
-  const [avatar, setAvatar] = useState<string | undefined>(
-    `${avatarImage}/default.png`,
-  );
+  const [avatar, setAvatar] = useState<string | undefined>('');
 
+  const [profile, setProfile] = useState({
+    first_name: '',
+    last_name: '',
+    phone_number: '',
+    email: '',
+    avatarFilename: '',
+  });
+
+  const [addresses, setAddresses] = useState<any[]>([]); // to store address data from the API
+
+  // Update avatar if selectedImage changes
   useEffect(() => {
     if (selectedImage) {
       setAvatar(URL.createObjectURL(selectedImage));
     }
   }, [selectedImage]);
 
-  const [experience, setExperience] = useState('0');
+  // Fetch user profile and address data from API
+  const fetchUserData = async () => {
+    try {
+      const [profileRes, addressRes] = await Promise.all([
+        instance().get('http://localhost:8000/api/user/profile'),
+        instance().get('http://localhost:8000/api/user/address'),
+      ]);
 
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    setExperience(event.target.value);
+      const userProfile = profileRes.data?.data;
+      setProfile(userProfile);
+      setAvatar(
+        `http://localhost:8000/static/avatar/${userProfile.avatarFilename}`,
+      ); // Set avatar from API
+      setAddresses(addressRes.data?.data || []);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  // Update Profile API call
+  const handleUpdateProfile = async () => {
+    try {
+      await instance().patch(
+        'http://localhost:8000/api/user/profile-update',
+        profile,
+      );
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
+
+  // Add new address
+  const handleAddAddress = () => {
+    setAddresses([
+      ...addresses,
+      {
+        name: '',
+        street_address: '',
+        city: '',
+        province: '',
+        postal_code: '',
+        isEditing: true,
+      },
+    ]);
+  };
+
+  // Edit address
+  const handleEditAddress = (index: number) => {
+    const updatedAddresses = addresses.map((address, i) =>
+      i === index ? { ...address, isEditing: true } : address,
+    );
+    setAddresses(updatedAddresses);
+  };
+
+  // Save address (API call to update/create)
+  const handleSaveAddress = async (index: number) => {
+    const address = addresses[index];
+    try {
+      if (address.id) {
+        // Edit existing address
+        await instance().put(
+          `http://localhost:8000/api/user/address/${address.id}`,
+          address,
+        );
+      } else {
+        // Add new address
+        await instance().post(
+          'http://localhost:8000/api/user/address',
+          address,
+        );
+      }
+      const updatedAddresses = addresses.map((addr, i) =>
+        i === index ? { ...addr, isEditing: false } : addr,
+      );
+      setAddresses(updatedAddresses);
+      fetchUserData(); // Refresh the addresses list
+    } catch (error) {
+      console.error('Error saving address:', error);
+    }
+  };
+
+  // Cancel editing
+  const handleCancelEdit = (index: number) => {
+    const updatedAddresses = addresses.filter(
+      (_, i) => !(i === index && addresses[index].name === ''),
+    );
+    const addressesWithCancel = updatedAddresses.map((address, i) => ({
+      ...address,
+      isEditing: false,
+    }));
+    setAddresses(addressesWithCancel);
+  };
+
+  // Handle address field change
+  const handleAddressChange = (index: number, field: string, value: string) => {
+    const updatedAddresses = addresses.map((address, i) =>
+      i === index ? { ...address, [field]: value } : address,
+    );
+    setAddresses(updatedAddresses);
   };
 
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={12} sm={6}>
+    <Grid container spacing={3} justifyContent="center">
+      {/* Personal Information */}
+      <Grid item xs={12} md={9}>
         <MainCard title="Personal Information">
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Stack spacing={2.5} alignItems="center" sx={{ m: 3 }}>
                 <FormLabel
-                  htmlFor="change-avtar"
+                  htmlFor="change-avatar"
                   sx={{
                     position: 'relative',
                     borderRadius: '50%',
@@ -117,7 +221,7 @@ export default function TabPersonal() {
                 </FormLabel>
                 <TextField
                   type="file"
-                  id="change-avtar"
+                  id="change-avatar"
                   placeholder="Outlined"
                   variant="outlined"
                   sx={{ display: 'none' }}
@@ -134,7 +238,10 @@ export default function TabPersonal() {
                 </InputLabel>
                 <TextField
                   fullWidth
-                  defaultValue="Anshan"
+                  value={profile.first_name}
+                  onChange={(e) =>
+                    setProfile({ ...profile, first_name: e.target.value })
+                  }
                   id="personal-first-name"
                   placeholder="First Name"
                   autoFocus
@@ -143,175 +250,204 @@ export default function TabPersonal() {
             </Grid>
             <Grid item xs={12} sm={6}>
               <Stack spacing={1}>
-                <InputLabel htmlFor="personal-first-name">Last Name</InputLabel>
+                <InputLabel htmlFor="personal-last-name">Last Name</InputLabel>
                 <TextField
                   fullWidth
-                  defaultValue="Handgun"
-                  id="personal-first-name"
+                  value={profile.last_name}
+                  onChange={(e) =>
+                    setProfile({ ...profile, last_name: e.target.value })
+                  }
+                  id="personal-last-name"
                   placeholder="Last Name"
                 />
               </Stack>
             </Grid>
             <Grid item xs={12} sm={6}>
               <Stack spacing={1}>
-                <InputLabel htmlFor="personal-location">Country</InputLabel>
-                <TextField
+                <InputLabel htmlFor="personal-phone">Phone Number</InputLabel>
+                <PatternFormat
+                  format="+62 ### #### #####"
                   fullWidth
-                  defaultValue="New York"
-                  id="personal-location"
-                  placeholder="Location"
+                  customInput={TextField}
+                  value={profile.phone_number}
+                  onChange={(e) =>
+                    setProfile({ ...profile, phone_number: e.target.value })
+                  }
+                  placeholder="Phone Number"
                 />
               </Stack>
             </Grid>
             <Grid item xs={12} sm={6}>
               <Stack spacing={1}>
-                <InputLabel htmlFor="personal-zipcode">Zipcode</InputLabel>
+                <InputLabel htmlFor="personal-email">Email Address</InputLabel>
                 <TextField
+                  type="email"
                   fullWidth
-                  defaultValue="956754"
-                  id="personal-zipcode"
-                  placeholder="Zipcode"
+                  value={profile.email}
+                  onChange={(e) =>
+                    setProfile({ ...profile, email: e.target.value })
+                  }
+                  id="personal-email"
+                  placeholder="Email Address"
                 />
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Stack spacing={1}>
-                <InputLabel htmlFor="personal-location">Bio</InputLabel>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={3}
-                  defaultValue="Hello, I’m Anshan Handgun Creative Graphic Designer & User Experience Designer based in Website, I create digital Products a more Beautiful and usable place. Morbid accusant ipsum. Nam nec tellus at."
-                  id="personal-location"
-                  placeholder="Location"
-                />
-              </Stack>
-            </Grid>
-            <Grid item xs={12}>
-              <Stack spacing={1}>
-                <InputLabel htmlFor="personal-experience">
-                  Experiance
-                </InputLabel>
-                <Select
-                  fullWidth
-                  id="personal-experience"
-                  value={experience}
-                  onChange={handleChange}
-                  MenuProps={MenuProps}
-                >
-                  <MenuItem value="0">Start Up</MenuItem>
-                  <MenuItem value="0.5">6 Months</MenuItem>
-                  <MenuItem value="1">1 Year</MenuItem>
-                  <MenuItem value="2">2 Years</MenuItem>
-                  <MenuItem value="3">3 Years</MenuItem>
-                  <MenuItem value="4">4 Years</MenuItem>
-                  <MenuItem value="5">5 Years</MenuItem>
-                  <MenuItem value="6">6 Years</MenuItem>
-                  <MenuItem value="10">10+ Years</MenuItem>
-                </Select>
+              <Stack
+                direction="row"
+                justifyContent="flex-end"
+                alignItems="center"
+                spacing={2}
+              >
+                <Button variant="outlined" color="secondary">
+                  Cancel
+                </Button>
+                <Button variant="contained" onClick={handleUpdateProfile}>
+                  Update Profile
+                </Button>
               </Stack>
             </Grid>
           </Grid>
         </MainCard>
       </Grid>
-      <Grid item xs={12} sm={6}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <MainCard title="Contact Information">
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <Stack spacing={1}>
-                    <InputLabel htmlFor="personal-phone">
-                      Phone Number
-                    </InputLabel>
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      spacing={2}
-                    >
-                      <Select defaultValue="1-876">
-                        <MenuItem value="91">+91</MenuItem>
-                        <MenuItem value="1-671">1-671</MenuItem>
-                        <MenuItem value="36">+36</MenuItem>
-                        <MenuItem value="225">(255)</MenuItem>
-                        <MenuItem value="39">+39</MenuItem>
-                        <MenuItem value="1-876">1-876</MenuItem>
-                        <MenuItem value="7">+7</MenuItem>
-                        <MenuItem value="254">(254)</MenuItem>
-                        <MenuItem value="373">(373)</MenuItem>
-                        <MenuItem value="1-664">1-664</MenuItem>
-                        <MenuItem value="95">+95</MenuItem>
-                        <MenuItem value="264">(264)</MenuItem>
-                      </Select>
-                      <PatternFormat
-                        format="+1 (###) ###-####"
-                        mask="_"
-                        fullWidth
-                        customInput={TextField}
-                        placeholder="Phone Number"
-                        defaultValue="8654239581"
-                        onBlur={() => {}}
-                        onChange={() => {}}
-                      />
-                    </Stack>
-                  </Stack>
+
+      {/* Addresses Card */}
+      <Grid item xs={12} md={9}>
+        <MainCard title="Addresses">
+          <List sx={{ py: 0 }}>
+            {addresses.map((address, index) => (
+              <ListItem key={index} divider sx={{ position: 'relative' }}>
+                <Grid container spacing={3}>
+                  {address.isEditing ? (
+                    <>
+                      <Grid item xs={12} md={6}>
+                        <Stack spacing={0.5}>
+                          <TextField
+                            fullWidth
+                            label="Address Name"
+                            value={address.name}
+                            onChange={(e) =>
+                              handleAddressChange(index, 'name', e.target.value)
+                            }
+                          />
+                          <TextField
+                            fullWidth
+                            label="Street Address"
+                            value={address.street_address}
+                            onChange={(e) =>
+                              handleAddressChange(
+                                index,
+                                'street_address',
+                                e.target.value,
+                              )
+                            }
+                          />
+                        </Stack>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Stack spacing={0.5}>
+                          <TextField
+                            fullWidth
+                            label="City"
+                            value={address.city}
+                            onChange={(e) =>
+                              handleAddressChange(index, 'city', e.target.value)
+                            }
+                          />
+                          <TextField
+                            fullWidth
+                            label="Province"
+                            value={address.province}
+                            onChange={(e) =>
+                              handleAddressChange(
+                                index,
+                                'province',
+                                e.target.value,
+                              )
+                            }
+                          />
+                          <TextField
+                            fullWidth
+                            label="Postal Code"
+                            value={address.postal_code}
+                            onChange={(e) =>
+                              handleAddressChange(
+                                index,
+                                'postal_code',
+                                e.target.value,
+                              )
+                            }
+                          />
+                        </Stack>
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'flex-end',
+                          gap: 2,
+                        }}
+                      >
+                        <Button
+                          onClick={() => handleCancelEdit(index)}
+                          variant="outlined"
+                          sx={{ minWidth: 32, padding: '6px' }}
+                        >
+                          <CancelIcon />
+                        </Button>
+                        <Button
+                          onClick={() => handleSaveAddress(index)}
+                          variant="contained"
+                          sx={{ minWidth: 32, padding: '6px' }}
+                        >
+                          <CheckIcon />
+                        </Button>
+                      </Grid>
+                    </>
+                  ) : (
+                    <>
+                      <Grid item xs={12} md={6}>
+                        <Typography>{address.name}</Typography>
+                        <Typography>{address.street_address}</Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography>{address.city}</Typography>
+                        <Typography>{address.province}</Typography>
+                        <Typography>{address.postal_code}</Typography>
+                      </Grid>
+                      <Grid
+                        item
+                        sx={{
+                          position: 'absolute',
+                          top: 10,
+                          right: 10,
+                          zIndex: 1,
+                        }}
+                      >
+                        <Button
+                          onClick={() => handleEditAddress(index)}
+                          variant="outlined"
+                          sx={{ minWidth: 32, padding: '6px' }}
+                        >
+                          <EditIcon />
+                        </Button>
+                      </Grid>
+                    </>
+                  )}
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <Stack spacing={1}>
-                    <InputLabel htmlFor="personal-email">
-                      Email Address
-                    </InputLabel>
-                    <TextField
-                      type="email"
-                      fullWidth
-                      defaultValue="stebin.ben@gmail.com"
-                      id="personal-email"
-                      placeholder="Email Address"
-                    />
-                  </Stack>
-                </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={1}>
-                    <InputLabel htmlFor="personal-email">
-                      Portfolio URL
-                    </InputLabel>
-                    <TextField
-                      fullWidth
-                      defaultValue="https://anshan.dh.url"
-                      id="personal-url"
-                      placeholder="Portfolio URL"
-                    />
-                  </Stack>
-                </Grid>
-                <Grid item xs={12}>
-                  <Stack spacing={1}>
-                    <InputLabel htmlFor="personal-address">Address</InputLabel>
-                    <TextField
-                      fullWidth
-                      defaultValue="Street 110-B Kalians Bag, Dewan, M.P. New York"
-                      id="personal-address"
-                      placeholder="Address"
-                    />
-                  </Stack>
-                </Grid>
-              </Grid>
-            </MainCard>
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12}>
-        <Stack
-          direction="row"
-          justifyContent="flex-end"
-          alignItems="center"
-          spacing={2}
-        >
-          <Button variant="outlined" color="secondary">
-            Cancel
+              </ListItem>
+            ))}
+          </List>
+          <Button
+            onClick={handleAddAddress}
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2 }}
+          >
+            + Add Address
           </Button>
-          <Button variant="contained">Update Profile</Button>
-        </Stack>
+        </MainCard>
       </Grid>
     </Grid>
   );

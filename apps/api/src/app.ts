@@ -7,6 +7,7 @@ import { PORT } from './config';
 import { AuthRouter } from './routers/auth.router';
 import { ErrorMiddleware } from './middlewares/error.middleware';
 import { UserRouter } from './routers/user.router';
+import { UserAddressRouter } from './routers/userAddress.router';
 import './libs/passport';
 import { OrderRouter } from './routers/order.router';
 import cookieParser from 'cookie-parser';
@@ -55,7 +56,12 @@ export default class App {
   }
 
   private routes(): void {
-    const routers = [new AuthRouter(), new UserRouter(), new OrderRouter()];
+    const routers = [
+      new AuthRouter(),
+      new UserRouter(),
+      new UserAddressRouter(),
+      new OrderRouter(),
+    ];
 
     routers.forEach((router) => {
       this.app.use('/api', router.getRouter());

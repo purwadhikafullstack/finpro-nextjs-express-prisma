@@ -23,22 +23,22 @@ model User {
 
   // Relation with UserAddress model
   addresses UserAddress[] // A user can have multiple addresses
-  orders    Order[]       
+  orders    Order[]
 }
 
 model UserAddress {
   user_address_id Int      @id @default(autoincrement())
-  user_id        Int
-  is_primary     Boolean
-  name           String
-  street_address String
-  city           String
-  province       String
-  postal_code    String
-  latitude       Decimal
-  longitude      Decimal
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  user_id         Int
+  is_primary      Boolean
+  name            String
+  street_address  String
+  city            String
+  province        String
+  postal_code     String
+  latitude        Decimal  @db.Decimal(11, 7)
+  longitude       Decimal  @db.Decimal(11, 7)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
   // Relation with User model
   user   User    @relation(fields: [user_id], references: [user_id])
@@ -49,21 +49,21 @@ model UserAddress {
 }
 
 model Order {
-  order_id       Int         @id @default(autoincrement())
-  transaction_id String      @unique
-  customer_id    Int
+  order_id        Int         @id @default(autoincrement())
+  transaction_id  String      @unique
+  customer_id     Int
   user_address_id Int
-  outlet_id      Int
-  driver_id      Int
-  status         String
-  total_weight   Float
-  total_cost     Float
-  created_at     DateTime    @default(now())
-  updated_at     DateTime    @updatedAt
-  OrderItems     OrderItem[]
-  Payments       Payment[]
-  UserAddress    UserAddress @relation(fields: [user_address_id], references: [user_address_id])
-  Customer       User        @relation(fields: [customer_id], references: [user_id])
+  outlet_id       Int
+  driver_id       Int
+  status          String
+  total_weight    Float
+  total_cost      Float
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @updatedAt
+  OrderItems      OrderItem[]
+  Payments        Payment[]
+  UserAddress     UserAddress @relation(fields: [user_address_id], references: [user_address_id])
+  Customer        User        @relation(fields: [customer_id], references: [user_id])
 }
 
 model OrderItem {

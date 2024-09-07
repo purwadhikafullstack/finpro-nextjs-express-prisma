@@ -1,10 +1,10 @@
 export type User = {
-  userId: number;
+  user_id: number;
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: number;
-  profilePicture?: string;
+  avatarFilename?: string;
   isVerified: boolean;
 };
 

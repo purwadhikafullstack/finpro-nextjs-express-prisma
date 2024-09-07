@@ -6,7 +6,7 @@ import passport from 'passport';
 import { generateToken } from '@/utils/tokenUtil';
 
 interface JwtPayload {
-  userId: number;
+  user_id: number;
   email: string;
 }
 
@@ -56,7 +56,7 @@ export class AuthController {
           httpOnly: false,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'strict',
-          maxAge: 60 * 60 * 1000, // 1 jam
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
         })
         .json({
           message: 'Successfully logged in',
@@ -153,13 +153,13 @@ export class AuthController {
   ) => {
     try {
       const { password } = req.body;
-      const { userId } = req.user as JwtPayload;
+      const { user_id } = req.user as JwtPayload;
 
       if (!password) {
         throw new HttpException(400, 'Password is required');
       }
 
-      const updatedUser = await authAction.setPassword(userId, password);
+      const updatedUser = await authAction.setPassword(user_id, password);
 
       res.status(200).json({
         message: 'Password set successfully',
@@ -185,7 +185,7 @@ export class AuthController {
 
       try {
         const accessPayload = {
-          userId: user.user_id,
+          user_id: user.user_id,
           firstName: user.first_name,
           lastName: user.last_name,
           email: user.email,

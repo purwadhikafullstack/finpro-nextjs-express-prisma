@@ -4,7 +4,7 @@ import { User } from '@/types/express';
 import { HttpException } from '@/exceptions/http.exception';
 
 interface JwtPayload {
-  userId: number;
+  user_id: number;
   email: string;
 }
 
@@ -27,7 +27,7 @@ export class AuthMiddleware {
     } catch (error) {
       if (error instanceof TokenExpiredError) {
         return res.status(401).json({
-          message: 'Token expired, please refresh token',
+          message: 'Token expired',
         });
       }
       next(error);
