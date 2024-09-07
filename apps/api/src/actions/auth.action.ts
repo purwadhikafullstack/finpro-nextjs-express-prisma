@@ -6,7 +6,7 @@ import { sendVerificationEmail } from '@/utils/emailUtil';
 import { generateToken } from '@/utils/tokenUtil';
 
 interface JwtPayload {
-  userId: number;
+  user_id: number;
   email: string;
 }
 
@@ -43,11 +43,11 @@ class AuthAction {
 
   activateUserEmail = async (req: any) => {
     try {
-      const { userId } = req.user as JwtPayload;
+      const { user_id } = req.user as JwtPayload;
 
       // checking user apakah udah verified
       const user = await prisma.user.findUnique({
-        where: { user_id: userId },
+        where: { user_id: user_id },
       });
 
       if (!user) {
@@ -60,7 +60,7 @@ class AuthAction {
 
       // Update status kalau blm verified
       const updatedUser = await prisma.user.update({
-        where: { user_id: userId },
+        where: { user_id: user_id },
         data: { is_verified: true },
       });
 
@@ -107,7 +107,7 @@ class AuthAction {
         throw new HttpException(500, 'Incorrect email or password');
 
       const accessPayload = {
-        userId: user.user_id,
+        user_id: user.user_id,
         firstName: user.first_name,
         lastName: user.last_name,
         email: user.email,
@@ -146,7 +146,7 @@ class AuthAction {
       if (!user) throw new HttpException(500, 'Something went wrong');
 
       const accessPayload = {
-        userId: user.user_id,
+        user_id: user.user_id,
         firstName: user.first_name,
         lastName: user.last_name,
         email: user.email,
@@ -195,13 +195,13 @@ class AuthAction {
     }
   };
 
-  setPassword = async (userId: number, password: string) => {
+  setPassword = async (user_id: number, password: string) => {
     try {
       const salt = await genSalt(10);
       const hashedPass = await hash(password, salt);
 
       const updatedUser = await prisma.user.update({
-        where: { user_id: userId },
+        where: { user_id: user_id },
         data: { password: hashedPass },
       });
 

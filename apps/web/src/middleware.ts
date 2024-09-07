@@ -11,7 +11,8 @@ const expiryChecker = async (token: string) => {
   const decoded = await decodeToken(token);
   if (!decoded || !decoded.exp) return true;
 
-  return Date.now() >= decoded.exp * 1000 - 15 * 60 * 1000; // 15 menit
+  return Date.now() >= decoded.exp * 1000 - 2 * 60 * 60 * 1000; // 2 jam
+  // return Date.now() >= decoded.exp * 1000 - 15 * 60 * 1000; // 15 menit
 };
 
 const decodeToken = async (token: string) => {
@@ -28,8 +29,12 @@ export async function middleware(request: NextRequest) {
   const REFRESH_TOKEN = request.cookies.get('refresh-token')?.value || '';
   const response = NextResponse.next();
 
+  // untuk ambil status isVerified si user. nanti dipake untuk amananin jika user belum verified gabisa akses /profile dll
+  const decodedToken = await decodeToken(ACCESS_TOKEN);
+  console.log('Decoded token:', decodedToken.isVerified);
+
   //  Kalau token ga ada, langsung di lempar ke home dan cookies di delete
-  if (!REFRESH_TOKEN || !ACCESS_TOKEN) {
+  if (!ACCESS_TOKEN) {
     response.cookies.delete('access-token');
     response.cookies.delete('refresh-token');
     return NextResponse.redirect(new URL('/', request.url));

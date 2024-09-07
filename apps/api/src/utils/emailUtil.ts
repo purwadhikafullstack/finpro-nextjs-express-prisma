@@ -34,7 +34,7 @@ export const sendEmail = async (
 export const sendVerificationEmail = async (user: any) => {
   try {
     const token = generateToken(
-      { userId: user.user_id, email: user.email },
+      { user_id: user.user_id, email: user.email },
       '30m',
       String(process.env.JWT_SECRET),
     );

@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { validateRegister, validateLogin } from '@/validators/auth.validator';
 import { AuthController } from '@/controllers/auth.controller';
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
-import { uploader } from '@/libs/uploader';
 import passport from 'passport';
 
 export class AuthRouter {

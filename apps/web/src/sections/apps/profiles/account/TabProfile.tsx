@@ -1,6 +1,6 @@
 'use client';
 
-import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
 
 // material-ui
 import { Theme } from '@mui/material/styles';
@@ -23,45 +23,56 @@ import { PatternFormat } from 'react-number-format';
 import MainCard from 'components/MainCard';
 import Avatar from 'components/@extended/Avatar';
 import { capitalize } from 'utils/stringUtils';
+import instance from 'utils/axiosIntance';
+import TabProfileShimmer from 'components/profile/tabProfileShimmer';
 
 // assets
 import { CallCalling, Gps, Sms } from 'iconsax-react';
 
-// data sementara, nanti di fetch
-const addresses = [
-  {
-    name: 'Home',
-    street:
-      'Merdeka Square, Jalan Lapangan Monas, Gambir, Kecamatan Gambir, Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta',
-    city: 'Jakarta',
-    province: 'Jakarta',
-    postalCode: '10001',
-    isPrimary: true,
-  },
-  {
-    name: 'Office',
-    street: 'Sinar Mas Land Plaza BSD City',
-    city: 'Tangerang',
-    province: 'Banten',
-    postalCode: '94105',
-    isPrimary: false,
-  },
-];
+// Interfaces
+import { Address } from 'interfaces/profile/address.interface';
+import { UserProfile } from 'interfaces/profile/userProfile.interface';
 
 // ==============================|| ACCOUNT PROFILE - BASIC ||============================== //
 
 export default function TabProfile() {
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<UserProfile>();
+  const [addresses, setAddresses] = useState<Address[]>([]);
+
   const matchDownMD = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down('md'),
   );
 
-  const { user } = useSelector((state: any) => state.auth);
+  const avatarUrl = `http://localhost:8000/static/avatar/${profile?.avatarFilename}`;
 
-  const avatarUrl = `http://localhost:8000/static/avatar/${user.avatarFilename}`;
-
-  const userStatus = user.isVerified
+  const userStatus = profile?.is_verified
     ? { label: 'VERIFIED', color: 'success' as const }
     : { label: 'UNVERIFIED', color: 'default' as const };
+
+  const fetchUserData = async () => {
+    try {
+      const [profileRes, addressRes] = await Promise.all([
+        instance().get('http://localhost:8000/api/user/profile'),
+        instance().get('http://localhost:8000/api/user/address'),
+      ]);
+
+      setProfile(profileRes.data?.data);
+      setAddresses(addressRes.data?.data || []);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  if (loading) {
+    return <TabProfileShimmer />;
+  }
 
   return (
     <Grid container spacing={3}>
@@ -79,10 +90,15 @@ export default function TabProfile() {
                     />
                   </Stack>
                   <Stack spacing={2.5} alignItems="center">
-                    <Avatar alt="Avatar" size="xl" src={avatarUrl} />
+                    <Avatar
+                      alt="Avatar"
+                      sx={{ width: 76, height: 76 }}
+                      src={avatarUrl}
+                    />
                     <Stack spacing={0.5} alignItems="center">
                       <Typography variant="h5">
-                        {capitalize(user.firstName)} {capitalize(user.lastName)}
+                        {capitalize(profile?.first_name ?? '')}{' '}
+                        {capitalize(profile?.last_name ?? '')}
                       </Typography>
                     </Stack>
                   </Stack>
@@ -102,7 +118,7 @@ export default function TabProfile() {
                         <Sms size={18} />
                       </ListItemIcon>
                       <ListItemSecondaryAction>
-                        <Typography align="right">{user.email}</Typography>
+                        <Typography align="right">{profile?.email}</Typography>
                       </ListItemSecondaryAction>
                     </ListItem>
                     <ListItem>
@@ -110,8 +126,13 @@ export default function TabProfile() {
                         <CallCalling size={18} />
                       </ListItemIcon>
                       <ListItemSecondaryAction>
-                        <Typography align="right">
-                          {user.phoneNumber}
+                        <Typography>
+                          (+62){' '}
+                          <PatternFormat
+                            value={profile?.phone_number}
+                            displayType="text"
+                            format="### #### #####"
+                          />
                         </Typography>
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -140,13 +161,17 @@ export default function TabProfile() {
                     <Grid item xs={12} md={6}>
                       <Stack spacing={0.5}>
                         <Typography color="secondary">First Name</Typography>
-                        <Typography>{capitalize(user.firstName)}</Typography>
+                        <Typography>
+                          {capitalize(profile?.first_name ?? '')}
+                        </Typography>
                       </Stack>
                     </Grid>
                     <Grid item xs={12} md={6}>
                       <Stack spacing={0.5}>
                         <Typography color="secondary">Last Name</Typography>
-                        <Typography>{capitalize(user.lastName)}</Typography>
+                        <Typography>
+                          {capitalize(profile?.last_name ?? '')}
+                        </Typography>
                       </Stack>
                     </Grid>
                   </Grid>
@@ -159,9 +184,8 @@ export default function TabProfile() {
                         <Typography>
                           (+62){' '}
                           <PatternFormat
-                            value={user.phoneNumber}
+                            value={profile?.phone_number}
                             displayType="text"
-                            type="text"
                             format="### #### #####"
                           />
                         </Typography>
@@ -169,36 +193,11 @@ export default function TabProfile() {
                     </Grid>
                     <Grid item xs={12} md={6}>
                       <Stack spacing={0.5}>
-                        <Typography color="secondary">Country</Typography>
-                        <Typography>Indonesia</Typography>
-                      </Stack>
-                    </Grid>
-                  </Grid>
-                </ListItem>
-                <ListItem divider={!matchDownMD}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Stack spacing={0.5}>
                         <Typography color="secondary">Email</Typography>
-                        <Typography>{user.email}</Typography>
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Stack spacing={0.5}>
-                        <Typography color="secondary">Zip Code</Typography>
-                        <Typography>956 754</Typography>
+                        <Typography>{profile?.email}</Typography>
                       </Stack>
                     </Grid>
                   </Grid>
-                </ListItem>
-                <ListItem>
-                  <Stack spacing={0.5}>
-                    <Typography color="secondary">Address</Typography>
-                    <Typography>
-                      Merdeka Square, Jalan Lapangan Monas, Gambir, Kecamatan
-                      Gambir, Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta
-                    </Typography>
-                  </Stack>
                 </ListItem>
               </List>
             </MainCard>
@@ -206,53 +205,70 @@ export default function TabProfile() {
           <Grid item xs={12}>
             <MainCard title="Addresses">
               <List sx={{ py: 0 }}>
-                {addresses.map((address, index) => (
-                  <ListItem key={index} divider sx={{ position: 'relative' }}>
-                    <Grid container spacing={matchDownMD ? 0.5 : 3}>
-                      <Grid item xs={12} md={6}>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <Typography variant="h6" fontWeight="bold">
-                            {address.name}
-                          </Typography>
-                          {address.isPrimary && (
-                            <Box
-                              sx={{
-                                backgroundColor: 'primary.main',
-                                color: 'white',
-                                px: 0.8,
-                                py: 0.3,
-                                borderRadius: '10px',
-                                fontSize: '12px',
-                                display: 'inline-block',
-                              }}
-                            >
-                              MAIN
-                            </Box>
-                          )}
-                        </Stack>
-                        <Typography>{address.street}</Typography>
+                {addresses.map((address, index) => {
+                  const {
+                    name,
+                    street_address,
+                    city,
+                    province,
+                    postal_code,
+                    is_primary,
+                  } = address;
+
+                  return (
+                    <ListItem key={index} divider sx={{ position: 'relative' }}>
+                      <Grid container spacing={matchDownMD ? 0.5 : 3}>
+                        <Grid item xs={12} md={6}>
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
+                          >
+                            <Typography variant="h6" fontWeight="bold">
+                              {name}
+                            </Typography>
+                            {is_primary && (
+                              <Box
+                                sx={{
+                                  backgroundColor: 'primary.main',
+                                  color: 'white',
+                                  px: 0.8,
+                                  py: 0.3,
+                                  borderRadius: '10px',
+                                  fontSize: '12px',
+                                  display: 'inline-block',
+                                }}
+                              >
+                                MAIN
+                              </Box>
+                            )}
+                          </Stack>
+                          <Typography>{street_address}</Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">City</Typography>
+                            <Typography>{city}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">Province</Typography>
+                            <Typography>{province}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">
+                              Postal Code
+                            </Typography>
+                            <Typography>{postal_code}</Typography>
+                          </Stack>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Stack spacing={0.5}>
-                          <Typography color="secondary">City</Typography>
-                          <Typography>{address.city}</Typography>
-                        </Stack>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Stack spacing={0.5}>
-                          <Typography color="secondary">Province</Typography>
-                          <Typography>{address.province}</Typography>
-                        </Stack>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Stack spacing={0.5}>
-                          <Typography color="secondary">Postal Code</Typography>
-                          <Typography>{address.postalCode}</Typography>
-                        </Stack>
-                      </Grid>
-                    </Grid>
-                  </ListItem>
-                ))}
+                    </ListItem>
+                  );
+                })}
               </List>
             </MainCard>
           </Grid>
