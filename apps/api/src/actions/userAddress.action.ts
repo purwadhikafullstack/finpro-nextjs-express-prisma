@@ -217,6 +217,44 @@ class UserAddressAction {
       throw new Error('Failed to fetch coordinates');
     }
   };
+
+  setPrimaryAddress = async (user_id: number, address_id: number) => {
+    try {
+      return await prisma.$transaction(async (transaction) => {
+        // Unset other primary addresses
+        await transaction.userAddress.updateMany({
+          where: {
+            user_id: user_id,
+            is_primary: true,
+          },
+          data: {
+            is_primary: false,
+          },
+        });
+
+        // Set selected address as primary
+        const updatedAddress = await transaction.userAddress.update({
+          where: {
+            user_address_id: address_id,
+            user_id: user_id,
+          },
+          data: {
+            is_primary: true,
+          },
+        });
+
+        if (!updatedAddress) {
+          throw new Error('Address not found or could not be updated');
+        }
+
+        return updatedAddress;
+      });
+    } catch (error) {
+      throw new Error(
+        'Failed to set primary address: ' + (error as Error).message,
+      );
+    }
+  };
 }
 
 export default new UserAddressAction();

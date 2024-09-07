@@ -230,4 +230,35 @@ export class AuthController {
       }
     })(req, res, next);
   };
+
+  changePasswordController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { oldPassword, newPassword } = req.body;
+      const { user_id } = req.user as { user_id: number };
+
+      if (!oldPassword || !newPassword) {
+        throw new HttpException(
+          400,
+          'Old password and new password are required',
+        );
+      }
+
+      const updatedUser = await authAction.changePasswordAction(
+        user_id,
+        oldPassword,
+        newPassword,
+      );
+
+      res.status(200).json({
+        message: 'Password changed successfully',
+        data: updatedUser,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

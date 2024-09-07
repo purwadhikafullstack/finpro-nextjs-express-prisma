@@ -55,6 +55,12 @@ export class AuthRouter {
       this.auth.refreshTokenController,
     );
 
+    this.router.post(
+      `${this.path}/change-password`,
+      this.guard.verifyAccessToken,
+      this.auth.changePasswordController,
+    );
+
     // Google login routes
     this.router.get(
       `${this.path}/google`,
