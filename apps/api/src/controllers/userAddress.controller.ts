@@ -113,4 +113,27 @@ export class UserAddressController {
       next(error);
     }
   };
+
+  setPrimaryAddressController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { user_id } = req.user as User;
+      const { address_id } = req.params;
+
+      const updatedAddress = await userAddressAction.setPrimaryAddress(
+        user_id,
+        Number(address_id),
+      );
+
+      res.status(200).json({
+        message: 'Primary address set successfully',
+        data: updatedAddress,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

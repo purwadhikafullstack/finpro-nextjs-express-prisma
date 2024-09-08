@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, SyntheticEvent } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation'; // Import useSearchParams
 import { useRouter } from 'next/navigation';
 
 // material-ui
@@ -23,9 +23,7 @@ import { Formik } from 'formik';
 // project-imports
 import IconButton from 'components/@extended/IconButton';
 import AnimateButton from 'components/@extended/AnimateButton';
-import { useAppDispatch } from 'libs/hooks';
-import { setPassword } from 'libs/auth/authSlices';
-
+import instance from 'utils/axiosIntance';
 import { openSnackbar } from 'api/snackbar';
 import { strengthColor, strengthIndicator } from 'utils/password-strength';
 
@@ -36,13 +34,12 @@ import { StringColorProps } from 'types/password';
 // assets
 import { Eye, EyeSlash } from 'iconsax-react';
 
-// ============================|| FIREBASE - SET PASSWORD ||============================ //
+// ============================|| SET PASSWORD COMPONENT ||============================ //
 
 export default function AuthSetPassword() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
-  const dispatch = useAppDispatch();
+  const searchParams = useSearchParams(); // Gunakan useSearchParams untuk mendapatkan token dari URL
+  const token = searchParams.get('token'); // Ambil token dari URL
 
   const [level, setLevel] = useState<StringColorProps>();
   const [showPassword, setShowPassword] = useState(false);
@@ -88,32 +85,40 @@ export default function AuthSetPassword() {
             return;
           }
 
-          const result = await setPassword({
-            token,
-            password: values.password,
-          })(dispatch);
-
-          if (result?.error) {
-            setStatus({ success: false });
-            setErrors({ submit: result.error });
-          } else {
-            setStatus({ success: true });
-            setSubmitting(false);
-            openSnackbar({
-              open: true,
-              message: 'Successfully set password.',
-              variant: 'alert',
-              alert: {
-                color: 'success',
+          // Axios call untuk set password dengan menambahkan token dari URL ke dalam header Authorization
+          const response = await instance().post(
+            '/auth/set-password',
+            {
+              password: values.password,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Tambahkan token dari URL ke dalam header Authorization
               },
-            } as SnackbarProps);
-            setTimeout(() => {
-              router.push('/login');
-            }, 1500);
-          }
-        } catch (err: any) {
+            },
+          );
+
+          openSnackbar({
+            open: true,
+            message: 'Successfully set password.',
+            variant: 'alert',
+            alert: {
+              color: 'success',
+            },
+          } as SnackbarProps);
+
+          setTimeout(() => {
+            router.push('/login');
+          }, 1500);
+
+          setStatus({ success: true });
+          setSubmitting(false);
+        } catch (error: any) {
+          console.error('Error during set-password request:', error); // Tambahkan logging di sini
           setStatus({ success: false });
-          setErrors({ submit: err.message });
+          setErrors({
+            submit: error.response?.data?.message || 'An error occurred',
+          });
         } finally {
           setSubmitting(false);
         }

@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 
 // material-ui
@@ -24,7 +22,8 @@ import MainCard from 'components/MainCard';
 import Avatar from 'components/@extended/Avatar';
 import { capitalize } from 'utils/stringUtils';
 import instance from 'utils/axiosIntance';
-import TabProfileShimmer from 'components/profile/tabProfileShimmer';
+import TabProfileShimmer from 'components/profiles/shimmer/tabProfileShimmer';
+import { useAppSelector } from 'libs/hooks';
 
 // assets
 import { CallCalling, Gps, Sms } from 'iconsax-react';
@@ -39,6 +38,7 @@ export default function TabProfile() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile>();
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const { user } = useAppSelector((state: any) => state.auth);
 
   const matchDownMD = useMediaQuery((theme: Theme) =>
     theme.breakpoints.down('md'),
@@ -75,7 +75,13 @@ export default function TabProfile() {
   }
 
   return (
-    <Grid container spacing={3}>
+    <Grid
+      container
+      spacing={3}
+      style={{
+        minHeight: '70vh',
+      }}
+    >
       <Grid item xs={12} sm={5} md={4} xl={3}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -91,7 +97,7 @@ export default function TabProfile() {
                   </Stack>
                   <Stack spacing={2.5} alignItems="center">
                     <Avatar
-                      alt="Avatar"
+                      alt={user.firstName}
                       sx={{ width: 76, height: 76 }}
                       src={avatarUrl}
                     />
@@ -205,70 +211,82 @@ export default function TabProfile() {
           <Grid item xs={12}>
             <MainCard title="Addresses">
               <List sx={{ py: 0 }}>
-                {addresses.map((address, index) => {
-                  const {
-                    name,
-                    street_address,
-                    city,
-                    province,
-                    postal_code,
-                    is_primary,
-                  } = address;
+                {addresses.length === 0 ? ( // Empty state condition
+                  <Typography variant="body1" align="center">
+                    You have no saved addresses.
+                  </Typography>
+                ) : (
+                  addresses.map((address, index) => {
+                    const {
+                      name,
+                      street_address,
+                      city,
+                      province,
+                      postal_code,
+                      is_primary,
+                    } = address;
 
-                  return (
-                    <ListItem key={index} divider sx={{ position: 'relative' }}>
-                      <Grid container spacing={matchDownMD ? 0.5 : 3}>
-                        <Grid item xs={12} md={6}>
-                          <Stack
-                            direction="row"
-                            spacing={1}
-                            alignItems="center"
-                          >
-                            <Typography variant="h6" fontWeight="bold">
-                              {name}
-                            </Typography>
-                            {is_primary && (
-                              <Box
-                                sx={{
-                                  backgroundColor: 'primary.main',
-                                  color: 'white',
-                                  px: 0.8,
-                                  py: 0.3,
-                                  borderRadius: '10px',
-                                  fontSize: '12px',
-                                  display: 'inline-block',
-                                }}
-                              >
-                                MAIN
-                              </Box>
-                            )}
-                          </Stack>
-                          <Typography>{street_address}</Typography>
+                    return (
+                      <ListItem
+                        key={index}
+                        divider
+                        sx={{ position: 'relative' }}
+                      >
+                        <Grid container spacing={matchDownMD ? 0.5 : 3}>
+                          <Grid item xs={12} md={6}>
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              alignItems="center"
+                            >
+                              <Typography variant="h6" fontWeight="bold">
+                                {name}
+                              </Typography>
+                              {is_primary && (
+                                <Box
+                                  sx={{
+                                    backgroundColor: 'primary.main',
+                                    color: 'white',
+                                    px: 0.8,
+                                    py: 0.3,
+                                    borderRadius: '10px',
+                                    fontSize: '12px',
+                                    display: 'inline-block',
+                                  }}
+                                >
+                                  MAIN
+                                </Box>
+                              )}
+                            </Stack>
+                            <Typography>{street_address}</Typography>
+                          </Grid>
+                          <Grid item xs={12} md={6}>
+                            <Stack spacing={0.5}>
+                              <Typography color="secondary">City</Typography>
+                              <Typography>{city}</Typography>
+                            </Stack>
+                          </Grid>
+                          <Grid item xs={12} md={6}>
+                            <Stack spacing={0.5}>
+                              <Typography color="secondary">
+                                Province
+                              </Typography>
+                              <Typography>{province}</Typography>
+                            </Stack>
+                          </Grid>
+                          <Grid item xs={12} md={6}>
+                            <Stack spacing={0.5}>
+                              <Typography color="secondary">
+                                Postal Code
+                              </Typography>
+                              <Typography>{postal_code}</Typography>
+                            </Stack>
+                          </Grid>
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">City</Typography>
-                            <Typography>{city}</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">Province</Typography>
-                            <Typography>{province}</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">
-                              Postal Code
-                            </Typography>
-                            <Typography>{postal_code}</Typography>
-                          </Stack>
-                        </Grid>
-                      </Grid>
-                    </ListItem>
-                  );
-                })}
+                      </ListItem>
+                    );
+                  })
+                )}
               </List>
             </MainCard>
           </Grid>

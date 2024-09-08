@@ -213,6 +213,49 @@ class AuthAction {
       );
     }
   };
+
+  changePasswordAction = async (
+    user_id: number,
+    oldPassword: string,
+    newPassword: string,
+  ) => {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { user_id },
+      });
+
+      if (!user) {
+        throw new HttpException(404, 'User not found');
+      }
+
+      // Verifikasi apakah oldPassword cocok dengan password yang tersimpan
+      if (!user.password) {
+        throw new HttpException(400, 'Password is missing or invalid');
+      }
+
+      const isOldPasswordValid = await compare(oldPassword, user.password);
+      if (!isOldPasswordValid) {
+        throw new HttpException(400, 'Old password is incorrect');
+      }
+
+      // Hashing newPassword
+      const salt = await genSalt(10);
+      const hashedNewPassword = await hash(newPassword, salt);
+
+      // Update password user
+      const updatedUser = await prisma.user.update({
+        where: { user_id },
+        data: { password: hashedNewPassword },
+      });
+
+      return updatedUser;
+    } catch (error) {
+      throw new HttpException(
+        500,
+        `Error changing password: ${(error as Error).message}`,
+      );
+    }
+  };
 }
 
 export default new AuthAction();

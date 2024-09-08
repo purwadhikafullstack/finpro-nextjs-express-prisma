@@ -44,6 +44,13 @@ export class UserAddressRouter {
       this.guard.verifyAccessToken,
       this.UserAddressController.deleteAddressController,
     );
+
+    // Route untuk set primary address
+    this.router.patch(
+      `${this.path}/address/:address_id/set-primary`,
+      this.guard.verifyAccessToken,
+      this.UserAddressController.setPrimaryAddressController,
+    );
   }
 
   getRouter(): Router {

@@ -10,7 +10,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
 // assets
-import { Map, Location, Edit2, Logout, Profile } from 'iconsax-react';
+import { Location, Edit2, Logout, Profile, Lock } from 'iconsax-react';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
@@ -37,10 +37,10 @@ export default function ProfileTab({ handleLogout }: Props) {
 
   useEffect(() => {
     const pathToIndex: { [key: string]: number } = {
-      '/apps/profiles/user/personal': 0,
-      '/profile/account/personal': 1,
-      '/profile/account/basic': 2,
-      '/apps/invoice/details/1': 3,
+      '/#': 0,
+      '/profile/account/basic': 1,
+      '/profile/account/personal': 2,
+      '/profile/account/password': 3,
     };
 
     setSelectedIndex(pathToIndex[pathname] ?? undefined);
@@ -66,19 +66,7 @@ export default function ProfileTab({ handleLogout }: Props) {
       <ListItemButton
         selected={selectedIndex === 1}
         onClick={(event: MouseEvent<HTMLDivElement>) =>
-          handleListItemClick(event, 1, '/profile/account/personal')
-        }
-      >
-        <ListItemIcon>
-          <Edit2 variant="Bulk" size={18} />
-        </ListItemIcon>
-        <ListItemText primary="Edit Profile" />
-      </ListItemButton>
-
-      <ListItemButton
-        selected={selectedIndex === 2}
-        onClick={(event: MouseEvent<HTMLDivElement>) =>
-          handleListItemClick(event, 2, '/profile/account/basic')
+          handleListItemClick(event, 1, '/profile/account/basic')
         }
       >
         <ListItemIcon>
@@ -88,15 +76,27 @@ export default function ProfileTab({ handleLogout }: Props) {
       </ListItemButton>
 
       <ListItemButton
-        selected={selectedIndex === 3}
+        selected={selectedIndex === 2}
         onClick={(event: MouseEvent<HTMLDivElement>) =>
-          handleListItemClick(event, 3, '/#')
+          handleListItemClick(event, 2, '/profile/account/personal')
         }
       >
         <ListItemIcon>
-          <Map variant="Bulk" size={18} />
+          <Edit2 variant="Bulk" size={18} />
         </ListItemIcon>
-        <ListItemText primary="Addresses" />
+        <ListItemText primary="Edit Profile" />
+      </ListItemButton>
+
+      <ListItemButton
+        selected={selectedIndex === 3}
+        onClick={(event: MouseEvent<HTMLDivElement>) =>
+          handleListItemClick(event, 3, '/profile/account/password')
+        }
+      >
+        <ListItemIcon>
+          <Lock variant="Bulk" size={18} />
+        </ListItemIcon>
+        <ListItemText primary="Change Password" />
       </ListItemButton>
 
       <ListItemButton selected={selectedIndex === 4} onClick={handleLogout}>
