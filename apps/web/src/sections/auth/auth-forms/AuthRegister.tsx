@@ -184,7 +184,7 @@ export default function AuthRegister({ providers, csrfToken }: any) {
                     name="email"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    placeholder="081234567890"
+                    placeholder="john@yourmail.com"
                     inputProps={{}}
                   />
                 </Stack>

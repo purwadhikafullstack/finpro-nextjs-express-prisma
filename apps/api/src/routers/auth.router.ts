@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import { validateRegister, validateLogin } from '@/validators/auth.validator';
+import {
+  validateRegister,
+  validateLogin,
+  validateAgentRegister,
+  validateAgentLogin,
+} from '@/validators/auth.validator';
 import { AuthController } from '@/controllers/auth.controller';
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
 import passport from 'passport';
@@ -70,6 +75,22 @@ export class AuthRouter {
     this.router.get(
       `${this.path}/google/callback`,
       this.auth.googleCallbackController,
+    );
+
+    // ======================================== NON-USER ROUTER ========================================
+
+    this.router.post(
+      `${this.path}/register-agent`,
+      this.guard.verifyAgentAccessToken,
+      this.guard.authorizeRoles(['admin', 'super-admin']),
+      validateAgentRegister,
+      this.auth.createAgentController,
+    );
+
+    this.router.post(
+      `${this.path}/login-agent`,
+      validateAgentLogin,
+      this.auth.loginAgentController,
     );
   }
 

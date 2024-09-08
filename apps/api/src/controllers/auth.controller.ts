@@ -4,6 +4,7 @@ import { HttpException } from '@/exceptions/http.exception';
 import { sendVerificationEmail } from '@/utils/emailUtil';
 import passport from 'passport';
 import { generateToken } from '@/utils/tokenUtil';
+import { WorkerType } from '@/types/workerType.enum';
 
 interface JwtPayload {
   user_id: number;
@@ -257,6 +258,76 @@ export class AuthController {
         message: 'Password changed successfully',
         data: updatedUser,
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // ======================================== NON-USER CONTROLLER ========================================
+
+  // Membuat agent baru (worker, admin, driver)
+  createAgentController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const {
+        username,
+        password,
+        first_name,
+        last_name,
+        phone_number,
+        role_id,
+        outlet_id,
+        worker_type,
+      } = req.body;
+
+      // Validasi worker_type
+      if (worker_type && !Object.values(WorkerType).includes(worker_type)) {
+        throw new Error('Invalid worker type');
+      }
+
+      const agent = await authAction.createAgent({
+        username,
+        password,
+        first_name,
+        last_name,
+        phone_number,
+        role_id,
+        outlet_id,
+        worker_type,
+      });
+
+      res.status(201).json({
+        message: `Successfully created new ${agent.role.name}`,
+        data: agent,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // Controller untuk login agent
+  loginAgentController = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { username, password } = req.body;
+
+      const result = await authAction.loginAgent(username, password);
+
+      res
+        .status(200)
+        .cookie('access-token', result?.accessToken, {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 1000, // 1 jam
+        })
+        .json(result);
     } catch (error) {
       next(error);
     }
