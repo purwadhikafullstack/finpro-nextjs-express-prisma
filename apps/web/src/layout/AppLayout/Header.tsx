@@ -37,7 +37,43 @@ export default function Header() {
 
   const [drawerToggle, setDrawerToggle] = useState<boolean>(false);
 
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+    null,
+  );
+  const [locationError, setLocationError] = useState<string | null>(null);
+
   const avatarUrl = `http://localhost:8000/static/avatar/${user.avatarFilename}`;
+
+  // Request location when the component is mounted
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setLocation({ lat: latitude, lng: longitude });
+          setLocationError(null);
+        },
+        (error) => {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              setLocationError('User denied the request for Geolocation.');
+              break;
+            case error.POSITION_UNAVAILABLE:
+              setLocationError('Location information is unavailable.');
+              break;
+            case error.TIMEOUT:
+              setLocationError('The request to get user location timed out.');
+              break;
+            default:
+              setLocationError('An unknown error occurred.');
+              break;
+          }
+        },
+      );
+    } else {
+      setLocationError('Geolocation is not supported by this browser.');
+    }
+  }, []);
 
   useEffect(() => {
     const accessToken = getCookie('access-token') as string;

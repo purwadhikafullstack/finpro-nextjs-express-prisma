@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
 
   // untuk ambil status isVerified si user. nanti dipake untuk amananin jika user belum verified gabisa akses /profile dll
   const decodedToken = await decodeToken(ACCESS_TOKEN);
-  console.log('Decoded token:', decodedToken.isVerified);
+  console.log('Decoded token:', decodedToken.is_verified);
 
   //  Kalau token ga ada, langsung di lempar ke home dan cookies di delete
   if (!ACCESS_TOKEN) {
