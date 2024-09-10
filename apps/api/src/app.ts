@@ -2,6 +2,7 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 
 import ApiError from '@/utils/api.error';
 import { PORT } from '@/config';
+import PassportConfig from './libs/passport';
 import { ValidationError } from 'yup';
 import cookie from 'cookie-parser';
 import cors from 'cors';
@@ -9,9 +10,12 @@ import v1Router from '@/routers/v1/index.routes';
 
 export default class App {
   private app: Express;
+  private passport: PassportConfig;
 
   constructor() {
     this.app = express();
+    this.passport = new PassportConfig();
+
     this.configure();
     this.routes();
     this.handleError();
@@ -20,14 +24,15 @@ export default class App {
   private configure(): void {
     this.app.use(
       cors({
+        credentials: true,
         origin: 'http://localhost:3000',
         allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true,
       })
     );
     this.app.use(cookie());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.passport.initialize();
   }
 
   private routes(): void {

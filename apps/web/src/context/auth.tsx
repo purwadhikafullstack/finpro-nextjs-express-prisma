@@ -14,6 +14,7 @@ interface AuthContextProps {
   signup: (data: { email: string; fullname: string; phone: string }) => Promise<void>;
   authenticate: (data: { password: string; token: string }) => Promise<void>;
   update: (data: { fullname: string; phone: string }) => Promise<void>;
+  google: () => Promise<void>;
   signout: () => Promise<void>;
 }
 
@@ -24,6 +25,7 @@ const AuthContext = React.createContext<AuthContextProps>({
   signup: async () => {},
   authenticate: async () => {},
   update: async () => {},
+  google: async () => {},
   signout: async () => {},
 });
 
@@ -88,8 +90,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
+  const google = async () => {
+    await axios.get('/auth/google');
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, signin, signup, authenticate, update, signout }}>
+    <AuthContext.Provider value={{ user, token, signin, signup, authenticate, update, google, signout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,8 +1,7 @@
 import * as React from 'react';
 
-import GoogleButton from '@/components/google-button';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import RegisterForm from './_components/form';
 
 interface PageProps {
   //
@@ -17,9 +16,19 @@ export default async function Page({ ...props }: PageProps): Promise<React.JSX.E
       </div>
 
       <div className='grid gap-4'>
-        <RegisterForm />
+        <p className='text-center'>
+          Please check your email to verify your account. If you did not receive an email, please check your spam
+          folder, or contact us at{' '}
+          <Link href='mailto:support@example.com'>
+            <Button variant='link' className='w-full'>
+              support@example.com
+            </Button>
+          </Link>
+        </p>
 
-        <GoogleButton />
+        <Link href='/auth/login'>
+          <Button className='w-full'>Resend Verification Email</Button>
+        </Link>
       </div>
 
       <div className='mt-4 text-center text-sm'>

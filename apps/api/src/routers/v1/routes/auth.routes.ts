@@ -1,6 +1,8 @@
 import AuthController from '@/controllers/auth.controller';
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
 import { Router } from 'express';
+import { options } from '@/libs/passport';
+import passport from 'passport';
 
 export default class AuthRouter {
   private router: Router;
@@ -21,6 +23,8 @@ export default class AuthRouter {
     this.router.post('/set-password', this.authMiddleware.body, this.authController.setPassword);
     this.router.post('/logout', this.authController.logout);
     this.router.post('/refresh', this.authMiddleware.cookie, this.authController.refresh);
+    this.router.get('/google', passport.authenticate('google', options));
+    this.router.get('/google/callback', passport.authenticate('google', options), this.authController.callback);
   }
 
   getRouter(): Router {

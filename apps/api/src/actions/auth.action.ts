@@ -2,6 +2,7 @@ import { comparePasswords, generateAccessToken, generateHash, generateRefreshTok
 
 import ApiError from '@/utils/api.error';
 import EmailAction from '@/actions/email.action';
+import { User } from '@prisma/client';
 import prisma from '@/libs/prisma';
 
 export default class AuthAction {
@@ -93,17 +94,13 @@ export default class AuthAction {
 
       const hashed = await generateHash(password);
       await prisma.user.update({
-        where: { user_id: user.user_id },
+        where: { user_id: user_id },
         data: { password: hashed },
       });
 
       await prisma.customer.create({
         data: {
-          User: {
-            connect: {
-              user_id: user.user_id,
-            },
-          },
+          user_id,
         },
       });
 
@@ -134,6 +131,27 @@ export default class AuthAction {
 
       if (!user) throw new ApiError(404, 'User not found');
 
+      const access_token = generateAccessToken({
+        user_id: user.user_id,
+        fullname: user.fullname,
+        email: user.email,
+        avatar_url: user.avatar_url,
+        role: user.role,
+      });
+
+      const refresh_token = generateRefreshToken({
+        user_id: user.user_id,
+        email: user.email,
+      });
+
+      return { access_token, refresh_token };
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  google = async (user: User) => {
+    try {
       const access_token = generateAccessToken({
         user_id: user.user_id,
         fullname: user.fullname,

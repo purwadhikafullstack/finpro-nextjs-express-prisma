@@ -3,13 +3,15 @@
 import * as React from 'react';
 
 import { Location } from '@/types/location';
+import { useToast } from '@/hooks/use-toast';
 
 export const useLocation = () => {
+  const { toast } = useToast();
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<GeolocationPositionError | null>(null);
   const [state, setState] = React.useState<Location>({
-    latitude: 0,
-    longitude: 0,
+    latitude: -6.1741855,
+    longitude: 106.8283778,
   });
 
   React.useEffect(() => {
@@ -23,7 +25,11 @@ export const useLocation = () => {
       },
       (error) => {
         setError(error);
-        console.log(error);
+        toast({
+          variant: 'destructive',
+          title: 'Location failed',
+          description: error.message,
+        });
       }
     );
 
@@ -37,14 +43,18 @@ export const useLocation = () => {
       },
       (error) => {
         setError(error);
-        console.log(error);
+        toast({
+          variant: 'destructive',
+          title: 'Location failed',
+          description: error.message,
+        });
       }
     );
 
     return () => {
       navigator.geolocation.clearWatch(id);
     };
-  }, []);
+  }, [toast]);
 
   return { state, error, isLoading: loading };
 };

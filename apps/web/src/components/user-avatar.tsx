@@ -1,5 +1,6 @@
 'use client';
 
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Check, CheckCircle, CircleUser } from 'lucide-react';
 import {
   DropdownMenu,
@@ -47,11 +48,12 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='secondary' size='icon' className='rounded-full'>
-          <CircleUser className='size-5' />
-          <span className='sr-only'>Toggle user menu</span>
-        </Button>
+        <Avatar className='cursor-pointer border'>
+          <AvatarImage src={user.avatar_url || '/avatar/default.png'} />
+          <AvatarFallback>{user.fullname.charAt(0)}</AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent align='end' className='w-56'>
         <div className='flex items-center space-x-1 py-2'>
           <DropdownMenuLabel>{user.fullname}</DropdownMenuLabel>

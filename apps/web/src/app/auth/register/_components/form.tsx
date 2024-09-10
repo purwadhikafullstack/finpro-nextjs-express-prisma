@@ -44,7 +44,7 @@ const RegisterForm: React.FC<LoginFormProps> = ({ ...props }) => {
         title: 'Register successful',
         description: 'Please check your email to verify your account',
       });
-      router.push('/auth/login');
+      router.push('/auth/verify');
     } catch (error: any) {
       toast({
         variant: 'destructive',

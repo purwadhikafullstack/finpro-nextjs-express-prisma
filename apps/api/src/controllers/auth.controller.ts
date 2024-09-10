@@ -3,9 +3,11 @@ import * as yup from 'yup';
 import { EmailTokenPayload, RefreshTokenPayload } from '@/type/jwt';
 import { NextFunction, Request, Response } from 'express';
 
+import ApiError from '@/utils/api.error';
 import ApiResponse from '@/utils/api.response';
 import AuthAction from '@/actions/auth.action';
 import { FRONTEND_URL } from '@/config';
+import { User } from '@prisma/client';
 
 export default class AuthController {
   private authAction: AuthAction;
@@ -144,6 +146,27 @@ export default class AuthController {
           access_token,
         })
       );
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  callback = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = req.user as User;
+      if (!user) throw new ApiError(400, 'Invalid username or password');
+      if (!user.is_verified) return res.redirect(`${FRONTEND_URL}/auth/verify`);
+
+      const { refresh_token } = await this.authAction.google(user);
+
+      res.cookie('refresh_token', refresh_token, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 7,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+      });
+
+      return res.redirect(FRONTEND_URL);
     } catch (error) {
       next(error);
     }

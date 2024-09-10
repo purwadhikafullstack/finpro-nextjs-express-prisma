@@ -6,12 +6,6 @@ import ApiError from '@/utils/api.error';
 import { JWT_SECRET } from '@/config';
 import { verify } from 'jsonwebtoken';
 
-interface AgentPayload {
-  agent_id: number;
-  username: string;
-  role: string;
-}
-
 export class AuthMiddleware {
   header = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -34,6 +28,7 @@ export class AuthMiddleware {
       const { refresh_token } = req.cookies;
 
       const token = refresh_token as string;
+      console.log(token);
       verify(token, JWT_SECRET, (error, decoded) => {
         if (error) throw new ApiError(401, error.message);
         req.user = decoded;
