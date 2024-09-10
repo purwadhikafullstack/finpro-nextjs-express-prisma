@@ -216,8 +216,8 @@ const OutletTable = () => {
     router.push(`${pathname}?${out}`);
   }, [router, pathname, pagination, sorting, filter]);
 
-  if (error || !data) return <div>failed to load</div>;
   if (isLoading) return <div>loading...</div>;
+  if (error || !data) return <div>Failed to load data, retrying...</div>;
 
   return (
     <DataTable
