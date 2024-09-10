@@ -219,6 +219,7 @@ const OutletTable = () => {
   if (isLoading) return <div>loading...</div>;
   if (error || !data) return <div>failed to load outlet data, retrying...</div>;
 
+
   return (
     <DataTable
       columns={columns}

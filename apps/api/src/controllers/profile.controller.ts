@@ -3,10 +3,8 @@ import * as yup from 'yup';
 import { NextFunction, Request, Response } from 'express';
 
 import { AccessTokenPayload } from '@/type/jwt';
-import ApiError from '@/utils/api.error';
 import ApiResponse from '@/utils/api.response';
 import ProfileAction from '@/actions/profile.action';
-import prisma from '@/libs/prisma';
 
 export default class ProfileController {
   private profileAction: ProfileAction;
