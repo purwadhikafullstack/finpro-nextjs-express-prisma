@@ -42,20 +42,6 @@ export default class AuthAction {
     }
   };
 
-  profile = async (user_id: string) => {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { user_id },
-      });
-
-      if (!user) throw new ApiError(404, 'User not found');
-
-      return user;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   register = async (email: string, fullname: string, phone: string) => {
     try {
       const user = await prisma.user.findUnique({
