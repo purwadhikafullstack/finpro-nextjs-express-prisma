@@ -1,16 +1,11 @@
-import express, { json, urlencoded, Express } from 'express';
+import express, { Express, NextFunction, Request, Response } from 'express';
+
+import ApiError from '@/utils/api.error';
+import { PORT } from '@/config';
+import { ValidationError } from 'yup';
+import cookie from 'cookie-parser';
 import cors from 'cors';
-import session from 'express-session';
-import passport, { initialize } from 'passport';
-import path from 'path';
-import { PORT } from './config';
-import { AuthRouter } from './routers/auth.router';
-import { ErrorMiddleware } from './middlewares/error.middleware';
-import { UserRouter } from './routers/user.router';
-import { UserAddressRouter } from './routers/userAddress.router';
-import './libs/passport';
-import { OrderRouter } from './routers/order.router';
-import cookieParser from 'cookie-parser';
+import v1Router from '@/routers/v1/index.routes';
 
 export default class App {
   private app: Express;
@@ -25,46 +20,42 @@ export default class App {
   private configure(): void {
     this.app.use(
       cors({
-        origin: String(process.env.FE_BASE_URL),
+        origin: 'http://localhost:3000',
+        allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
-      }),
+      })
     );
-    this.app.use(json());
-    this.app.use(urlencoded({ extended: true }));
-
-    this.app.use(cookieParser());
-
-    // Setup session middleware
-    this.app.use(
-      session({
-        secret: String(process.env.API_KEY),
-        resave: false,
-        saveUninitialized: true,
-      }),
-    );
-
-    // Initialize passport
-    this.app.use(passport.initialize());
-    this.app.use(passport.session());
-
-    // Tambahan middleware untuk menyajikan file statis
-    this.app.use('/static', express.static(path.join(__dirname, '../public')));
-  }
-
-  private handleError(): void {
-    this.app.use(ErrorMiddleware);
+    this.app.use(cookie());
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
   }
 
   private routes(): void {
-    const routers = [
-      new AuthRouter(),
-      new UserRouter(),
-      new UserAddressRouter(),
-      new OrderRouter(),
-    ];
+    const v1 = new v1Router();
 
-    routers.forEach((router) => {
-      this.app.use('/api', router.getRouter());
+    this.app.get('/_debug/healthcheck', (req: Request, res: Response) => {
+      res.send('OK');
+    });
+
+    this.app.use('/api/v1', v1.getRouter());
+  }
+
+  private handleError(): void {
+    this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+      if (err instanceof ApiError) {
+        return res.status(err.status).json({
+          message: err.message,
+        });
+      }
+
+      if (err instanceof ValidationError) {
+        return res.status(400).json({
+          ...err,
+        });
+      }
+
+      console.error('Error : ', err.stack);
+      res.status(500).send('Error !');
     });
   }
 

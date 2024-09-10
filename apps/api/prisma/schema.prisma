@@ -1,95 +1,308 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  Driver
+  Customer
+  SuperAdmin
+  OutletAdmin
+  WashingWorker
+  IroningWorker
+  PackingWorker
 }
 
 model User {
-  user_id        Int      @id @default(autoincrement())
-  first_name     String?
-  last_name      String?
-  email          String   @unique
-  password       String?
-  googleId       String?  @unique
-  phone_number   String?
-  avatarFilename String?  @default("avatarempty.jpg")
-  is_verified    Boolean  @default(false)
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  user_id     String   @id @default(cuid())
+  fullname    String
+  email       String   @unique
+  phone       String
+  role        Role     @default(Customer)
+  password    String?
+  google_id   String?
+  avatar_url  String?
+  is_verified Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
-  // Relation with UserAddress model
-  addresses UserAddress[] // A user can have multiple addresses
-  orders    Order[]
+  Customer Customer?
+  Employee Employee?
+  Order    Order[]
+  Ticket   Ticket[]
+
+  @@map("users")
 }
 
-model UserAddress {
-  user_address_id Int      @id @default(autoincrement())
-  user_id         Int
-  is_primary      Boolean
-  name            String
-  street_address  String
-  city            String
-  province        String
-  postal_code     String
-  latitude        Decimal  @db.Decimal(11, 7)
-  longitude       Decimal  @db.Decimal(11, 7)
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+model Customer {
+  customer_id String @id @default(cuid())
+  user_id     String @unique
 
-  // Relation with User model
-  user   User    @relation(fields: [user_id], references: [user_id])
-  // Relation with Order model (One UserAddress can have multiple Orders)
-  orders Order[]
+  User           User             @relation(fields: [user_id], references: [user_id])
+  CustomerAdress CustomerAdress[]
 
-  @@index([user_id])
+  @@map("customers")
+}
+
+model CustomerAdress {
+  customer_address_id String   @id @default(cuid())
+  customer_id         String
+  is_primary          Boolean  @default(false)
+  name                String   @default("Home")
+  address             String
+  formatted           String?
+  road                String?
+  city                String?
+  city_district       String?
+  region              String?
+  suburb              String?
+  zipcode             String?
+  latitude            Decimal  @db.Decimal(11, 7)
+  longitude           Decimal  @db.Decimal(11, 7)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  Customer Customer @relation(fields: [customer_id], references: [customer_id])
+
+  @@map("customer_addresses")
+}
+
+model Outlet {
+  outlet_id     String   @id @default(cuid())
+  name          String
+  description   String
+  address       String
+  formatted     String?
+  road          String?
+  city          String?
+  city_district String?
+  region        String?
+  suburb        String?
+  zipcode       String?
+  latitude      Decimal  @db.Decimal(11, 7)
+  longitude     Decimal  @db.Decimal(11, 7)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  Employee      Employee[]
+  Delivery      Delivery[]
+  Order         Order[]
+  Job           Job[]
+  Resolution    Resolution[]
+  RequestAccess RequestAccess[]
+
+  @@map("outlets")
+}
+
+model Shift {
+  shift_id   String   @id @default(cuid())
+  start      Int
+  end        Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  Employee Employee[]
+
+  @@map("shifts")
+}
+
+model Employee {
+  employee_id String   @id @default(cuid())
+  user_id     String   @unique
+  outlet_id   String?
+  shift_id    String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  User          User            @relation(fields: [user_id], references: [user_id])
+  Outlet        Outlet?         @relation(fields: [outlet_id], references: [outlet_id])
+  Shift         Shift?          @relation(fields: [shift_id], references: [shift_id])
+  Resolution    Resolution[]
+  RequestAccess RequestAccess[]
+
+  @@map("employees")
 }
 
 model Order {
-  order_id        Int         @id @default(autoincrement())
-  transaction_id  String      @unique
-  customer_id     Int
-  user_address_id Int
-  outlet_id       Int
-  driver_id       Int
-  status          String
-  total_weight    Float
-  total_cost      Float
-  created_at      DateTime    @default(now())
-  updated_at      DateTime    @updatedAt
-  OrderItems      OrderItem[]
-  Payments        Payment[]
-  UserAddress     UserAddress @relation(fields: [user_address_id], references: [user_address_id])
-  Customer        User        @relation(fields: [customer_id], references: [user_id])
-  Driver          Agent       @relation(fields: [driver_id], references: [agent_id], name: "DriverRelation")
-  Outlet          Outlet      @relation(fields: [outlet_id], references: [outlet_id])
+  order_id   String   @id @default(cuid())
+  outlet_id  String
+  user_id    String
+  price      Decimal  @db.Decimal(8, 2)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  User          User            @relation(fields: [user_id], references: [user_id])
+  Outlet        Outlet          @relation(fields: [outlet_id], references: [outlet_id])
+  OrderItem     OrderItem[]
+  OrderProgress OrderProgress[]
+  Payment       Payment[]
+  Ticket        Ticket[]
+  Delivery      Delivery[]
+  Job           Job[]
+
+  @@map("orders")
 }
 
-model OrderItem {
-  order_item_id Int       @id @default(autoincrement())
-  order_id      Int
-  item_id       Int
-  quantity      Int
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
-  Order         Order     @relation(fields: [order_id], references: [order_id])
-  WorkLogs      WorkLog[]
+enum PaymentStatus {
+  Pending
+  Paid
+  Cancelled
+  Refunded
 }
 
 model Payment {
-  payment_id     Int      @id @default(autoincrement())
-  invoice_id     String   @unique
-  order_id       Int
-  payment_method String
-  payment_status String
-  amount         Float
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  payment_id String        @id @default(cuid())
+  order_id   String
+  method     String
+  amount     Decimal       @db.Decimal(8, 2)
+  status     PaymentStatus @default(Pending)
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
 
   Order Order @relation(fields: [order_id], references: [order_id])
+
+  @@map("payments")
+}
+
+model LaundryItem {
+  laundry_item_id String   @id @default(cuid())
+  name            String
+  icon_url        String
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  OrderItem OrderItem[]
+
+  @@map("laundry_items")
+}
+
+model OrderItem {
+  order_item_id   String  @id @default(cuid())
+  order_id        String
+  laundry_item_id String
+  quantity        Int
+  weight          Decimal @db.Decimal(8, 2)
+
+  Order       Order       @relation(fields: [order_id], references: [order_id])
+  LaundryItem LaundryItem @relation(fields: [laundry_item_id], references: [laundry_item_id])
+
+  @@map("order_items")
+}
+
+model OrderProgress {
+  order_progrses_id String   @id @default(cuid())
+  order_id          String
+  name              String
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  Order Order @relation(fields: [order_id], references: [order_id])
+
+  @@map("order_progresses")
+}
+
+enum ProgressType {
+  Pending
+  Ongoing
+  Completed
+}
+
+enum DeliveryType {
+  Pickup
+  Dropoff
+}
+
+model Delivery {
+  delivery_id String       @id @default(cuid())
+  order_id    String
+  outlet_id   String
+  progress    ProgressType @default(Pending)
+  type        DeliveryType
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+
+  Outlet Outlet @relation(fields: [outlet_id], references: [outlet_id])
+  Order  Order  @relation(fields: [order_id], references: [order_id])
+
+  @@map("deliveries")
+}
+
+enum JobType {
+  Washing
+  Ironing
+  Packing
+}
+
+model Job {
+  job_id     String       @id @default(cuid())
+  outlet_id  String
+  order_id   String
+  progress   ProgressType @default(Pending)
+  type       JobType
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+
+  Outlet Outlet @relation(fields: [outlet_id], references: [outlet_id])
+  Order  Order  @relation(fields: [order_id], references: [order_id])
+
+  @@map("jobs")
+}
+
+model Ticket {
+  ticket_id  String   @id @default(cuid())
+  order_id   String
+  user_id    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  Order      Order        @relation(fields: [order_id], references: [order_id])
+  User       User         @relation(fields: [user_id], references: [user_id])
+  Resolution Resolution[]
+
+  @@map("tickets")
+}
+
+model Resolution {
+  resolution_id String   @id @default(cuid())
+  outlet_id     String
+  employee_id   String
+  description   String
+  ticket_id     String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  Ticket   Ticket   @relation(fields: [ticket_id], references: [ticket_id])
+  Outlet   Outlet   @relation(fields: [outlet_id], references: [outlet_id])
+  Employee Employee @relation(fields: [employee_id], references: [employee_id])
+
+  @@map("resolutions")
+}
+
+enum RequestStatus {
+  Pending
+  Accepted
+  Rejected
+}
+
+model RequestAccess {
+  request_access_id String        @id @default(cuid())
+  outlet_id         String
+  employee_id       String
+  status            RequestStatus @default(Pending)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+
+  Outlet   Outlet   @relation(fields: [outlet_id], references: [outlet_id])
+  Employee Employee @relation(fields: [employee_id], references: [employee_id])
+
+  @@map("request_access")
 }
 
 model Agent {
