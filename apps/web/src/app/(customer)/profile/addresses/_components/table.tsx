@@ -16,8 +16,8 @@ interface AddressListProps {
 const AddressTable: React.FC<AddressListProps> = ({ ...props }) => {
   const { data, error, isLoading } = useCustomerAddress();
 
-  if (error || !data) return <div>failed to load</div>;
   if (isLoading) return <div>loading...</div>;
+  if (error || !data) return <div>failed to load</div>;
 
   return (
     <div className='rounded-md border'>

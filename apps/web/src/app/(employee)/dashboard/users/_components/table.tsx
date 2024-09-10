@@ -29,7 +29,7 @@ import { DataTablePagination } from '@/components/table/pagination';
 import { Input } from '@/components/ui/input';
 import columns from './column';
 import { useDebounceValue } from 'usehooks-ts';
-import { useOutlets } from '@/hooks/use-outlets';
+import { useUsers } from '@/hooks/use-user';
 
 interface DataTableProps<TData, TValue> {
   data: TData[];
@@ -83,8 +83,8 @@ const DataTable = <TData, TValue>({
       <div className='flex flex-col lg:justify-between lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-4 mb-6'>
         <Input
           placeholder='Filter name'
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
+          value={(table.getColumn('fullname')?.getFilterValue() as string) ?? ''}
+          onChange={(event) => table.getColumn('fullname')?.setFilterValue(event.target.value)}
           className='w-full lg:max-w-md'
         />
 
@@ -153,7 +153,7 @@ const DataTable = <TData, TValue>({
   );
 };
 
-const OutletTable = () => {
+const UserTable = () => {
   const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams();
@@ -167,7 +167,7 @@ const OutletTable = () => {
 
   const [filter] = useDebounceValue<ColumnFiltersState>(columnFilters, 500);
 
-  const { data, error, isLoading } = useOutlets(filter, pagination, sorting);
+  const { data, error, isLoading } = useUsers(filter, pagination, sorting);
 
   React.useEffect(() => {
     if (search.has('page')) {
@@ -217,12 +217,12 @@ const OutletTable = () => {
   }, [router, pathname, pagination, sorting, filter]);
 
   if (isLoading) return <div>loading...</div>;
-  if (error || !data) return <div>failed to load outlet data, retrying...</div>;
+  if (error || !data) return <div>failed to load user data, retrying...</div>;
 
   return (
     <DataTable
       columns={columns}
-      data={data.data.outlets}
+      data={data.data.users}
       pageCount={Math.ceil(data.data.count / pagination.pageSize)}
       sorting={sorting}
       onSortingChange={setSorting}
@@ -234,4 +234,4 @@ const OutletTable = () => {
   );
 };
 
-export default OutletTable;
+export default UserTable;
