@@ -28,7 +28,6 @@ export class AuthMiddleware {
       const { refresh_token } = req.cookies;
 
       const token = refresh_token as string;
-      console.log(token);
       verify(token, JWT_SECRET, (error, decoded) => {
         if (error) throw new ApiError(401, error.message);
         req.user = decoded;

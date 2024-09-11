@@ -19,6 +19,7 @@ import axios from '@/lib/axios';
 import dynamic from 'next/dynamic';
 import { useForm } from 'react-hook-form';
 import { useLocation } from '@/hooks/use-location';
+import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -46,6 +47,7 @@ const outletSchema = yup.object({
 });
 
 const OutletCreate: React.FC<OutletCreateProps> = ({ ...props }) => {
+  const router = useRouter();
   const { toast } = useToast();
   const { state } = useLocation();
   const [location, setLocation] = React.useState<Location | null>(null);

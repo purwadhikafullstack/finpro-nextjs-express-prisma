@@ -93,9 +93,13 @@ export default class AuthController {
 
   setPassword = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { password } = await yup
+      const { password, confirmation } = await yup
         .object({
           password: yup.string().required(),
+          confirmation: yup
+            .string()
+            .oneOf([yup.ref('password')])
+            .required(),
         })
         .validate(req.body);
 
