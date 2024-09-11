@@ -27,9 +27,12 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { DataTablePagination } from '@/components/table/pagination';
 import { Input } from '@/components/ui/input';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
+import TableLoader from '@/components/loader/table';
 import columns from './column';
 import { useDebounceValue } from 'usehooks-ts';
-import { useUsers } from '@/hooks/use-user';
+import { useOutlets } from '@/hooks/use-outlets';
 
 interface DataTableProps<TData, TValue> {
   data: TData[];
@@ -83,34 +86,43 @@ const DataTable = <TData, TValue>({
       <div className='flex flex-col lg:justify-between lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-4 mb-6'>
         <Input
           placeholder='Filter name'
-          value={(table.getColumn('fullname')?.getFilterValue() as string) ?? ''}
-          onChange={(event) => table.getColumn('fullname')?.setFilterValue(event.target.value)}
+          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+          onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
           className='w-full lg:max-w-md'
         />
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='lg:ml-auto'>
-              Columns
+        <div className='flex items-center space-x-2 w-full lg:w-auto flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4'>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='outline' className='w-full'>
+                Columns
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className='capitalize'
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) => column.toggleVisibility(!!value)}>
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Link href='/dashboard/outlets/create' className='w-full'>
+            <Button className='w-full'>
+              <Plus className='mr-2 inline-block w-4 h-4' />
+              <span>Add Outlet</span>
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className='capitalize'
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}>
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </Link>
+        </div>
       </div>
 
       <div className='rounded-md border mb-6'>
@@ -153,7 +165,7 @@ const DataTable = <TData, TValue>({
   );
 };
 
-const UserTable = () => {
+const OutletTable = () => {
   const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams();
@@ -167,7 +179,7 @@ const UserTable = () => {
 
   const [filter] = useDebounceValue<ColumnFiltersState>(columnFilters, 500);
 
-  const { data, error, isLoading } = useUsers(filter, pagination, sorting);
+  const { data, error, isLoading } = useOutlets(filter, pagination, sorting);
 
   React.useEffect(() => {
     if (search.has('page')) {
@@ -216,13 +228,13 @@ const UserTable = () => {
     router.push(`${pathname}?${out}`);
   }, [router, pathname, pagination, sorting, filter]);
 
-  if (isLoading) return <div>loading...</div>;
-  if (error || !data) return <div>failed to load user data, retrying...</div>;
+  if (isLoading) return <TableLoader />;
+  if (error || !data) return <div>failed to load outlet data, retrying...</div>;
 
   return (
     <DataTable
       columns={columns}
-      data={data.data.users}
+      data={data.data.outlets}
       pageCount={Math.ceil(data.data.count / pagination.pageSize)}
       sorting={sorting}
       onSortingChange={setSorting}
@@ -234,4 +246,4 @@ const UserTable = () => {
   );
 };
 
-export default UserTable;
+export default OutletTable;

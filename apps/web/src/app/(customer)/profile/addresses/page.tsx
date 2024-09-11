@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import AddressTable from './_components/table';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import OutletTable from '@/app/(employee)/dashboard/outlets/_components/table';
 
 interface PageProps {
   //

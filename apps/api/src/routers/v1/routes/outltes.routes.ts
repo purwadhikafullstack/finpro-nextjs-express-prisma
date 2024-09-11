@@ -20,6 +20,7 @@ export default class OutletsRouter {
 
   private initializeRoutes(): void {
     this.router.get('/', this.outletsController.index);
+    this.router.post('/', this.outletsController.create);
     this.router.get('/:outlet_id', this.outletsController.show);
   }
 

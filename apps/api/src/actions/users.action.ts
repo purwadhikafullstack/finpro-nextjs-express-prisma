@@ -137,4 +137,40 @@ export default class UserAction {
       throw error;
     }
   };
+
+  search = async (query: string | undefined) => {
+    try {
+      const users = await prisma.user.findMany({
+        where: {
+          OR: [
+            {
+              fullname: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+            {
+              email: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+          ],
+          role: {
+            equals: 'Customer',
+          },
+        },
+        select: {
+          user_id: true,
+          fullname: true,
+          email: true,
+          role: true,
+        },
+      });
+
+      return users;
+    } catch (error) {
+      throw error;
+    }
+  };
 }

@@ -5,6 +5,8 @@ interface PageProps {
 }
 
 export default async function Page({ ...props }: PageProps): Promise<React.JSX.Element> {
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+
   return (
     <div className='flex flex-col space-y-2 items-start'>
       <h2 className='font-bold text-4xl'>Dashboard Page</h2>

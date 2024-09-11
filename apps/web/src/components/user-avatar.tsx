@@ -55,11 +55,14 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user }) => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align='end' className='w-56'>
-        <div className='flex items-center space-x-1 py-2'>
-          <DropdownMenuLabel>{user.fullname}</DropdownMenuLabel>
-          <Badge variant='default' className='text-xs aspect-square p-0.5'>
-            {user.is_verified ? <Check className='size-3' /> : 'Unverified'}
-          </Badge>
+        <div className='py-2 flex flex-col space-y-0'>
+          <DropdownMenuLabel className='flex space-y-0 items-center space-x-2'>
+            <span>{user.fullname}</span>
+            <Badge variant='default' className='text-xs aspect-square p-px'>
+              {user.is_verified ? <Check className='size-3' /> : 'Unverified'}
+            </Badge>
+          </DropdownMenuLabel>
+          <span className='text-sm text-muted-foreground px-2'>{user.email}</span>
         </div>
         <DropdownMenuSeparator />
         {user.role !== 'Customer' && (

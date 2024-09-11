@@ -3,7 +3,7 @@ import * as React from 'react';
 import Feature from '@/components/landing/feature';
 import Hero from '@/components/landing/hero';
 import HowTo from '@/components/landing/how-to';
-import OutletTable from '../(employee)/dashboard/outlets/_components/table';
+import OutletTable from '../(employee)/dashboard/(superadmin)/outlets/_components/table';
 import Showcase from '@/components/landing/showcase';
 import Testimony from '@/components/landing/testimony';
 import fs from 'fs';

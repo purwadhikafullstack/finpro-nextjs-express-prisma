@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-import OutletTable from '@/app/(employee)/dashboard/outlets/_components/table';
+import OutletTable from '@/app/(employee)/dashboard/(superadmin)/outlets/_components/table';
 import ProfileForm from './_components/form';
 
 interface PageProps {
