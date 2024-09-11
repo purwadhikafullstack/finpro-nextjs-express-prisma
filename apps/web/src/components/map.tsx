@@ -4,48 +4,26 @@ import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 
 import * as React from 'react';
 
-import { LatLngLiteral, LeafletEvent } from 'leaflet';
 import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
 
 import { Location } from '@/types/location';
-import { map } from 'cypress/types/bluebird';
+import { cn } from '@/lib/utils';
 
 interface MapProps {
   location: Location;
   setLocation: (location: Location) => void;
+  className?: string;
 }
 
-interface DraggableMarkerProps {
-  location: Location;
-  mapRef: React.RefObject<any>;
-  setLocation: (location: Location) => void;
-}
-
-const DraggableMarker: React.FC<DraggableMarkerProps> = ({ location, setLocation, mapRef }) => {
-  const markerRef = React.useRef(null);
-
-  // const eventHandlers = React.useMemo(
-  //   () => ({
-  //     dragend() {
-  //       const marker = markerRef.current as any;
-  //       if (marker) {
-  //         setLocation({
-  //           latitude: marker.getLatLng().lat,
-  //           longitude: marker.getLatLng().lng,
-  //         });
-  //       }
-  //     },
-  //   }),
-
-  //   [markerRef, setLocation]
-  // );
-
-  return <Marker ref={markerRef} position={[location.latitude, location.longitude]}></Marker>;
+type LatLng = {
+  lat: number;
+  lng: number;
+  alt?: number;
 };
 
 interface MapEventProps {
-  handleClick: (lngLat: LatLngLiteral) => void;
-  handleLocationFound: (lngLat: LatLngLiteral) => void;
+  handleClick: (lngLat: LatLng) => void;
+  handleLocationFound: (lngLat: LatLng) => void;
 }
 
 const MapEvent: React.FC<MapEventProps> = ({ handleClick, handleLocationFound }) => {
@@ -61,10 +39,10 @@ const MapEvent: React.FC<MapEventProps> = ({ handleClick, handleLocationFound })
   return null;
 };
 
-const Map: React.FC<MapProps> = ({ location, setLocation }) => {
+const Map: React.FC<MapProps> = ({ location, setLocation, className }) => {
   const [mapRef, setMapRef] = React.useState<any>(null);
 
-  const handleClick = (latlng: LatLngLiteral) => {
+  const handleClick = (latlng: LatLng) => {
     setLocation({
       latitude: latlng.lat,
       longitude: latlng.lng,
@@ -83,12 +61,11 @@ const Map: React.FC<MapProps> = ({ location, setLocation }) => {
       ref={setMapRef}
       center={[location.latitude, location.longitude]}
       scrollWheelZoom={true}
-      className='aspect-[4/3] w-full border rounded-lg'>
+      className={cn('w-full border rounded-lg', className)}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
       />
-      {/* <DraggableMarker location={location} setLocation={setLocation} mapRef={mapRef} /> */}
       <Marker position={[location.latitude, location.longitude]}></Marker>
       <MapEvent handleClick={handleClick} handleLocationFound={handleClick} />
     </MapContainer>

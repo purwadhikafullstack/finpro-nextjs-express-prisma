@@ -2,10 +2,10 @@
 
 import * as React from 'react';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatDate } from '@/lib/utils';
 import { useCustomerAddress } from '@/hooks/use-customer-addres';
 
@@ -16,7 +16,7 @@ interface AddressListProps {
 const AddressTable: React.FC<AddressListProps> = ({ ...props }) => {
   const { data, error, isLoading } = useCustomerAddress();
 
-  if (isLoading) return <div>loading...</div>;
+  if (isLoading) return <Skeleton className='w-full h-32 rounded-lg' />;
   if (error || !data) return <div>failed to load</div>;
 
   return (

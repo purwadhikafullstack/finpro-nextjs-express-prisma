@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import ApiResponse from '@/utils/api.response';
 import OutletsAction from '@/actions/outlets.action';
+import { Role } from '@prisma/client';
 
 export default class OutletsController {
   private outletsAction: OutletsAction;
@@ -58,6 +59,36 @@ export default class OutletsController {
       const outlet = await this.outletsAction.show(outlet_id);
 
       return res.status(200).json(new ApiResponse('Outlet retrieved successfully', outlet));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  create = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { name, description, address, latitude, longitude, employees } = await yup
+        .object({
+          name: yup.string().required(),
+          description: yup.string().required(),
+          address: yup.string().required(),
+          latitude: yup.number().required(),
+          longitude: yup.number().required(),
+          employees: yup
+            .array(
+              yup.object({
+                user_id: yup.string().required(),
+                email: yup.string().required(),
+                fullname: yup.string().required(),
+                role: yup.string().oneOf(Object.values(Role)).required(),
+              })
+            )
+            .required(),
+        })
+        .validate(req.body);
+
+      const created = await this.outletsAction.create(name, description, address, latitude, longitude, employees);
+
+      return res.status(201).json(new ApiResponse('Outlet created successfully', created));
     } catch (error) {
       next(error);
     }

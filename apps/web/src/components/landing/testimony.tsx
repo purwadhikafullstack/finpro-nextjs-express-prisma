@@ -55,8 +55,8 @@ const Testimony: React.FC<TestimonyProps> = ({ ...props }) => {
                 </div>
                 <div className='flex flex-col space-y-2'>
                   <blockquote className='text-muted-foreground text-sm'>
-                    “LaundryXpert exceeded my expectations. My clothes are always perfectly cleaned and handled with
-                    care. 💎“
+                    LaundryXpert exceeded my expectations. My clothes are always perfectly cleaned and handled with
+                    care. ⭐
                   </blockquote>
                   <span className='text-foreground text-sm font-medium'>John Doe</span>
                 </div>
@@ -74,8 +74,8 @@ const Testimony: React.FC<TestimonyProps> = ({ ...props }) => {
                 </div>
                 <div className='flex flex-col space-y-2'>
                   <blockquote className='text-muted-foreground text-sm'>
-                    “LaundryXpert exceeded my expectations. My clothes are always perfectly cleaned and handled with
-                    care. 💎“
+                    LaundryXpert exceeded my expectations. My clothes are always perfectly cleaned and handled with
+                    care. 😍
                   </blockquote>
                   <span className='text-foreground text-sm font-medium'>John Doe</span>
                 </div>

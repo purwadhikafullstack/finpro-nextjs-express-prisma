@@ -1,5 +1,8 @@
+import { Prisma, Role } from '@prisma/client';
+
 import ApiError from '@/utils/api.error';
-import { Prisma } from '@prisma/client';
+import { OPENCAGE_API } from '@/config';
+import axios from 'axios';
 import prisma from '@/libs/prisma';
 
 export default class OutletsAction {
@@ -51,6 +54,71 @@ export default class OutletsAction {
       });
 
       if (!outlet) throw new ApiError(404, 'Outlet not found');
+
+      return outlet;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  create = async (
+    name: string,
+    description: string,
+    address: string,
+    latitude: number,
+    longitude: number,
+    employees: {
+      user_id: string;
+      email: string;
+      fullname: string;
+      role: Role;
+    }[]
+  ) => {
+    try {
+      const url = new URL('https://api.opencagedata.com/geocode/v1/json');
+      url.searchParams.set('q', latitude + '+' + longitude);
+      url.searchParams.set('key', OPENCAGE_API);
+      url.searchParams.set('language', 'id');
+      url.searchParams.set('countrycode', 'id');
+      const output = url.toString();
+
+      const { data } = await axios.get(output);
+      const { formatted, components } = data.results.at(0);
+
+      const [outlet, _] = await Promise.all([
+        prisma.outlet.create({
+          data: {
+            name,
+            description,
+            address,
+            latitude,
+            longitude,
+            formatted,
+            city: components.city,
+            road: components.road,
+            region: components.state,
+            suburb: components.suburb,
+            zipcode: components.postcode,
+            city_district: components.city_district,
+            Employee: {
+              createMany: {
+                data: employees.map((employee) => ({
+                  user_id: employee.user_id,
+                })),
+              },
+            },
+          },
+        }),
+
+        prisma.$transaction([
+          ...employees.map((employee) => {
+            return prisma.user.update({
+              where: { user_id: employee.user_id },
+              data: { role: employee.role },
+            });
+          }),
+        ]),
+      ]);
 
       return outlet;
     } catch (error) {
