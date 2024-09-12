@@ -18,7 +18,7 @@ const SidebarDrawer: React.FC<DrawerProps> = ({ ...props }) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant='outline' size='icon' className='shrink-0 md:hidden'>
+        <Button variant='outline' size='icon' className='shrink-0 lg:hidden'>
           <Menu className='size-5' />
           <span className='sr-only'>Toggle navigation menu</span>
         </Button>
@@ -26,11 +26,11 @@ const SidebarDrawer: React.FC<DrawerProps> = ({ ...props }) => {
 
       <SheetContent side='left' className='flex flex-col'>
         <Link href='/' className='flex items-center gap-2 px-3 text-lg font-semibold'>
-          <AppIcon className='h-6 w-6' />
+          <AppIcon className='w-6 h-6' />
           <span>{PROJECT_NAME}</span>
         </Link>
 
-        <nav className='grid items-start gap-1 text-sm font-medium mt-6'>
+        <nav className='grid items-start gap-1 mt-6 text-sm font-medium'>
           {SIDEBAR_LINKS.map((link) => (
             <SidebarLink key={link.title} link={link} />
           ))}

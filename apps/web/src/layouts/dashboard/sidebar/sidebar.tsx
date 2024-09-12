@@ -14,7 +14,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Sidebar: React.FC<SidebarProps> = ({ className, ...props }) => {
   return (
-    <div className={cn('hidden border-r bg-zinc-50/40 md:block', className)} {...props}>
+    <div className={cn('border-r bg-zinc-50/40', className)} {...props}>
       <div className='flex flex-col h-full gap-2'>
         <div className='flex items-center flex-none h-16 px-6 border-b'>
           <Link href='/' className='flex items-center space-x-2 font-semibold'>
