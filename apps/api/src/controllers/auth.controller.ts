@@ -93,7 +93,7 @@ export default class AuthController {
 
   setPassword = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { password, confirmation } = await yup
+      const { password } = await yup
         .object({
           password: yup.string().required(),
           confirmation: yup
