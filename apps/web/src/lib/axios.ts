@@ -18,33 +18,36 @@ axios.interceptors.request.use(
   }
 );
 
-const interceptor = axios.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response.status !== 401) {
-      return Promise.reject((error.response && error.response.data) || 'Wrong Services');
-    }
+const intercept = () => {
+  const interceptor = axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      console.log(error);
 
-    axios.interceptors.response.eject(interceptor);
+      if (error.response.status !== 401) {
+        return Promise.reject((error.response && error.response.data) || 'Wrong Services');
+      }
 
-    if (!window.location.href.includes('/auth')) {
+      axios.interceptors.response.eject(interceptor);
+
       return axios
         .post('/auth/refresh')
         .then(({ data }) => {
-          const token = `"${data.data.access_token}"`;
-          window.localStorage.setItem('access_token', token);
-          error.response.config.headers['Authorization'] = 'Bearer ' + token;
+          const token = data.data.access_token;
+          window.localStorage.setItem('access_token', JSON.stringify(token));
+          error.response.config.headers['Authorization'] = 'Bearer ' + JSON.stringify(token);
           return axios(error.response.config);
         })
         .catch((err) => {
           window.localStorage.removeItem('access_token');
           return Promise.reject((err.response && err.response.data) || 'Wrong Services');
-        });
+        })
+        .finally(intercept);
     }
+  );
+};
 
-    return Promise.reject((error.response && error.response.data) || 'Wrong Services');
-  }
-);
+intercept();
 
 export const fetcher = async (args: string | [string, AxiosRequestConfig]) => {
   const [url, config] = Array.isArray(args) ? args : [args];

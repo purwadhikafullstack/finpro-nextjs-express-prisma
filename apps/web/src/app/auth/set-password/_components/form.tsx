@@ -59,7 +59,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ ...props }) => {
   const search = useSearchParams();
 
   const { toast } = useToast();
-  const { authenticate } = useAuth();
+  const { verify } = useAuth();
 
   const form = useForm<yup.InferType<typeof passwordSchema>>({
     resolver: yupResolver(passwordSchema),
@@ -103,7 +103,7 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ ...props }) => {
 
   const onSubmit = async (formData: yup.InferType<typeof passwordSchema>) => {
     try {
-      await authenticate(formData);
+      await verify(formData);
       toast({
         title: 'Password set successfully',
         description: 'Please login with your new password',
