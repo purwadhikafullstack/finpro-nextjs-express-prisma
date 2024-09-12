@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from 'axios';
 
-import ApiError from '@/utils/api.error';
+import ApiError from '@/utils/error.util';
 import { OPENCAGE_API } from '@/config';
 import prisma from '@/libs/prisma';
 

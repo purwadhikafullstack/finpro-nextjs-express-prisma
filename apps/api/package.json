@@ -9,11 +9,11 @@
     "serve": "cross-env NODE_ENV=production node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prisma": "npx prisma",
-    "db:migrate": "dotenv -e .env.development -- npx prisma migrate dev",
-    "db:generate": "dotenv -e .env.development -- npx prisma generate",
-    "db:pull": "dotenv -e .env.development -- npx prisma db pull",
-    "db:push": "dotenv -e .env.development -- npx prisma db push",
-    "db:studio": "dotenv -e .env.development -- npx prisma studio"
+    "db:migrate": "dotenv -e .env.development -e .env.development.local -- npx prisma migrate dev",
+    "db:generate": "dotenv -e .env.development -e .env.development.local -- npx prisma generate",
+    "db:pull": "dotenv -e .env.development -e .env.development.local -- npx prisma db pull",
+    "db:push": "dotenv -e .env.development -e .env.development.local -- npx prisma db push",
+    "db:studio": "dotenv -e .env.development -e .env.development.local -- npx prisma studio"
   },
   "author": "",
   "license": "ISC",

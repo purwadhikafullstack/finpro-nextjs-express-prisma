@@ -20,7 +20,7 @@ export const useCustomerAddress = () => {
     if (data) {
       toast({
         title: 'Addresses loaded',
-        description: 'Your addresses have been loaded successfully',
+        description: data.data.length ? data.message : 'You have no addresses added yet',
       });
     } else if (error) {
       toast({

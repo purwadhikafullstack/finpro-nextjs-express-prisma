@@ -1,6 +1,6 @@
-import { comparePasswords, generateAccessToken, generateHash, generateRefreshToken } from '@/utils/encryption';
+import { comparePasswords, generateAccessToken, generateHash, generateRefreshToken } from '@/utils/encrypt.util';
 
-import ApiError from '@/utils/api.error';
+import ApiError from '@/utils/error.util';
 import EmailAction from '@/actions/email.action';
 import { User } from '@prisma/client';
 import prisma from '@/libs/prisma';

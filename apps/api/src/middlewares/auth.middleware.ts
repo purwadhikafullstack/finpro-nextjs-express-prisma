@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 import { NextFunction, Request, Response } from 'express';
 
-import ApiError from '@/utils/api.error';
+import ApiError from '@/utils/error.util';
 import { JWT_SECRET } from '@/config';
 import { verify } from 'jsonwebtoken';
 

@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 import { NextFunction, Request, Response } from 'express';
 
-import ApiResponse from '@/utils/api.response';
+import ApiResponse from '@/utils/response.util';
 import OutletsAction from '@/actions/outlets.action';
 import { Role } from '@prisma/client';
 
@@ -89,6 +89,30 @@ export default class OutletsController {
       const created = await this.outletsAction.create(name, description, address, latitude, longitude, employees);
 
       return res.status(201).json(new ApiResponse('Outlet created successfully', created));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  nearest = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { customer_address_id } = await yup
+        .object({
+          customer_address_id: yup.string().required(),
+        })
+        .validate(req.query);
+
+      const outlets = await this.outletsAction.nearest(customer_address_id);
+
+      return res.status(200).json(
+        new ApiResponse(
+          'Outlets retrieved successfully',
+          outlets.map((outlet) => ({
+            outlet,
+            distance: Math.random() * 100,
+          }))
+        )
+      );
     } catch (error) {
       next(error);
     }

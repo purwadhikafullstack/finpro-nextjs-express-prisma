@@ -12,32 +12,38 @@ import {
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTableColumnHeader from '@/components/table/header';
+import { Delivery } from '@/types/delivery';
 import { MoreHorizontal } from 'lucide-react';
-import { User } from '@/types/user';
 
-const columns: ColumnDef<User>[] = [
+const columns: ColumnDef<Delivery>[] = [
   {
-    accessorKey: 'fullname',
+    accessorKey: 'delivery_id',
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title='User Name' />;
+      return <DataTableColumnHeader column={column} title='Delivery ID' />;
     },
   },
   {
-    accessorKey: 'phone',
+    accessorKey: 'outlet_id',
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title='phone' />;
+      return <DataTableColumnHeader column={column} title='Outlet ID' />;
     },
   },
   {
-    accessorKey: 'email',
+    accessorKey: 'employee_id',
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title='Email' />;
+      return <DataTableColumnHeader column={column} title='Employee ID' />;
     },
   },
   {
-    accessorKey: 'role',
+    accessorKey: 'type',
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title='Role' />;
+      return <DataTableColumnHeader column={column} title='Type' />;
+    },
+  },
+  {
+    accessorKey: 'progress',
+    header: ({ column }) => {
+      return <DataTableColumnHeader column={column} title='Progress' />;
     },
   },
   {

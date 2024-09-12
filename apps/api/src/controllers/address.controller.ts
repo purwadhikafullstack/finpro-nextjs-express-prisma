@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import { AccessTokenPayload } from '@/type/jwt';
 import AddressAction from '@/actions/address.action';
-import ApiResponse from '@/utils/api.response';
+import ApiResponse from '@/utils/response.util';
 
 export default class AddressController {
   private addressAction: AddressAction;

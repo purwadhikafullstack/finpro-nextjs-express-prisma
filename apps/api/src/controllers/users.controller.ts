@@ -2,10 +2,9 @@ import * as yup from 'yup';
 
 import { NextFunction, Request, Response } from 'express';
 
-import ApiResponse from '@/utils/api.response';
+import ApiResponse from '@/utils/response.util';
 import { Role } from '@prisma/client';
 import UserAction from '@/actions/users.action';
-import { transform } from 'typescript';
 
 export default class UsersController {
   private userAction: UserAction;

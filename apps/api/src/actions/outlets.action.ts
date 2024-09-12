@@ -1,6 +1,6 @@
 import { Prisma, Role } from '@prisma/client';
 
-import ApiError from '@/utils/api.error';
+import ApiError from '@/utils/error.util';
 import { OPENCAGE_API } from '@/config';
 import axios from 'axios';
 import prisma from '@/libs/prisma';
@@ -121,6 +121,25 @@ export default class OutletsAction {
       ]);
 
       return outlet;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  nearest = async (customer_address_id: string) => {
+    try {
+      const outlets = await prisma.outlet.findMany({
+        // where: {
+        // customerAddress: {
+        //   customer_address_id,
+        // },
+        // },
+        orderBy: {
+          created_at: 'asc',
+        },
+      });
+
+      return outlets;
     } catch (error) {
       throw error;
     }

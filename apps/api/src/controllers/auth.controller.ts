@@ -3,8 +3,8 @@ import * as yup from 'yup';
 import { EmailTokenPayload, RefreshTokenPayload } from '@/type/jwt';
 import { NextFunction, Request, Response } from 'express';
 
-import ApiError from '@/utils/api.error';
-import ApiResponse from '@/utils/api.response';
+import ApiError from '@/utils/error.util';
+import ApiResponse from '@/utils/response.util';
 import AuthAction from '@/actions/auth.action';
 import { FRONTEND_URL } from '@/config';
 import { User } from '@prisma/client';
@@ -136,14 +136,7 @@ export default class AuthController {
     try {
       const { user_id } = req.user as RefreshTokenPayload;
 
-      const { access_token, refresh_token } = await this.authAction.refresh(user_id);
-
-      res.cookie('refresh_token', refresh_token, {
-        httpOnly: true,
-        maxAge: 60 * 60 * 24 * 7,
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV === 'production',
-      });
+      const { access_token } = await this.authAction.refresh(user_id);
 
       return res.status(200).json(
         new ApiResponse('Refresh successful', {

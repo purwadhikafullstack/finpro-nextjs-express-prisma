@@ -1,6 +1,6 @@
 import { Prisma, Role } from '@prisma/client';
 
-import ApiError from '@/utils/api.error';
+import ApiError from '@/utils/error.util';
 import prisma from '@/libs/prisma';
 
 export default class UserAction {

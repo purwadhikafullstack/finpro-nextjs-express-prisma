@@ -1,6 +1,6 @@
 import { BACKEND_URL } from '@/config';
 import { User } from '@prisma/client';
-import { generateEmailToken } from '@/utils/encryption';
+import { generateEmailToken } from '@/utils/encrypt.util';
 
 export default class EmailAction {
   sendVerificationEmail = async (user: User) => {

@@ -1,4 +1,5 @@
 export type Address = {
+  customer_address_id: string;
   is_primary: boolean;
   name: string;
   address: string;

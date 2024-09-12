@@ -1,6 +1,6 @@
 import { BACKEND_URL, FRONTEND_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '@/config';
 
-import ApiError from '@/utils/api.error';
+import ApiError from '@/utils/error.util';
 import EmailAction from '@/actions/email.action';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import passport from 'passport';

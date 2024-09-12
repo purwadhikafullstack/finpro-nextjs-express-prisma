@@ -1,6 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 
-import ApiError from '@/utils/api.error';
+import ApiError from '@/utils/error.util';
 import { PORT } from '@/config';
 import PassportConfig from './libs/passport';
 import { ValidationError } from 'yup';

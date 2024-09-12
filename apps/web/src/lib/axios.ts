@@ -22,13 +22,12 @@ const intercept = () => {
   const interceptor = axios.interceptors.response.use(
     (response) => response,
     (error) => {
-      console.log(error);
-
       if (error.response.status !== 401) {
         return Promise.reject((error.response && error.response.data) || 'Wrong Services');
       }
 
       axios.interceptors.response.eject(interceptor);
+
 
       return axios
         .post('/auth/refresh')

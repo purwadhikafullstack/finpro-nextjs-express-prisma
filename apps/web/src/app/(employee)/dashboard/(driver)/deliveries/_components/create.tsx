@@ -4,9 +4,9 @@ import * as React from 'react';
 import * as yup from 'yup';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import EmployeeSelectField, { EmployeeForm } from './select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import UserSelect, { EmployeeForm } from './select';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -46,7 +46,7 @@ const outletSchema = yup.object({
     .required(),
 });
 
-const OutletCreate: React.FC<OutletCreateProps> = ({ ...props }) => {
+const OrderCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
   const router = useRouter();
   const { toast } = useToast();
   const { state } = useLocation();
@@ -189,7 +189,7 @@ const OutletCreate: React.FC<OutletCreateProps> = ({ ...props }) => {
                     <FormItem>
                       <FormLabel>Employees</FormLabel>
                       <FormControl>
-                        <UserSelect {...field} selected={employees} setSelected={setEmployees} />
+                        <EmployeeSelectField {...field} selected={employees} setSelected={setEmployees} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -284,4 +284,4 @@ const OutletCreate: React.FC<OutletCreateProps> = ({ ...props }) => {
   );
 };
 
-export default OutletCreate;
+export default OrderCreateForm;

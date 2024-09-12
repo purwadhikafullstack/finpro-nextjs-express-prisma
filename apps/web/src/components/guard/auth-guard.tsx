@@ -23,8 +23,12 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ allowed, children }) => {
       const verify = async () => {
         const res = await fetch('/api/auth/verify', {
           method: 'POST',
-          body: JSON.stringify({ token, allowed }),
+          body: JSON.stringify({
+            token,
+            allowed,
+          }),
         });
+
         const json = await res.json();
 
         if (json.protected) {
@@ -38,15 +42,16 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ allowed, children }) => {
 
       verify();
     } else {
-      window.location.href = '/auth/login';
       toast({
         title: 'You are not logged in',
         description: 'Please login with your credentials',
       });
+      router.push('/auth/login');
     }
   }, [token, allowed, router, toast]);
 
   if (!authhorized) return <FullscreenLoader />;
+
   return <>{children}</>;
 };
 
