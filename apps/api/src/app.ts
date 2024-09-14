@@ -1,7 +1,7 @@
+import { PORT, validateEnv } from '@/config';
 import express, { Express, NextFunction, Request, Response } from 'express';
 
 import ApiError from '@/utils/error.util';
-import { PORT } from '@/config';
 import PassportConfig from './libs/passport';
 import { ValidationError } from 'yup';
 import cookie from 'cookie-parser';
@@ -65,8 +65,14 @@ export default class App {
   }
 
   public start(): void {
-    this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
-    });
+    validateEnv()
+      .then(() => {
+        this.app.listen(PORT, () => {
+          console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
+        });
+      })
+      .catch((error) => {
+        console.error('Environment variables are not valid', error.message);
+      });
   }
 }

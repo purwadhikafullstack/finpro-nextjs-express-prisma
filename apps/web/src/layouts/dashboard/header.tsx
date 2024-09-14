@@ -17,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({ className, ...props }) => {
   const { user } = useAuth();
 
   return (
-    <header className={cn('flex items-center w-full h-16 gap-4 px-6 border-b bg-zinc-50', className)} {...props}>
+    <header className={cn('flex items-center w-full h-16 gap-4 px-6 border-b bg-zinc-50/50', className)} {...props}>
       <SidebarDrawer />
 
       <div className='flex-1 w-full'>

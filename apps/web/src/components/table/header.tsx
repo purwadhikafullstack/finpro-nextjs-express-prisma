@@ -28,11 +28,11 @@ function DataTableColumnHeader<TData, TValue>({ column, title, className }: Data
           <Button variant='ghost' size='sm' className='-ml-3 h-8 data-[state=open]:bg-accent'>
             <span>{title}</span>
             {column.getIsSorted() === 'desc' ? (
-              <ArrowDown className='ml-2 h-4 w-4' />
+              <ArrowDown className='w-4 h-4 ml-2' />
             ) : column.getIsSorted() === 'asc' ? (
-              <ArrowUp className='ml-2 h-4 w-4' />
+              <ArrowUp className='w-4 h-4 ml-2' />
             ) : (
-              <ArrowUpDown className='ml-2 h-4 w-4' />
+              <ArrowUpDown className='w-4 h-4 ml-2' />
             )}
           </Button>
         </DropdownMenuTrigger>

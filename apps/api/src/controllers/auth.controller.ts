@@ -95,7 +95,14 @@ export default class AuthController {
     try {
       const { password } = await yup
         .object({
-          password: yup.string().required(),
+          password: yup
+            .string()
+            .min(10, 'Password is too short')
+            .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+            .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+            .matches(/[0-9]/, 'Password must contain at least one number')
+            .matches(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
+            .required(),
           confirmation: yup
             .string()
             .oneOf([yup.ref('password')])

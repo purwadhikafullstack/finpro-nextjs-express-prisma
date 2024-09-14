@@ -26,7 +26,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 interface OutletCreateProps {
   //
 }
-const Role = ['Customer', 'Driver', 'OutletAdmin', 'WashingWorker', 'IroningWorker', 'PackingWorker'] as const;
+const Role = ['Employee', 'Driver', 'OutletAdmin', 'WashingWorker', 'IroningWorker', 'PackingWorker'] as const;
 
 const outletSchema = yup.object({
   name: yup.string().required(),
@@ -46,7 +46,7 @@ const outletSchema = yup.object({
     .required(),
 });
 
-const OrderCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
+const OutletCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
   const router = useRouter();
   const { toast } = useToast();
   const { state } = useLocation();
@@ -110,8 +110,8 @@ const OrderCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='grid lg:grid-cols-5 gap-8 items-start'>
-        <div className='flex flex-col lg:col-span-3 gap-8'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='grid items-start gap-8 lg:grid-cols-5'>
+        <div className='flex flex-col gap-8 lg:col-span-3'>
           <Card>
             <CardHeader>
               <CardTitle className='text-xl font-bold'>Outlet Detail</CardTitle>
@@ -159,6 +159,13 @@ const OrderCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
+                      {employees.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={3} className='h-20 text-center'>
+                            No results.
+                          </TableCell>
+                        </TableRow>
+                      )}
                       {employees.map((employee, idx) => (
                         <TableRow key={idx}>
                           <TableCell className='font-medium'>{employee.fullname}</TableCell>
@@ -200,7 +207,7 @@ const OrderCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
           </Card>
         </div>
 
-        <div className='flex flex-col lg:col-span-2 gap-8'>
+        <div className='flex flex-col gap-8 lg:col-span-2'>
           <Card className='col-span-2'>
             <CardHeader>
               <CardTitle className='text-xl font-bold'>Outlet Location</CardTitle>
@@ -270,7 +277,7 @@ const OrderCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
               <CardDescription>Save outlet data and assign employees to it.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className='flex justify-end space-x-4 items-center'>
+              <div className='flex items-center justify-end space-x-4'>
                 <Link href='/dashboard/outlets'>
                   <Button variant='outline'>Cancel</Button>
                 </Link>
@@ -284,4 +291,4 @@ const OrderCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
   );
 };
 
-export default OrderCreateForm;
+export default OutletCreateForm;

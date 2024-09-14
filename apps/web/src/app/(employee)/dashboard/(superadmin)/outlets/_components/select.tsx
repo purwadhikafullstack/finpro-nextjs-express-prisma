@@ -24,6 +24,8 @@ interface UserSelectProps {
   setSelected: React.Dispatch<React.SetStateAction<EmployeeForm[]>>;
 }
 
+const DEFAULT_ROLE = 'Employee';
+
 const EmployeeSelectField = React.forwardRef<HTMLDivElement, UserSelectProps>(({ selected, setSelected }, ref) => {
   const { toast } = useToast();
   const [filter, setFilter] = React.useState('');
@@ -45,7 +47,7 @@ const EmployeeSelectField = React.forwardRef<HTMLDivElement, UserSelectProps>(({
     };
 
     getUsers();
-  }, [debounced]);
+  }, [toast, debounced]);
 
   const getPlaceholder = (user: (typeof users)[0]) => {
     const find = selected.find((u) => u.user_id === user.user_id);
@@ -70,8 +72,8 @@ const EmployeeSelectField = React.forwardRef<HTMLDivElement, UserSelectProps>(({
               <TableCell className='font-medium'>{user.email}</TableCell>
               <TableCell>
                 <Select
-                  onValueChange={(value: (typeof roleOptions)[number] | 'Customer') => {
-                    if (value === 'Customer') {
+                  onValueChange={(value: (typeof roleOptions)[number] | typeof DEFAULT_ROLE) => {
+                    if (value === DEFAULT_ROLE) {
                       setSelected(selected.filter((item) => item.user_id !== user.user_id));
                     } else {
                       const find = selected.find((item) => item.user_id === user.user_id);
@@ -92,7 +94,7 @@ const EmployeeSelectField = React.forwardRef<HTMLDivElement, UserSelectProps>(({
                   </SelectTrigger>
 
                   <SelectContent>
-                    {[...roleOptions, 'Customer'].map((option) => (
+                    {[...roleOptions, DEFAULT_ROLE].map((option) => (
                       <SelectItem key={option} value={option}>
                         {option}
                       </SelectItem>
@@ -107,5 +109,7 @@ const EmployeeSelectField = React.forwardRef<HTMLDivElement, UserSelectProps>(({
     </>
   );
 });
+
+EmployeeSelectField.displayName = 'EmployeeSelectField';
 
 export default EmployeeSelectField;

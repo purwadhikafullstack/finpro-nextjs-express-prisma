@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "serve": "next start -p $PORT",
+    "serve": "next start",
     "lint": "next lint",
     "test": "npx cypress verify & cypress run --component"
   },
@@ -37,6 +37,7 @@
     "cross-env": "^7.0.3",
     "embla-carousel-react": "^8.2.1",
     "jose": "^5.8.0",
+    "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",

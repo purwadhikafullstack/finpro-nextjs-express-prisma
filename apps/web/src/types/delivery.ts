@@ -1,12 +1,12 @@
-export type DeliveryType = 'Pickup' | 'Dropoff';
+import { ProgressType } from '@/types/shared';
 
-export type ProgressType = 'Pending' | 'Ongoing' | 'Completed';
+export type DeliveryType = 'Pickup' | 'Dropoff';
 
 export type Delivery = {
   delivery_id: string;
   outlet_id: string;
   employee_id: string;
-  progrses: ProgressType;
+  progress: ProgressType;
   type: DeliveryType;
   created_at: string;
   updated_at: string;

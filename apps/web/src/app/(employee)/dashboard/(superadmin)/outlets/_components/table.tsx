@@ -83,15 +83,16 @@ const DataTable = <TData, TValue>({
 
   return (
     <div className='w-full'>
-      <div className='flex flex-col lg:justify-between lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-4 mb-6'>
+      <div className='flex flex-col mb-6 space-y-4 lg:justify-between lg:flex-row lg:items-center lg:space-y-0 lg:space-x-4'>
         <Input
+          autoFocus
           placeholder='Filter name'
           value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
           onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
           className='w-full lg:max-w-md'
         />
 
-        <div className='flex items-center space-x-2 w-full lg:w-auto flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4'>
+        <div className='flex flex-col items-center w-full space-x-2 space-y-4 lg:w-auto lg:flex-row lg:space-y-0 lg:space-x-4'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant='outline' className='w-full'>
@@ -118,14 +119,14 @@ const DataTable = <TData, TValue>({
 
           <Link href='/dashboard/outlets/create' className='w-full'>
             <Button className='w-full'>
-              <Plus className='mr-2 inline-block w-4 h-4' />
+              <Plus className='inline-block w-4 h-4 mr-2' />
               <span>Add Outlet</span>
             </Button>
           </Link>
         </div>
       </div>
 
-      <div className='rounded-md border mb-6'>
+      <div className='mb-6 border rounded-md'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

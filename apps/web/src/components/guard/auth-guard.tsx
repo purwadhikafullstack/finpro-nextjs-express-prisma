@@ -4,7 +4,9 @@ import * as React from 'react';
 
 import FullscreenLoader from '../loader/fullscreen';
 import { Role } from '@/types/user';
-import { useAuth } from '@/hooks/use-auth';
+import axios from '@/lib/axios';
+import { jwtDecode } from 'jwt-decode';
+import { useLocalStorage } from 'usehooks-ts';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
@@ -15,29 +17,31 @@ interface AuthGuardProps extends React.PropsWithChildren {
 const AuthGuard: React.FC<AuthGuardProps> = ({ allowed, children }) => {
   const router = useRouter();
   const { toast } = useToast();
-  const { token } = useAuth();
+  const [token, setToken] = useLocalStorage<string | null>('access_token', null);
   const [authhorized, setAuthhorized] = React.useState(false);
 
   React.useEffect(() => {
     if (token) {
       const verify = async () => {
-        const res = await fetch('/api/auth/verify', {
-          method: 'POST',
-          body: JSON.stringify({
-            token,
-            allowed,
-          }),
-        });
+        try {
+          const { data } = await axios.post('/auth/guard', { allowed });
+          if (!data.protected) {
+            setAuthhorized(true);
+            return;
+          }
 
-        const json = await res.json();
-
-        if (json.protected) {
-          router.push('/');
           toast({
             title: 'You are not authorized',
             description: 'Please login with your credentials',
           });
-        } else setAuthhorized(true);
+
+          router.push('/');
+        } catch (err) {
+          toast({
+            title: 'You are not authorized',
+            description: 'Your token has expired, please login with your credentials',
+          });
+        }
       };
 
       verify();
@@ -48,7 +52,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ allowed, children }) => {
       });
       router.push('/auth/login');
     }
-  }, [token, allowed, router, toast]);
+  }, [token, setToken, allowed, router, toast]);
 
   if (!authhorized) return <FullscreenLoader />;
 

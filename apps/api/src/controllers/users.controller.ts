@@ -67,15 +67,16 @@ export default class UsersController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, fullname, phone } = await yup
+      const { email, fullname, phone, password } = await yup
         .object({
           email: yup.string().email().required(),
           fullname: yup.string().required(),
           phone: yup.string().required(),
+          password: yup.string().required(),
         })
         .validate(req.body);
 
-      const user = await this.userAction.create(email, fullname, phone);
+      const user = await this.userAction.create(email, fullname, phone, password);
 
       return res.status(201).json(new ApiResponse('User created successfully', user));
     } catch (error) {

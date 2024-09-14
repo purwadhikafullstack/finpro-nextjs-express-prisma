@@ -18,7 +18,7 @@ export default async function Page({ ...props }: PageProps): Promise<React.JSX.E
   return (
     <div className='flex flex-col w-full gap-32 py-20'>
       <Hero data-aos='fade-up' data-aos-delay={100} className='h-[50vh] container' />
-      <Showcase data-aos='fade-up' data-aos-delay={200} images={images} className='mb-20 container' />
+      <Showcase data-aos='fade-up' data-aos-delay={200} images={images} className='container mb-20' />
       <Feature data-aos='fade-up' data-aos-delay={300} className='container' />
       <HowTo data-aos='fade-up' data-aos-delay={400} />
       <Testimony data-aos='fade-up' data-aos-delay={500} />

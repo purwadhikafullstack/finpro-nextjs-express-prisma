@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import AuthGuard from '@/components/guard/auth-guard';
-import DashboardLayout from '@/layouts/dashboard/dashboard';
 
 interface LayoutProps extends React.PropsWithChildren {
   //

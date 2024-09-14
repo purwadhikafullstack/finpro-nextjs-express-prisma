@@ -38,46 +38,46 @@ const Testimony: React.FC<TestimonyProps> = ({ ...props }) => {
 
   return (
     <div className='py-20' {...props}>
-      <div className='flex flex-col space-y-2 items-center'>
-        <h2 className='font-bold text-4xl'>They love LaundryXpert, Now your turn 😍</h2>
-        <p className='leading-relaxed tracking-tight text-muted-foreground text-left'>
+      <div className='container flex flex-col items-center space-y-2'>
+        <h2 className='text-4xl font-bold'>They love LaundryXpert, Now your turn 😍</h2>
+        <p className='leading-relaxed tracking-tight text-left text-muted-foreground'>
           Our customers trust LaundryXpert for exceptional service and convenience
         </p>
       </div>
 
-      <div ref={container} className='mt-14 flex flex-col space-y-6 overflow-hidden relative'>
-        <ul ref={left} className='animate-left flex-nowrap shrink-0 flex space-x-6 items-center'>
+      <div ref={container} className='relative flex flex-col space-y-6 overflow-hidden mt-14'>
+        <ul ref={left} className='flex items-center space-x-6 animate-left flex-nowrap shrink-0'>
           {Array.from({ length: 8 }, (_, index) => (
-            <li key={index} className='basis-2/3 lg:basis-1/4 p-8 bg-accent rounded-lg flex-none'>
+            <li key={index} className='flex-none p-8 rounded-lg basis-2/3 lg:basis-1/4 bg-accent'>
               <div className='flex space-x-4'>
-                <div className='rounded-full size-10 flex-none font-medium bg-white flex items-center justify-center'>
+                <div className='flex items-center justify-center flex-none font-medium bg-white rounded-full size-10'>
                   A
                 </div>
                 <div className='flex flex-col space-y-2'>
-                  <blockquote className='text-muted-foreground text-sm'>
+                  <blockquote className='text-sm text-muted-foreground'>
                     LaundryXpert exceeded my expectations. My clothes are always perfectly cleaned and handled with
                     care. ⭐
                   </blockquote>
-                  <span className='text-foreground text-sm font-medium'>John Doe</span>
+                  <span className='text-sm font-medium text-foreground'>John Doe</span>
                 </div>
               </div>
             </li>
           ))}
         </ul>
 
-        <ul ref={right} className='animate-right flex-nowrap shrink-0 flex space-x-6 items-center'>
+        <ul ref={right} className='flex items-center space-x-6 animate-right flex-nowrap shrink-0'>
           {Array.from({ length: 8 }, (_, index) => (
-            <li key={index} className='basis-2/3 lg:basis-1/4 p-8 bg-accent rounded-lg flex-none'>
+            <li key={index} className='flex-none p-8 rounded-lg basis-2/3 lg:basis-1/4 bg-accent'>
               <div className='flex space-x-4'>
-                <div className='rounded-full size-10 flex-none font-medium bg-white flex items-center justify-center'>
+                <div className='flex items-center justify-center flex-none font-medium bg-white rounded-full size-10'>
                   B
                 </div>
                 <div className='flex flex-col space-y-2'>
-                  <blockquote className='text-muted-foreground text-sm'>
+                  <blockquote className='text-sm text-muted-foreground'>
                     LaundryXpert exceeded my expectations. My clothes are always perfectly cleaned and handled with
                     care. 😍
                   </blockquote>
-                  <span className='text-foreground text-sm font-medium'>John Doe</span>
+                  <span className='text-sm font-medium text-foreground'>John Doe</span>
                 </div>
               </div>
             </li>

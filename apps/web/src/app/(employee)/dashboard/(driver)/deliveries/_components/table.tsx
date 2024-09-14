@@ -85,44 +85,36 @@ const DataTable = <TData, TValue>({
     <div className='w-full'>
       <div className='flex flex-col mb-6 space-y-4 lg:justify-between lg:flex-row lg:items-center lg:space-y-0 lg:space-x-4'>
         <Input
-          placeholder='Filter name'
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
+          autoFocus
+          placeholder='Filter Delivery by ID'
+          value={(table.getColumn('delivery_id')?.getFilterValue() as string) ?? ''}
+          onChange={(event) => table.getColumn('delivery_id')?.setFilterValue(event.target.value)}
           className='w-full lg:max-w-md'
         />
 
-        <div className='flex flex-col items-center w-full space-x-2 space-y-4 lg:w-auto lg:flex-row lg:space-y-0 lg:space-x-4'>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='outline' className='w-full'>
-                Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className='capitalize'
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) => column.toggleVisibility(!!value)}>
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Link href='/dashboard/deliveries/create' className='w-full'>
-            <Button className='w-full'>
-              <Plus className='inline-block w-4 h-4 mr-2' />
-              <span>Add Delivery</span>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='outline' className='w-full'>
+              Columns
             </Button>
-          </Link>
-        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className='capitalize'
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}>
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className='mb-6 border rounded-md'>
@@ -165,7 +157,11 @@ const DataTable = <TData, TValue>({
   );
 };
 
-const DeliveryTable = () => {
+interface DevlieryTableProps {
+  //
+}
+
+const DeliveryTable: React.FC<DevlieryTableProps> = ({ ...props }) => {
   const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams();

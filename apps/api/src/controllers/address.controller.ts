@@ -45,4 +45,21 @@ export default class AddressController {
       next(error);
     }
   };
+
+  primary = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { user_id } = req.user as AccessTokenPayload;
+      const { customer_address_id } = await yup
+        .object({
+          customer_address_id: yup.string().required(),
+        })
+        .validate(req.params);
+
+      const updated = await this.addressAction.primary(user_id, customer_address_id);
+
+      return res.status(200).json(new ApiResponse('Address set as primary successfully', updated));
+    } catch (error) {
+      next(error);
+    }
+  };
 }

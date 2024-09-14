@@ -62,5 +62,4 @@ export const FEATURES_LIST = [
 export const AVATAR_LINKS = [
   { title: 'Profile', href: '/profile' },
   { title: 'Orders', href: '/orders' },
-  { title: 'Support', href: '/support' },
 ];

@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTableColumnHeader from '@/components/table/header';
+import Link from 'next/link';
 import { MoreHorizontal } from 'lucide-react';
 import { Outlet } from '@/types/outlet';
 
@@ -35,12 +36,6 @@ const columns: ColumnDef<Outlet>[] = [
     },
   },
   {
-    accessorKey: 'city_district',
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title='City District' />;
-    },
-  },
-  {
     accessorKey: 'region',
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title='Region' />;
@@ -56,17 +51,21 @@ const columns: ColumnDef<Outlet>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
+            <Button variant='ghost' className='w-8 h-8 p-0'>
               <span className='sr-only'>Open menu</span>
-              <MoreHorizontal className='h-4 w-4' />
+              <MoreHorizontal className='w-4 h-4' />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Edit Outlet</DropdownMenuItem>
+            <Link href={'/dashboard/outlets/' + row.original.outlet_id} className='w-full'>
+              <DropdownMenuItem>View Oultet</DropdownMenuItem>{' '}
+            </Link>
+            <Link href={'/dashboard/outlets/' + row.original.outlet_id + '/edit'} className='w-full'>
+              <DropdownMenuItem>Edit Outlet</DropdownMenuItem>
+            </Link>
             <DropdownMenuItem>Delete Outlet</DropdownMenuItem>
-            <DropdownMenuItem>View Employee</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

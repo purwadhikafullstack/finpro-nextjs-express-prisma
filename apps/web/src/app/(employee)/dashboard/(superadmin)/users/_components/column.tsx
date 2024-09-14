@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTableColumnHeader from '@/components/table/header';
@@ -25,7 +26,7 @@ const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'phone',
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title='phone' />;
+      return <DataTableColumnHeader column={column} title='Phone' />;
     },
   },
   {
@@ -38,6 +39,9 @@ const columns: ColumnDef<User>[] = [
     accessorKey: 'role',
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title='Role' />;
+    },
+    cell: ({ row }) => {
+      return <Badge className='whitespace-nowrap'>{row.original.role}</Badge>;
     },
   },
   {
