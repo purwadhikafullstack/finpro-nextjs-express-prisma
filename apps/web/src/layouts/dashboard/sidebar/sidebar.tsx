@@ -32,7 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, ...props }) => {
         </div>
 
         <div className='p-4 mt-auto'>
-          <SidebarCard />
+          {/* <SidebarCard /> */}
         </div>
       </div>
     </div>

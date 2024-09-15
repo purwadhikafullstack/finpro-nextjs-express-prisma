@@ -39,7 +39,7 @@ export default async function Page({ params, ...props }: PageProps): Promise<Rea
 
         <CardFooter>
           <Link href='/request' className='ml-auto'>
-            <Button variant='outline'>Add Orders</Button>
+            <Button variant='outline'>Add Order</Button>
           </Link>
         </CardFooter>
       </Card>
