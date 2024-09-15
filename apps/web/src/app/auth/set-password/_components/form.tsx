@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 import PasswordMeter from '@/components/password-meter';
 import { useAuth } from '@/hooks/use-auth';
 import { useForm } from 'react-hook-form';
@@ -113,7 +114,8 @@ const SetPasswordForm: React.FC<SetPasswordFormProps> = ({ ...props }) => {
           render={({ field }) => <Input type='hidden' placeholder='enter your token' {...field} />}
         />
 
-        <Button type='submit' className='w-full'>
+        <Button type='submit' className='w-full' disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
           Set Password
         </Button>
       </form>

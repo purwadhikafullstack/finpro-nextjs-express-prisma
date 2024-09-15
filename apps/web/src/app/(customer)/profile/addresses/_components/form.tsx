@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 import { Location } from '@/types/location';
 import { MapLoader } from '@/components/loader/map';
 import { Textarea } from '@/components/ui/textarea';
@@ -155,7 +156,10 @@ const AddressForm: React.FC<AddressFormProps> = ({ ...props }) => {
         </div>
 
         <div className='flex justify-start'>
-          <Button type='submit'>Save</Button>
+          <Button type='submit' disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
+            Create Address
+          </Button>
         </div>
       </form>
     </Form>

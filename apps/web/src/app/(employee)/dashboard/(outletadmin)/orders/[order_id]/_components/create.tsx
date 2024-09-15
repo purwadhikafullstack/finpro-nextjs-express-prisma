@@ -4,8 +4,8 @@ import * as React from 'react';
 import * as yup from 'yup';
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Minus, Plus } from 'lucide-react';
+import { Form, FormLabel } from '@/components/ui/form';
+import { Loader2, Minus, Plus } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { Button } from '@/components/ui/button';
@@ -215,7 +215,10 @@ const OrderItemsForm: React.FC<OrderItemsFormProps> = ({ order_id, ...props }) =
             </CardContent>
             <CardFooter>
               <div className='flex justify-end w-full'>
-                <Button type='submit'>Confirm Order</Button>
+                <Button type='submit' disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
+                  Confirm Order
+                </Button>
               </div>
             </CardFooter>
           </Card>

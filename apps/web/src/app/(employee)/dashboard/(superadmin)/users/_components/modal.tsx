@@ -14,11 +14,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Loader2, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import PasswordMeter from '@/components/password-meter';
-import { Plus } from 'lucide-react';
 import axios from '@/lib/axios';
 import { useForm } from 'react-hook-form';
 import { useSWRConfig } from 'swr';
@@ -158,7 +158,10 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ ...props }) => {
                   Close
                 </Button>
               </DialogClose>
-              <Button type='submit'>Create Employee</Button>
+              <Button type='submit' disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
+                Create Employee
+              </Button>
             </DialogFooter>
           </form>
         </Form>

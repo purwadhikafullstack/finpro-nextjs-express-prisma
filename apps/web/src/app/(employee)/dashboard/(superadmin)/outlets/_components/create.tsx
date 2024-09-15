@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import { Loader2 } from 'lucide-react';
 import { Location } from '@/types/location';
 import { MapLoader } from '@/components/loader/map';
 import { Textarea } from '@/components/ui/textarea';
@@ -281,7 +282,10 @@ const OutletCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
                 <Link href='/dashboard/outlets'>
                   <Button variant='outline'>Cancel</Button>
                 </Link>
-                <Button type='submit'>Save Outlet</Button>
+                <Button type='submit' disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
+                  Create Outlet
+                </Button>
               </div>
             </CardContent>
           </Card>

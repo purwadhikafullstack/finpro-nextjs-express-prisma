@@ -4,13 +4,13 @@ import * as React from 'react';
 import * as yup from 'yup';
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChevronsUpDown, Loader2 } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronsUpDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { Outlet } from '@/types/outlet';
@@ -255,7 +255,10 @@ const RequestOrderForm: React.FC<RequestOrderFormProps> = ({ ...props }) => {
 
           <CardFooter>
             <div className='flex justify-start'>
-              <Button type='submit'>Place Order</Button>
+              <Button type='submit' disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
+                Place Order
+              </Button>
             </div>
           </CardFooter>
         </Card>

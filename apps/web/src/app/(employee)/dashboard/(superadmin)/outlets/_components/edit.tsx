@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { EmployeeForm } from './select';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import { Loader2 } from 'lucide-react';
 import { Location } from '@/types/location';
 import { MapLoader } from '@/components/loader/map';
 import { Textarea } from '@/components/ui/textarea';
@@ -253,7 +254,10 @@ const OutletEditForm: React.FC<OutletEditProps> = ({ outlet_id }) => {
                 <Link href='/dashboard/outlets'>
                   <Button variant='outline'>Cancel</Button>
                 </Link>
-                <Button type='submit'>Save Outlet</Button>
+                <Button type='submit' disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
+                  Update Outlet
+                </Button>
               </div>
             </CardContent>
           </Card>
