@@ -12,10 +12,7 @@ const GuestGuard: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    if (token) {
-      router.push('/');
-    }
-
+    if (token) router.push('/');
     setLoading(false);
   }, [token, router]);
 

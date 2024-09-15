@@ -4,11 +4,18 @@ import * as React from 'react';
 
 import { User } from '@/types/user';
 import axios from '@/lib/axios';
+import { jwtDecode } from 'jwt-decode';
 import { useLocalStorage } from 'usehooks-ts';
-import { useToast } from '@/hooks/use-toast';
+
+type UserToken = Omit<User, 'phone' | 'created_at' | 'updated_at'>;
+
+interface AccessTokenPayload extends UserToken {
+  exp: number;
+  iat: number;
+}
 
 interface AuthContextProps {
-  user: User | null;
+  user: UserToken | null;
   token: string | null;
   signin: (data: { email: string; password: string }) => Promise<void>;
   signup: (data: { email: string; fullname: string; phone: string }) => Promise<void>;
@@ -30,19 +37,18 @@ const AuthContext = React.createContext<AuthContextProps>({
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { toast } = useToast();
-
   const [token, setToken] = useLocalStorage<string | null>('access_token', null);
-  const [user, setUser] = React.useState<User | null>(null);
+  const [user, setUser] = React.useState<UserToken | null>(null);
 
   React.useEffect(() => {
-    const profile = async () => {
-      const { data } = await axios.get('/profile');
-      setUser(data.data);
+    const parseToken = (token: string) => {
+      const { exp, iat, ...user } = jwtDecode<AccessTokenPayload>(token);
+      setUser(user);
     };
 
-    if (token) profile();
-  }, [token, toast, setToken]);
+    if (token) parseToken(token);
+    else setUser(null);
+  }, [token]);
 
   const signin = async ({ email, password }: { email: string; password: string }) => {
     const { data } = await axios.post('/auth/login', { email, password });

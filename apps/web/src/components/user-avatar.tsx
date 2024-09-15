@@ -57,9 +57,11 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user }) => {
         <div className='flex flex-col py-2 space-y-0'>
           <DropdownMenuLabel className='flex items-center space-x-2 space-y-0'>
             <span>{user.fullname}</span>
-            <Badge variant='default' className='p-px text-xs aspect-square'>
-              {user.is_verified ? <Check className='size-3' /> : 'Unverified'}
-            </Badge>
+            {user.is_verified && (
+              <Badge className='p-px text-xs aspect-square'>
+                <Check className='size-2' />
+              </Badge>
+            )}
           </DropdownMenuLabel>
           <span className='px-2 text-sm text-muted-foreground'>{user.email}</span>
         </div>
