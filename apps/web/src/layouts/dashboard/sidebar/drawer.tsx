@@ -37,7 +37,7 @@ const SidebarDrawer: React.FC<DrawerProps> = ({ ...props }) => {
         </nav>
 
         <div className='mt-auto'>
-          <SidebarCard />
+          {/* <SidebarCard /> */}
         </div>
       </SheetContent>
     </Sheet>

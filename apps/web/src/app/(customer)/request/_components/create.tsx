@@ -255,7 +255,7 @@ const RequestOrderForm: React.FC<RequestOrderFormProps> = ({ ...props }) => {
 
           <CardFooter>
             <div className='flex justify-start'>
-              <Button type='submit'>Save</Button>
+              <Button type='submit'>Place Order</Button>
             </div>
           </CardFooter>
         </Card>
