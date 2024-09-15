@@ -24,7 +24,6 @@ export default class OutletsRouter {
 
     this.router.use(this.roleMiddleware.role(['SuperAdmin']));
     this.router.get('/', this.outletsController.index);
-    this.router.get('/nearest', this.outletsController.nearest);
     this.router.post('/', this.outletsController.create);
     this.router.get('/:outlet_id', this.outletsController.show);
     this.router.put('/:outlet_id', this.outletsController.update);
