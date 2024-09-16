@@ -29,16 +29,21 @@ export default class ProfileController {
     try {
       const { user_id } = req.user as AccessTokenPayload;
 
-      const { fullname, phone } = await yup
+      const { fullname, phone, avatar_url } = await yup
         .object({
           fullname: yup.string().required(),
           phone: yup.string().required(),
+          avatar_url: yup.string().required(),
         })
         .validate(req.body);
 
-      const { password, ...rest } = await this.profileAction.update(user_id, fullname, phone);
+      const { access_token } = await this.profileAction.update(user_id, fullname, phone, avatar_url);
 
-      return res.status(200).json(new ApiResponse('Profile updated successfully', rest));
+      return res.status(200).json(
+        new ApiResponse('Profile updated successfully', {
+          access_token,
+        })
+      );
     } catch (error) {
       next(error);
     }

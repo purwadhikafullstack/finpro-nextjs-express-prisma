@@ -11,7 +11,7 @@ export type Role =
 export type User = {
   user_id: string;
   fullname: string;
-  phone: string;
+  phone?: string;
   role: Role;
   email: string;
   avatar_url: string;

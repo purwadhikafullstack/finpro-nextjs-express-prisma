@@ -6,6 +6,7 @@ import * as yup from 'yup';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 import { Button } from '@/components/ui/button';
+import ImageUpload from '@/components/image-upload';
 import { Input } from '@/components/ui/input';
 import Loader from '@/components/loader/loader';
 import { Loader2 } from 'lucide-react';
@@ -24,11 +25,13 @@ interface ProfileFormProps {
 const profileSchema = yup.object({
   fullname: yup.string().required(),
   phone: yup.string().required(),
+  avatar_url: yup.string().required(),
 });
 
 const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
   const { toast } = useToast();
   const { update } = useAuth();
+
   const { data, error, isLoading } = useSWR<{ message: string; data: User }>('/profile', fetcher, {
     onError: (error) => {
       toast({
@@ -44,13 +47,15 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
     defaultValues: {
       fullname: '',
       phone: '',
+      avatar_url: '',
     },
   });
 
   React.useEffect(() => {
     if (data) {
       form.setValue('fullname', data.data.fullname);
-      form.setValue('phone', data.data.phone);
+      form.setValue('phone', data.data.phone || '');
+      form.setValue('avatar_url', data.data.avatar_url || '');
     }
   }, [data, form]);
 
@@ -84,6 +89,26 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
             </FormControl>
             <FormMessage />
           </FormItem>
+
+          <FormField
+            control={form.control}
+            name='avatar_url'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Avatar Url</FormLabel>
+                <ImageUpload
+                  imageWidth={300}
+                  imageHeight={300}
+                  asset_folder={'avatar'}
+                  src={form.watch('avatar_url')}
+                  eager='w_200,h_200,c_fill'
+                  onChangeImage={(original, eager) => form.setValue('avatar_url', eager ? eager : original)}
+                  className='overflow-hidden border rounded-full size-32 bg-accent'
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
