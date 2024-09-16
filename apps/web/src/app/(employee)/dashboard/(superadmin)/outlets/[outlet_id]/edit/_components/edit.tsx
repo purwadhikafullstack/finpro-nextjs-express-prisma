@@ -4,12 +4,12 @@ import * as React from 'react';
 import * as yup from 'yup';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import EmployeeSelectField, { EmployeeForm } from './select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { EmployeeForm } from '../../../_components/select';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
@@ -20,15 +20,14 @@ import axios from '@/lib/axios';
 import dynamic from 'next/dynamic';
 import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
-import { useLocation } from '@/hooks/use-location';
+import { useOutletDetail } from '@/hooks/use-outlet-detail';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { yupResolver } from '@hookform/resolvers/yup';
 
-interface OutletCreateProps {
-  //
+interface OutletEditProps {
+  outlet_id: string;
 }
-const Role = ['Employee', 'Driver', 'OutletAdmin', 'WashingWorker', 'IroningWorker', 'PackingWorker'] as const;
 
 const outletSchema = yup.object({
   name: yup.string().required(),
@@ -36,25 +35,15 @@ const outletSchema = yup.object({
   address: yup.string().required(),
   latitude: yup.number().required(),
   longitude: yup.number().required(),
-  employees: yup
-    .array(
-      yup.object({
-        user_id: yup.string().required(),
-        email: yup.string().required(),
-        fullname: yup.string().required(),
-        role: yup.string().oneOf(Object.values(Role)).required().defined(),
-      })
-    )
-    .required(),
 });
 
-const CreateOutletForm: React.FC<OutletCreateProps> = ({ ...props }) => {
+const OutletEditForm: React.FC<OutletEditProps> = ({ outlet_id }) => {
   const router = useRouter();
   const { toast } = useToast();
   const { confirm } = useConfirm();
-  const { state } = useLocation();
   const [location, setLocation] = React.useState<Location | null>(null);
   const [employees, setEmployees] = React.useState<EmployeeForm[]>([]);
+  const { data, error, isLoading, mutate } = useOutletDetail(outlet_id);
 
   const Map = React.useMemo(
     () =>
@@ -73,13 +62,21 @@ const CreateOutletForm: React.FC<OutletCreateProps> = ({ ...props }) => {
       address: '',
       latitude: 0,
       longitude: 0,
-      employees: [],
     },
   });
 
   React.useEffect(() => {
-    if (state) setLocation(state);
-  }, [state, setLocation]);
+    if (data) {
+      form.setValue('name', data.data.name);
+      form.setValue('description', data.data.description);
+      form.setValue('address', data.data.address);
+      setLocation({
+        latitude: data.data.latitude,
+        longitude: data.data.longitude,
+      });
+      setEmployees(data.data.Employee.map((employee) => ({ ...(employee.User as EmployeeForm) })));
+    }
+  }, [data, form]);
 
   React.useEffect(() => {
     if (location) {
@@ -88,24 +85,19 @@ const CreateOutletForm: React.FC<OutletCreateProps> = ({ ...props }) => {
     }
   }, [form, location]);
 
-  React.useEffect(() => {
-    if (employees.length > 0) {
-      form.setValue('employees', employees);
-    }
-  }, [form, employees]);
-
   const onSubmit = async (formData: yup.InferType<typeof outletSchema>) => {
     try {
       confirm({
-        title: 'Create Outlet',
-        description: 'Are you sure you want to create this outlet? make sure the details are correct.',
+        title: 'Update Outlet',
+        description: 'Are you sure you want to update this outlet? make sure the details are correct.',
       })
         .then(async () => {
-          await axios.post('/outlets', formData);
+          await axios.put('/outlets/' + outlet_id, formData);
           toast({
-            title: 'Outlet created',
-            description: 'Your outlet has been created successfully',
+            title: 'Outlet updated',
+            description: 'Your outlet has been updated successfully',
           });
+          mutate();
           router.push('/dashboard/outlets');
         })
         .catch(() => {
@@ -119,6 +111,9 @@ const CreateOutletForm: React.FC<OutletCreateProps> = ({ ...props }) => {
       });
     }
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error || !data) return <div>failed to load outlet data, retrying...</div>;
 
   return (
     <Form {...form}>
@@ -171,7 +166,7 @@ const CreateOutletForm: React.FC<OutletCreateProps> = ({ ...props }) => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {employees.length === 0 && (
+                      {data.data.Employee.length === 0 && (
                         <TableRow>
                           <TableCell colSpan={3} className='h-20 text-center'>
                             No results.
@@ -190,30 +185,6 @@ const CreateOutletForm: React.FC<OutletCreateProps> = ({ ...props }) => {
                     </TableBody>
                   </Table>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-xl font-bold'>Search Users</CardTitle>
-              <CardDescription>List of available users to select, you can search by name or email.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className='grid gap-4'>
-                <FormField
-                  control={form.control}
-                  name='employees'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Employees</FormLabel>
-                      <FormControl>
-                        <EmployeeSelectField {...field} selected={employees} setSelected={setEmployees} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
             </CardContent>
           </Card>
@@ -295,7 +266,7 @@ const CreateOutletForm: React.FC<OutletCreateProps> = ({ ...props }) => {
                 </Link>
                 <Button type='submit' disabled={form.formState.isSubmitting}>
                   {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
-                  Create Outlet
+                  Update Outlet
                 </Button>
               </div>
             </CardContent>
@@ -306,4 +277,4 @@ const CreateOutletForm: React.FC<OutletCreateProps> = ({ ...props }) => {
   );
 };
 
-export default CreateOutletForm;
+export default OutletEditForm;

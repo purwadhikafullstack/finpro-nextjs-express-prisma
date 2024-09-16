@@ -54,8 +54,6 @@ export default class JobAction {
               },
             },
           },
-          skip: (page - 1) * limit,
-          take: limit,
           orderBy: order,
         };
       }
@@ -63,6 +61,8 @@ export default class JobAction {
       const [jobs, count] = await prisma.$transaction([
         prisma.job.findMany({
           ...query,
+          skip: (page - 1) * limit,
+          take: limit,
           include: {
             Outlet: true,
             Order: true,

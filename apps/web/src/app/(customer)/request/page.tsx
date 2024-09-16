@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import RequestOrderForm from './_components/create';
+import CreateRequestForm from './_components/create';
 
 interface PageProps {
   //
@@ -16,7 +16,7 @@ export default async function Page({ ...props }: PageProps): Promise<React.JSX.E
         </p>
       </div>
 
-      <RequestOrderForm />
+      <CreateRequestForm />
     </div>
   );
 }

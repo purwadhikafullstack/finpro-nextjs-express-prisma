@@ -2,12 +2,11 @@
 
 import * as React from 'react';
 
-import { User } from '@/types/user';
+import { User, UserToken } from '@/types/user';
+
 import axios from '@/lib/axios';
 import { jwtDecode } from 'jwt-decode';
 import { useLocalStorage } from 'usehooks-ts';
-
-type UserToken = Omit<User, 'phone' | 'created_at' | 'updated_at'>;
 
 interface AccessTokenPayload extends UserToken {
   exp: number;
@@ -20,7 +19,7 @@ interface AuthContextProps {
   signin: (data: { email: string; password: string }) => Promise<void>;
   signup: (data: { email: string; fullname: string; phone: string }) => Promise<void>;
   verify: (data: { password: string; confirmation: string; token: string }) => Promise<void>;
-  update: (data: { fullname: string; phone: string }) => Promise<void>;
+  update: (data: { fullname: string; phone: string; avatar_url: string }) => Promise<void>;
   google: () => Promise<void>;
   signout: () => Promise<void>;
 }
@@ -72,9 +71,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken(data.data.access_token);
   };
 
-  const update = async ({ fullname, phone }: { fullname: string; phone: string }) => {
-    const { data } = await axios.put('/profile', { fullname, phone });
-    setUser(data.data);
+  const update = async ({ fullname, phone, avatar_url }: { fullname: string; phone: string; avatar_url: string }) => {
+    const { data } = await axios.put('/profile', { fullname, phone, avatar_url });
+    setToken(data.data.access_token);
   };
 
   const signout = async () => {

@@ -11,8 +11,8 @@ export default async function Page({ ...props }: PageProps): Promise<React.JSX.E
   return (
     <div className='grid gap-6'>
       <div className='grid gap-2 text-center'>
-        <h1 className='text-3xl font-bold'>Register</h1>
-        <p className='text-balance text-muted-foreground'>Enter your email below to create an account</p>
+        <h1 className='text-3xl font-bold'>Account Verification</h1>
+        <p className='text-balance text-muted-foreground'>Your account has been created successfully</p>
       </div>
 
       <div className='grid gap-4'>
@@ -31,7 +31,7 @@ export default async function Page({ ...props }: PageProps): Promise<React.JSX.E
         </Link>
       </div>
 
-      <div className='mt-4 text-center text-sm'>
+      <div className='mt-4 text-sm text-center'>
         Already have an account?{' '}
         <Link href='/auth/login' className='underline'>
           Login

@@ -15,24 +15,23 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { DataTablePagination } from '@/components/table/pagination';
 import { Input } from '@/components/ui/input';
+<<<<<<<< HEAD:apps/web/src/app/(employee)/dashboard/(worker)/jobs/_components/table.tsx
+import TableLoader from '@/components/loader/table';
+========
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import TableLoader from '@/components/loader/table';
+import ToggleColumn from '@/components/table/column-toggle';
+>>>>>>>> origin/2-LWA18-userprofile:apps/web/src/app/(employee)/dashboard/(superadmin)/outlets/_components/table.tsx
 import columns from './column';
 import { useDebounceValue } from 'usehooks-ts';
-import { useOutlets } from '@/hooks/use-outlets';
+import { useJobs } from '@/hooks/use-jobs';
 
 interface DataTableProps<TData, TValue> {
   data: TData[];
@@ -86,6 +85,18 @@ const DataTable = <TData, TValue>({
       <div className='flex flex-col mb-6 space-y-4 lg:justify-between lg:flex-row lg:items-center lg:space-y-0 lg:space-x-4'>
         <Input
           autoFocus
+<<<<<<<< HEAD:apps/web/src/app/(employee)/dashboard/(worker)/jobs/_components/table.tsx
+          placeholder='Filter Jobs by ID'
+          value={(table.getColumn('job_id')?.getFilterValue() as string) ?? ''}
+          onChange={(event) => table.getColumn('job_id')?.setFilterValue(event.target.value)}
+          className='w-full lg:max-w-md'
+        />
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='outline' className='w-full'>
+              Columns
+========
           placeholder='Filter name'
           value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
           onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
@@ -93,34 +104,13 @@ const DataTable = <TData, TValue>({
         />
 
         <div className='flex flex-col items-center w-full space-x-2 space-y-4 lg:w-auto lg:flex-row lg:space-y-0 lg:space-x-4'>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='outline' className='w-full'>
-                Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className='capitalize'
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) => column.toggleVisibility(!!value)}>
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ToggleColumn table={table} />
 
           <Link href='/dashboard/outlets/create' className='w-full'>
             <Button className='w-full'>
               <Plus className='inline-block w-4 h-4 mr-2' />
               <span>Add Outlet</span>
+>>>>>>>> origin/2-LWA18-userprofile:apps/web/src/app/(employee)/dashboard/(superadmin)/outlets/_components/table.tsx
             </Button>
           </Link>
         </div>
@@ -166,7 +156,11 @@ const DataTable = <TData, TValue>({
   );
 };
 
-const OutletTable = () => {
+interface JobTableProps {
+  //
+}
+
+const JobTable: React.FC<JobTableProps> = ({ ...props }) => {
   const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams();
@@ -180,7 +174,7 @@ const OutletTable = () => {
 
   const [filter] = useDebounceValue<ColumnFiltersState>(columnFilters, 500);
 
-  const { data, error, isLoading } = useOutlets(filter, pagination, sorting);
+  const { data, error, isLoading } = useJobs(filter, pagination, sorting);
 
   React.useEffect(() => {
     if (search.has('page')) {
@@ -230,12 +224,16 @@ const OutletTable = () => {
   }, [router, pathname, pagination, sorting, filter]);
 
   if (isLoading) return <TableLoader />;
+<<<<<<<< HEAD:apps/web/src/app/(employee)/dashboard/(worker)/jobs/_components/table.tsx
+  if (error || !data) return <div>failed to load jobs data, retrying...</div>;
+========
   if (error || !data) return <div>failed to load outlet data, retrying...</div>;
+>>>>>>>> origin/2-LWA18-userprofile:apps/web/src/app/(employee)/dashboard/(superadmin)/outlets/_components/table.tsx
 
   return (
     <DataTable
       columns={columns}
-      data={data.data.outlets}
+      data={data.data.jobs}
       pageCount={Math.ceil(data.data.count / pagination.pageSize)}
       sorting={sorting}
       onSortingChange={setSorting}
@@ -247,4 +245,4 @@ const OutletTable = () => {
   );
 };
 
-export default OutletTable;
+export default JobTable;

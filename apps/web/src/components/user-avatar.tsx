@@ -14,13 +14,13 @@ import { AVATAR_LINKS } from '@/lib/constant';
 import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
-import { User } from '@/types/user';
+import { UserToken } from '@/types/user';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 interface UserAvatarProps {
-  user: User;
+  user: UserToken;
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({ user }) => {

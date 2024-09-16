@@ -1,8 +1,7 @@
 import * as React from 'react';
 import * as yup from 'yup';
 
-import OrderItemsForm from '../_components/create';
-import axios from '@/lib/axios';
+import CreateOrderItemsForm from '../_components/create';
 import { redirect } from 'next/navigation';
 
 interface PageProps {
@@ -30,7 +29,7 @@ export default async function Page({ params, ...props }: PageProps): Promise<Rea
           </p>
         </div>
 
-        <OrderItemsForm order_id={order_id} />
+        <CreateOrderItemsForm order_id={order_id} />
       </>
     );
   } catch (error) {

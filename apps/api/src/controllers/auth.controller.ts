@@ -161,7 +161,7 @@ export default class AuthController {
       if (!user) throw new ApiError(400, 'Invalid username or password');
       if (!user.is_verified) return res.redirect(`${FRONTEND_URL}/auth/verify`);
 
-      const { refresh_token } = await this.authAction.google(user);
+      const { access_token, refresh_token } = await this.authAction.google(user);
 
       res.cookie('refresh_token', refresh_token, {
         httpOnly: true,
@@ -170,7 +170,7 @@ export default class AuthController {
         secure: process.env.NODE_ENV === 'production',
       });
 
-      return res.redirect(FRONTEND_URL);
+      return res.redirect(FRONTEND_URL + '/auth/callback?token=' + access_token);
     } catch (error) {
       next(error);
     }

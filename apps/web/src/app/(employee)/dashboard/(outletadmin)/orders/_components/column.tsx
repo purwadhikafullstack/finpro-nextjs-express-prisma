@@ -104,9 +104,11 @@ const columns: ColumnDef<
             <Link href={'/dashboard/orders/' + row.original.order_id} className='w-full'>
               <DropdownMenuItem>View Order</DropdownMenuItem>
             </Link>
-            <Link href={'/dashboard/orders/' + row.original.order_id + '/create'} className='w-full'>
-              <DropdownMenuItem>Add Order Items</DropdownMenuItem>
-            </Link>
+            {row.original.OrderProgress && row.original.OrderProgress.name === 'Laundry Telah Sampai Outlet' && (
+              <Link href={'/dashboard/orders/' + row.original.order_id + '/create'} className='w-full'>
+                <DropdownMenuItem>Add Order Items</DropdownMenuItem>
+              </Link>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       );

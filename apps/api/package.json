@@ -9,6 +9,7 @@
     "serve": "cross-env NODE_ENV=production node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prisma": "npx prisma",
+    "email": "dotenv -e .env.development.local -e .env.development -- email dev --port 3001 --dir src/emails",
     "db:migrate": "dotenv -e .env.development.local -e .env.development -- npx prisma migrate dev",
     "db:generate": "dotenv -e .env.development.local -e .env.development -- npx prisma generate",
     "db:pull": "dotenv -e .env.development.local -e .env.development -- npx prisma db pull",
@@ -19,7 +20,9 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.7.1",
+    "@react-email/components": "^0.0.25",
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.5.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
@@ -29,6 +32,7 @@
     "jsonwebtoken": "^9.0.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "resend": "^4.0.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3",
@@ -42,6 +46,7 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/passport-google-oauth20": "^2.0.16",
     "prisma": "^5.7.1",
+    "react-email": "^3.0.1",
     "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0"
   }

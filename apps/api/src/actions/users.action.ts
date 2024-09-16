@@ -33,12 +33,17 @@ export default class UserAction {
 
       const query = {
         where: filter,
-        skip: (page - 1) * limit,
-        take: limit,
         orderBy: order,
       };
 
-      const [users, count] = await prisma.$transaction([prisma.user.findMany(query), prisma.user.count(query)]);
+      const [users, count] = await prisma.$transaction([
+        prisma.user.findMany({
+          ...query,
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        prisma.user.count(query),
+      ]);
 
       return [users, count];
     } catch (error) {

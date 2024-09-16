@@ -55,8 +55,6 @@ export default class OrderAction {
               },
             },
           },
-          skip: (page - 1) * limit,
-          take: limit,
           orderBy: order,
         };
       }
@@ -64,6 +62,8 @@ export default class OrderAction {
       const [orders, count] = await prisma.$transaction([
         prisma.order.findMany({
           ...query,
+          skip: (page - 1) * limit,
+          take: limit,
           include: {
             Outlet: true,
             OrderProgress: {

@@ -19,8 +19,8 @@ import Link from 'next/link';
 import { MoreHorizontal } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import axios from '@/lib/axios';
+import useConfirm from '@/hooks/use-confirm';
 import { useCustomerAddresses } from '@/hooks/use-customer-addresses';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 interface AddressListProps {
@@ -29,6 +29,7 @@ interface AddressListProps {
 
 const CustomerAddressTable: React.FC<AddressListProps> = ({ ...props }) => {
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const { data, error, isLoading, mutate } = useCustomerAddresses();
 
   const handleSetPrimary = async (address: Address) => {
@@ -41,13 +42,21 @@ const CustomerAddressTable: React.FC<AddressListProps> = ({ ...props }) => {
         return;
       }
 
-      await axios.put(`/profile/addresses/${address.customer_address_id}/set-primary`);
-
-      toast({
-        title: 'Address set as primary',
-        description: 'Your address has been set as primary.',
-      });
-      mutate();
+      await confirm({
+        title: 'Set as Primary Address',
+        description: 'Are you sure you want to set this address as primary?',
+      })
+        .then(async () => {
+          await axios.put(`/profile/addresses/${address.customer_address_id}/set-primary`);
+          toast({
+            title: 'Address set as primary',
+            description: 'Your address has been set as primary.',
+          });
+          mutate();
+        })
+        .catch(() => {
+          // do nothing
+        });
     } catch (error: any) {
       toast({
         title: 'Failed to set address as primary',

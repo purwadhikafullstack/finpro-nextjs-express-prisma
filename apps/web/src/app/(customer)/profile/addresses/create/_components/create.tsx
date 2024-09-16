@@ -13,6 +13,7 @@ import { MapLoader } from '@/components/loader/map';
 import { Textarea } from '@/components/ui/textarea';
 import axios from '@/lib/axios';
 import dynamic from 'next/dynamic';
+import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
 import { useLocation } from '@/hooks/use-location';
 import { useRouter } from 'next/navigation';
@@ -30,9 +31,10 @@ const addressSchema = yup.object({
   longitude: yup.number().required(),
 });
 
-const AddressForm: React.FC<AddressFormProps> = ({ ...props }) => {
+const CreateAddressForm: React.FC<AddressFormProps> = ({ ...props }) => {
   const router = useRouter();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const { state } = useLocation();
   const [location, setLocation] = React.useState<Location | null>(null);
 
@@ -72,12 +74,21 @@ const AddressForm: React.FC<AddressFormProps> = ({ ...props }) => {
 
   const onSubmit = async (formData: yup.InferType<typeof addressSchema>) => {
     try {
-      await axios.post('/profile/addresses', formData);
-      toast({
-        title: 'Address saved',
-        description: 'Your address has been saved successfully',
-      });
-      router.push('/profile/addresses');
+      confirm({
+        title: 'Create Address',
+        description: 'Are you sure you want to create this address? make sure the details are correct.',
+      })
+        .then(async () => {
+          await axios.post('/profile/addresses', formData);
+          toast({
+            title: 'Address saved',
+            description: 'Your address has been saved successfully',
+          });
+          router.push('/profile/addresses');
+        })
+        .catch(() => {
+          // do nothing
+        });
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -166,4 +177,4 @@ const AddressForm: React.FC<AddressFormProps> = ({ ...props }) => {
   );
 };
 
-export default AddressForm;
+export default CreateAddressForm;

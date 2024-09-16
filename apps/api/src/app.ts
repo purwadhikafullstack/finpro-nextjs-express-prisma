@@ -6,6 +6,7 @@ import PassportConfig from './libs/passport';
 import { ValidationError } from 'yup';
 import cookie from 'cookie-parser';
 import cors from 'cors';
+import path from 'path';
 import v1Router from '@/routers/v1/index.routes';
 
 export default class App {
@@ -38,6 +39,7 @@ export default class App {
   private routes(): void {
     const v1 = new v1Router();
 
+    this.app.use('/static', express.static(path.join(__dirname, '../public')));
     this.app.get('/_debug/healthcheck', (req: Request, res: Response) => {
       res.send('OK');
     });

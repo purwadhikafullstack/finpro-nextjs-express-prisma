@@ -56,8 +56,6 @@ export default class DeliveryAction {
               },
             },
           },
-          skip: (page - 1) * limit,
-          take: limit,
           orderBy: order,
         };
       }
@@ -65,6 +63,8 @@ export default class DeliveryAction {
       const [deliveries, count] = await prisma.$transaction([
         prisma.delivery.findMany({
           ...query,
+          skip: (page - 1) * limit,
+          take: limit,
           include: {
             Outlet: true,
           },

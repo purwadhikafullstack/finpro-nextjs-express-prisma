@@ -35,12 +35,17 @@ export default class OutletsAction {
 
       const query = {
         where: filter,
-        skip: (page - 1) * limit,
-        take: limit,
         orderBy: order,
       };
 
-      const [outlets, count] = await prisma.$transaction([prisma.outlet.findMany(query), prisma.outlet.count(query)]);
+      const [outlets, count] = await prisma.$transaction([
+        prisma.outlet.findMany({
+          ...query,
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        prisma.outlet.count(query),
+      ]);
 
       return [outlets, count];
     } catch (error) {

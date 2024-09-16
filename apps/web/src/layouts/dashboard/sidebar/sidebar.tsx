@@ -4,7 +4,6 @@ import { PROJECT_NAME, SIDEBAR_LINKS } from '@/lib/constant';
 
 import AppIcon from '@/components/app-icon';
 import Link from 'next/link';
-import SidebarCard from '@/layouts/dashboard/sidebar/card';
 import SidebarLink from '@/layouts/dashboard/sidebar/sidelink';
 import { cn } from '@/lib/utils';
 
@@ -14,7 +13,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Sidebar: React.FC<SidebarProps> = ({ className, ...props }) => {
   return (
-    <div className={cn('border-r bg-zinc-50/50', className)} {...props}>
+    <div className={cn('border-r bg-zinc-50', className)} {...props}>
       <div className='flex flex-col h-full gap-2'>
         <div className='flex items-center flex-none h-16 px-6 border-b'>
           <Link href='/' className='flex items-center space-x-2 font-semibold'>
@@ -31,9 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, ...props }) => {
           </nav>
         </div>
 
-        <div className='p-4 mt-auto'>
-          {/* <SidebarCard /> */}
-        </div>
+        <div className='p-4 mt-auto'>{/* <SidebarCard /> */}</div>
       </div>
     </div>
   );

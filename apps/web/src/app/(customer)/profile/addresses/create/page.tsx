@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-import AddressForm from '../_components/form';
+import CreateAddressForm from './_components/create';
 
 interface PageProps {
   //
@@ -16,7 +16,7 @@ export default async function Page({ ...props }: PageProps): Promise<React.JSX.E
         <CardDescription>Manage your addresses, this information will be used to deliver your orders.</CardDescription>
       </CardHeader>
       <CardContent>
-        <AddressForm />
+        <CreateAddressForm />
       </CardContent>
     </Card>
   );

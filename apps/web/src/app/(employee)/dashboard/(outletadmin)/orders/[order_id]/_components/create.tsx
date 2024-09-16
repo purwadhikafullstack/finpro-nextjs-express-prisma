@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LaundryItem } from '@/types/laundry-item';
 import axios from '@/lib/axios';
+import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
 import { useLaundryItems } from '@/hooks/use-laundry-items';
 import { useRouter } from 'next/navigation';
@@ -44,9 +45,10 @@ interface ChoosenItem {
   laundry_item_id: string;
 }
 
-const OrderItemsForm: React.FC<OrderItemsFormProps> = ({ order_id, ...props }) => {
+const CreateOrderItemsForm: React.FC<OrderItemsFormProps> = ({ order_id, ...props }) => {
   const router = useRouter();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const { data, error, isLoading } = useLaundryItems();
   const [orderItems, setOrderItems] = React.useState<ChoosenItem[]>([]);
 
@@ -63,12 +65,21 @@ const OrderItemsForm: React.FC<OrderItemsFormProps> = ({ order_id, ...props }) =
 
   const onSubmit = async (formData: yup.InferType<typeof orderItemsSchema>) => {
     try {
-      await axios.post('/orders/' + order_id + '/items', formData);
-      toast({
-        title: 'Order created',
-        description: 'Your order has been created successfully',
-      });
-      router.push('/dashboard/orders');
+      confirm({
+        title: 'Create Order Items',
+        description: 'Are you sure you want to update this order? make sure the details are correct.',
+      })
+        .then(async () => {
+          await axios.post('/orders/' + order_id + '/items', formData);
+          toast({
+            title: 'Order created',
+            description: 'Your order has been created successfully',
+          });
+          router.push('/dashboard/orders');
+        })
+        .catch(() => {
+          // do nothing
+        });
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -228,4 +239,4 @@ const OrderItemsForm: React.FC<OrderItemsFormProps> = ({ order_id, ...props }) =
   );
 };
 
-export default OrderItemsForm;
+export default CreateOrderItemsForm;
