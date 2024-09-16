@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import axios from '@/lib/axios';
+import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -24,9 +25,10 @@ const laundryItemSchema = yup.object({
   icon_url: yup.string().optional(),
 });
 
-const CreateLaundryItem: React.FC<CreateLaundryItemProps> = ({ ...props }) => {
+const CreateLaundryItemForm: React.FC<CreateLaundryItemProps> = ({ ...props }) => {
   const router = useRouter();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const form = useForm<yup.InferType<typeof laundryItemSchema>>({
     resolver: yupResolver(laundryItemSchema),
@@ -38,12 +40,21 @@ const CreateLaundryItem: React.FC<CreateLaundryItemProps> = ({ ...props }) => {
 
   const onSubmit = async (formData: yup.InferType<typeof laundryItemSchema>) => {
     try {
-      await axios.post('/laundry-items', formData);
-      toast({
-        title: 'Laundry Item created',
-        description: 'Your laundry item has been created successfully',
-      });
-      router.push('/dashboard/laundry-items');
+      confirm({
+        title: 'Create Laundry Item',
+        description: 'Are you sure you want to create this laundry item? make sure the details are correct.',
+      })
+        .then(async () => {
+          await axios.post('/laundry-items', formData);
+          toast({
+            title: 'Laundry Item created',
+            description: 'Your laundry item has been created successfully',
+          });
+          router.push('/dashboard/laundry-items');
+        })
+        .catch(() => {
+          // do nothing
+        });
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -106,4 +117,4 @@ const CreateLaundryItem: React.FC<CreateLaundryItemProps> = ({ ...props }) => {
   );
 };
 
-export default CreateLaundryItem;
+export default CreateLaundryItemForm;

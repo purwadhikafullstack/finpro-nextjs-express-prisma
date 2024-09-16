@@ -61,7 +61,7 @@ const Map: React.FC<MapProps> = ({ location, setLocation, className }) => {
       ref={setMapRef}
       center={[location.latitude, location.longitude]}
       scrollWheelZoom={true}
-      className={cn('w-full border rounded-lg', className)}>
+      className={cn('w-full border rounded-lg z-0', className)}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'

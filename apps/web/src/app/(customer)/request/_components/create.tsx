@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { Outlet } from '@/types/outlet';
 import axios from '@/lib/axios';
 import { cn } from '@/lib/utils';
+import useConfirm from '@/hooks/use-confirm';
 import { useCustomerAddresses } from '@/hooks/use-customer-addresses';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
@@ -36,9 +37,10 @@ interface OutletDistance {
   distance: number;
 }
 
-const RequestOrderForm: React.FC<RequestOrderFormProps> = ({ ...props }) => {
+const CreateRequestForm: React.FC<RequestOrderFormProps> = ({ ...props }) => {
   const router = useRouter();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const { data } = useCustomerAddresses();
   const [outlets, setOutlets] = React.useState<OutletDistance[]>([]);
 
@@ -84,12 +86,21 @@ const RequestOrderForm: React.FC<RequestOrderFormProps> = ({ ...props }) => {
 
   const onSubmit = async (formData: yup.InferType<typeof requestOrderSchema>) => {
     try {
-      await axios.post('/deliveries/request', formData);
-      toast({
-        title: 'Order created',
-        description: 'Your order has been created successfully',
-      });
-      router.push('/orders');
+      confirm({
+        title: 'Create Order',
+        description: 'Are you sure you want to request this order? make sure the details are correct.',
+      })
+        .then(async () => {
+          await axios.post('/deliveries/request', formData);
+          toast({
+            title: 'Order created',
+            description: 'Your order has been created successfully',
+          });
+          router.push('/orders');
+        })
+        .catch(() => {
+          // do nothing
+        });
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -267,4 +278,4 @@ const RequestOrderForm: React.FC<RequestOrderFormProps> = ({ ...props }) => {
   );
 };
 
-export default RequestOrderForm;
+export default CreateRequestForm;

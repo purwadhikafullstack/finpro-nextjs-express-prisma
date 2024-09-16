@@ -18,6 +18,7 @@ import { MoreHorizontal } from 'lucide-react';
 import { Outlet } from '@/types/outlet';
 import { ProgressType } from '@/types/shared';
 import axios from '@/lib/axios';
+import useConfirm from '@/hooks/use-confirm';
 import { useSWRConfig } from 'swr';
 import { useToast } from '@/hooks/use-toast';
 
@@ -84,15 +85,25 @@ interface TableActionProps {
 const TableAction: React.FC<TableActionProps> = ({ row }) => {
   const { mutate } = useSWRConfig();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const changeProgress = async (progress: ProgressType) => {
     try {
-      await axios.put('/jobs/' + row.original.job_id, { progress });
-      toast({
-        title: 'Job progress updated',
-        description: 'Your job progress has been updated successfully',
-      });
-      mutate((key) => typeof key === 'string' && key.startsWith('/jobs'));
+      confirm({
+        title: 'Update Job Progress',
+        description: 'Are you sure you want to update this job progress?',
+      })
+        .then(async () => {
+          await axios.put('/jobs/' + row.original.job_id, { progress });
+          toast({
+            title: 'Job progress updated',
+            description: 'Your job progress has been updated successfully',
+          });
+          mutate((key) => typeof key === 'string' && key.startsWith('/jobs'));
+        })
+        .catch(() => {
+          // do nothing
+        });
     } catch (error: any) {
       toast({
         variant: 'destructive',

@@ -13,6 +13,7 @@ import { Loader2 } from 'lucide-react';
 import { User } from '@/types/user';
 import { fetcher } from '@/lib/axios';
 import { useAuth } from '@/hooks/use-auth';
+import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
 import useSWR from 'swr';
 import { useToast } from '@/hooks/use-toast';
@@ -28,9 +29,10 @@ const profileSchema = yup.object({
   avatar_url: yup.string().required(),
 });
 
-const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
+const EditProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
   const { toast } = useToast();
   const { update } = useAuth();
+  const { confirm } = useConfirm();
 
   const { data, error, isLoading } = useSWR<{ message: string; data: User }>('/profile', fetcher, {
     onError: (error) => {
@@ -61,11 +63,20 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
 
   const onSubmit = async (formData: yup.InferType<typeof profileSchema>) => {
     try {
-      await update(formData);
-      toast({
-        title: 'Profile saved',
-        description: 'Your profile has been saved successfully',
-      });
+      confirm({
+        title: 'Update Profile',
+        description: 'Are you sure you want to update your profile? make sure the details are correct.',
+      })
+        .then(async () => {
+          await update(formData);
+          toast({
+            title: 'Profile saved',
+            description: 'Your profile has been saved successfully',
+          });
+        })
+        .catch(() => {
+          // do nothing
+        });
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -150,4 +161,4 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
   );
 };
 
-export default ProfileForm;
+export default EditProfileForm;

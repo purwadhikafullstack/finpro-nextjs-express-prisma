@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { EmployeeForm } from './select';
+import { EmployeeForm } from '../../../_components/select';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
@@ -18,6 +18,7 @@ import { MapLoader } from '@/components/loader/map';
 import { Textarea } from '@/components/ui/textarea';
 import axios from '@/lib/axios';
 import dynamic from 'next/dynamic';
+import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
 import { useOutletDetail } from '@/hooks/use-outlet-detail';
 import { useRouter } from 'next/navigation';
@@ -27,8 +28,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 interface OutletEditProps {
   outlet_id: string;
 }
-
-const Role = ['Customer', 'Driver', 'OutletAdmin', 'WashingWorker', 'IroningWorker', 'PackingWorker'] as const;
 
 const outletSchema = yup.object({
   name: yup.string().required(),
@@ -41,6 +40,7 @@ const outletSchema = yup.object({
 const OutletEditForm: React.FC<OutletEditProps> = ({ outlet_id }) => {
   const router = useRouter();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const [location, setLocation] = React.useState<Location | null>(null);
   const [employees, setEmployees] = React.useState<EmployeeForm[]>([]);
   const { data, error, isLoading, mutate } = useOutletDetail(outlet_id);
@@ -87,12 +87,22 @@ const OutletEditForm: React.FC<OutletEditProps> = ({ outlet_id }) => {
 
   const onSubmit = async (formData: yup.InferType<typeof outletSchema>) => {
     try {
-      await axios.put('/outlets/' + outlet_id, formData);
-      toast({
-        title: 'Outlet created',
-        description: 'Your outlet has been created successfully',
-      });
-      mutate();
+      confirm({
+        title: 'Update Outlet',
+        description: 'Are you sure you want to update this outlet? make sure the details are correct.',
+      })
+        .then(async () => {
+          await axios.put('/outlets/' + outlet_id, formData);
+          toast({
+            title: 'Outlet updated',
+            description: 'Your outlet has been updated successfully',
+          });
+          mutate();
+          router.push('/dashboard/outlets');
+        })
+        .catch(() => {
+          // do nothing
+        });
     } catch (error: any) {
       toast({
         variant: 'destructive',

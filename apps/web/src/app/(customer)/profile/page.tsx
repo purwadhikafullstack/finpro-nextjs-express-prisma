@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-import ProfileForm from './_components/form';
+import EditProfileForm from './_components/edit';
 
 interface PageProps {
   //
@@ -19,7 +19,7 @@ export default async function Page({ ...props }: PageProps): Promise<React.JSX.E
       </CardHeader>
 
       <CardContent>
-        <ProfileForm />
+        <EditProfileForm />
       </CardContent>
     </Card>
   );

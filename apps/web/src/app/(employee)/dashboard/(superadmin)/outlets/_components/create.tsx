@@ -18,6 +18,7 @@ import { MapLoader } from '@/components/loader/map';
 import { Textarea } from '@/components/ui/textarea';
 import axios from '@/lib/axios';
 import dynamic from 'next/dynamic';
+import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
 import { useLocation } from '@/hooks/use-location';
 import { useRouter } from 'next/navigation';
@@ -47,9 +48,10 @@ const outletSchema = yup.object({
     .required(),
 });
 
-const OutletCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
+const CreateOutletForm: React.FC<OutletCreateProps> = ({ ...props }) => {
   const router = useRouter();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const { state } = useLocation();
   const [location, setLocation] = React.useState<Location | null>(null);
   const [employees, setEmployees] = React.useState<EmployeeForm[]>([]);
@@ -94,12 +96,21 @@ const OutletCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
 
   const onSubmit = async (formData: yup.InferType<typeof outletSchema>) => {
     try {
-      await axios.post('/outlets', formData);
-      toast({
-        title: 'Outlet created',
-        description: 'Your outlet has been created successfully',
-      });
-      router.push('/dashboard/outlets');
+      confirm({
+        title: 'Create Outlet',
+        description: 'Are you sure you want to create this outlet? make sure the details are correct.',
+      })
+        .then(async () => {
+          await axios.post('/outlets', formData);
+          toast({
+            title: 'Outlet created',
+            description: 'Your outlet has been created successfully',
+          });
+          router.push('/dashboard/outlets');
+        })
+        .catch(() => {
+          // do nothing
+        });
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -295,4 +306,4 @@ const OutletCreateForm: React.FC<OutletCreateProps> = ({ ...props }) => {
   );
 };
 
-export default OutletCreateForm;
+export default CreateOutletForm;

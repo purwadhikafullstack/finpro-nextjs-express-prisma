@@ -80,8 +80,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
   };
 
-  console.log(progress);
-
   const uploading = progress > 0;
 
   return (

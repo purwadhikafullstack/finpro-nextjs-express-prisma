@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import CreateLaundryItem from '../_components/form';
+import CreateLaundryItemForm from './_components/create';
 
 interface PageProps {
   //
@@ -16,7 +16,7 @@ export default async function Page({ ...props }: PageProps): Promise<React.JSX.E
         </p>
       </div>
 
-      <CreateLaundryItem />
+      <CreateLaundryItemForm />
     </>
   );
 }
