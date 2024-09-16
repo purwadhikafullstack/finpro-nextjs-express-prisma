@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, CheckCircle, CircleUser } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,16 +11,16 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { AVATAR_LINKS } from '@/lib/constant';
-import { Badge } from './ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Check } from 'lucide-react';
 import Link from 'next/link';
-import { User } from '@/types/user';
+import { UserToken } from '@/types/user';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 interface UserAvatarProps {
-  user: User;
+  user: UserToken;
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({ user }) => {
@@ -47,24 +47,25 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='secondary' size='icon' className='rounded-full'>
-          <CircleUser className='size-5' />
-          <span className='sr-only'>Toggle user menu</span>
-        </Button>
+        <Avatar className='border cursor-pointer'>
+          <AvatarImage src={user.avatar_url || '/avatar/default.png'} />
+          <AvatarFallback>{user.fullname.charAt(0)}</AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent align='end' className='w-56'>
-        <div className='flex items-center space-x-1 py-2'>
-          <DropdownMenuLabel>{user.fullname}</DropdownMenuLabel>
-          <Badge variant='default' className='text-xs aspect-square p-0.5'>
-            {user.is_verified ? <Check className='size-3' /> : 'Unverified'}
-          </Badge>
+        <div className='flex flex-col py-2 space-y-0'>
+          <DropdownMenuLabel className='flex items-center space-x-2 space-y-0'>
+            <span>{user.fullname}</span>
+            {user.is_verified && (
+              <Badge className='p-px text-xs aspect-square'>
+                <Check className='size-2' />
+              </Badge>
+            )}
+          </DropdownMenuLabel>
+          <span className='px-2 text-sm text-muted-foreground'>{user.email}</span>
         </div>
         <DropdownMenuSeparator />
-        {user.role !== 'Customer' && (
-          <Link href='/dashboard'>
-            <DropdownMenuItem className='cursor-pointer'>Dashboard</DropdownMenuItem>
-          </Link>
-        )}
         {AVATAR_LINKS.map((link) => (
           <Link key={link.title} href={link.href}>
             <DropdownMenuItem className='cursor-pointer'>{link.title}</DropdownMenuItem>

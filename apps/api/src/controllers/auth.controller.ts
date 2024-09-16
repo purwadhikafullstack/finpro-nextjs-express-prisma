@@ -3,9 +3,11 @@ import * as yup from 'yup';
 import { EmailTokenPayload, RefreshTokenPayload } from '@/type/jwt';
 import { NextFunction, Request, Response } from 'express';
 
-import ApiResponse from '@/utils/api.response';
+import ApiError from '@/utils/error.util';
+import ApiResponse from '@/utils/response.util';
 import AuthAction from '@/actions/auth.action';
 import { FRONTEND_URL } from '@/config';
+import { User } from '@prisma/client';
 
 export default class AuthController {
   private authAction: AuthAction;
@@ -93,7 +95,18 @@ export default class AuthController {
     try {
       const { password } = await yup
         .object({
-          password: yup.string().required(),
+          password: yup
+            .string()
+            .min(10, 'Password is too short')
+            .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+            .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+            .matches(/[0-9]/, 'Password must contain at least one number')
+            .matches(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
+            .required(),
+          confirmation: yup
+            .string()
+            .oneOf([yup.ref('password')])
+            .required(),
         })
         .validate(req.body);
 
@@ -130,7 +143,25 @@ export default class AuthController {
     try {
       const { user_id } = req.user as RefreshTokenPayload;
 
-      const { access_token, refresh_token } = await this.authAction.refresh(user_id);
+      const { access_token } = await this.authAction.refresh(user_id);
+
+      return res.status(200).json(
+        new ApiResponse('Refresh successful', {
+          access_token,
+        })
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  callback = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = req.user as User;
+      if (!user) throw new ApiError(400, 'Invalid username or password');
+      if (!user.is_verified) return res.redirect(`${FRONTEND_URL}/auth/verify`);
+
+      const { access_token, refresh_token } = await this.authAction.google(user);
 
       res.cookie('refresh_token', refresh_token, {
         httpOnly: true,
@@ -139,11 +170,7 @@ export default class AuthController {
         secure: process.env.NODE_ENV === 'production',
       });
 
-      return res.status(200).json(
-        new ApiResponse('Refresh successful', {
-          access_token,
-        })
-      );
+      return res.redirect(FRONTEND_URL + '/auth/callback?token=' + access_token);
     } catch (error) {
       next(error);
     }

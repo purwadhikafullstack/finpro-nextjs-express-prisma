@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import { AccessTokenPayload } from '@/type/jwt';
 import AddressAction from '@/actions/address.action';
-import ApiResponse from '@/utils/api.response';
+import ApiResponse from '@/utils/response.util';
 
 export default class AddressController {
   private addressAction: AddressAction;
@@ -41,6 +41,23 @@ export default class AddressController {
       const created = await this.addressAction.create(user_id, name, address, latitude, longitude);
 
       return res.status(201).json(new ApiResponse('Address created successfully', created));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  primary = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { user_id } = req.user as AccessTokenPayload;
+      const { customer_address_id } = await yup
+        .object({
+          customer_address_id: yup.string().required(),
+        })
+        .validate(req.params);
+
+      const updated = await this.addressAction.primary(user_id, customer_address_id);
+
+      return res.status(200).json(new ApiResponse('Address set as primary successfully', updated));
     } catch (error) {
       next(error);
     }

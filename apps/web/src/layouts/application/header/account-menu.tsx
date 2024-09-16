@@ -28,9 +28,11 @@ const AccountMenu: React.FC<AccountMenuProps> = ({ menus }) => {
         </Link>
       )}
 
-      <Link href='/dashboard' className='hidden md:block'>
-        <Button>Dashboard</Button>
-      </Link>
+      {user && user.role !== 'Customer' && (
+        <Link href='/dashboard' className='hidden md:block'>
+          <Button>Dashboard</Button>
+        </Link>
+      )}
     </div>
   );
 };

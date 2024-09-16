@@ -2,8 +2,9 @@ import * as yup from 'yup';
 
 import { NextFunction, Request, Response } from 'express';
 
-import ApiResponse from '@/utils/api.response';
+import ApiResponse from '@/utils/response.util';
 import OutletsAction from '@/actions/outlets.action';
+import { Role } from '@prisma/client';
 
 export default class OutletsController {
   private outletsAction: OutletsAction;
@@ -53,11 +54,83 @@ export default class OutletsController {
         .object({
           outlet_id: yup.string().required(),
         })
-        .validate(req.query);
+        .validate(req.params);
 
       const outlet = await this.outletsAction.show(outlet_id);
 
       return res.status(200).json(new ApiResponse('Outlet retrieved successfully', outlet));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  create = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { name, description, address, latitude, longitude, employees } = await yup
+        .object({
+          name: yup.string().required(),
+          description: yup.string().required(),
+          address: yup.string().required(),
+          latitude: yup.number().required(),
+          longitude: yup.number().required(),
+          employees: yup
+            .array(
+              yup.object({
+                user_id: yup.string().required(),
+                email: yup.string().required(),
+                fullname: yup.string().required(),
+                role: yup.string().oneOf(Object.values(Role)).required(),
+              })
+            )
+            .required(),
+        })
+        .validate(req.body);
+
+      const created = await this.outletsAction.create(name, description, address, latitude, longitude, employees);
+
+      return res.status(201).json(new ApiResponse('Outlet created successfully', created));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  update = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { outlet_id } = await yup
+        .object({
+          outlet_id: yup.string().required(),
+        })
+        .validate(req.params);
+
+      const { name, description, address, latitude, longitude } = await yup
+        .object({
+          name: yup.string().required(),
+          description: yup.string().required(),
+          address: yup.string().required(),
+          latitude: yup.number().required(),
+          longitude: yup.number().required(),
+        })
+        .validate(req.body);
+
+      const updated = await this.outletsAction.update(outlet_id, name, description, address, latitude, longitude);
+
+      return res.status(200).json(new ApiResponse('Outlet updated successfully', updated));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  nearest = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { customer_address_id } = await yup
+        .object({
+          customer_address_id: yup.string().required(),
+        })
+        .validate(req.query);
+
+      const outletsDistances = await this.outletsAction.nearest(customer_address_id);
+
+      return res.status(200).json(new ApiResponse('Outlets retrieved successfully', outletsDistances));
     } catch (error) {
       next(error);
     }

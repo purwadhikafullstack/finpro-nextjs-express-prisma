@@ -9,7 +9,7 @@ interface LayoutProps extends React.PropsWithChildren {
 export default async function Layout({ children }: LayoutProps): Promise<React.JSX.Element> {
   const links = [
     { title: 'Profile', href: '/profile' },
-    { title: 'Adderess', href: '/profile/addresses' },
+    { title: 'Manage Address', href: '/profile/addresses' },
   ];
 
   return (

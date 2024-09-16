@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from 'axios';
 
-import ApiError from '@/utils/api.error';
+import ApiError from '@/utils/error.util';
 import { OPENCAGE_API } from '@/config';
 import prisma from '@/libs/prisma';
 
@@ -12,6 +12,9 @@ export default class AddressAction {
           Customer: {
             user_id,
           },
+        },
+        orderBy: {
+          created_at: 'asc',
         },
       });
 
@@ -28,6 +31,7 @@ export default class AddressAction {
           user_id,
         },
       });
+
       if (!customer) throw new ApiError(404, 'Customer not found');
 
       const addresses = await prisma.customerAdress.findFirst({
@@ -73,6 +77,36 @@ export default class AddressAction {
         );
       }
 
+      throw error;
+    }
+  };
+
+  primary = async (user_id: string, customer_address_id: string) => {
+    try {
+      const address = await prisma.customerAdress.findUnique({
+        where: {
+          customer_address_id,
+          Customer: {
+            user_id,
+          },
+        },
+      });
+
+      if (!address) throw new ApiError(404, 'Address not found, or not belong to the customer');
+      if (address.is_primary) throw new ApiError(400, 'Address is already set as primary');
+
+      await prisma.customerAdress.updateMany({
+        where: { customer_id: address.customer_id },
+        data: { is_primary: false },
+      });
+
+      const updated = await prisma.customerAdress.update({
+        where: { customer_address_id },
+        data: { is_primary: true },
+      });
+
+      return updated;
+    } catch (error) {
       throw error;
     }
   };

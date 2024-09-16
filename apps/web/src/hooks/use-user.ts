@@ -1,13 +1,11 @@
 'use client';
 
-import * as React from 'react';
-
 import { ColumnFiltersState, PaginationState, SortingState } from '@tanstack/react-table';
 
 import { User } from '@/types/user';
 import { fetcher } from '@/lib/axios';
 import useSWR from 'swr';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from './use-toast';
 
 export const useUsers = (filter: ColumnFiltersState, pagination: PaginationState, sorting: SortingState) => {
   const { toast } = useToast();
@@ -30,30 +28,18 @@ export const useUsers = (filter: ColumnFiltersState, pagination: PaginationState
 
   const out = query.toString();
 
-  const { data, error, isLoading } = useSWR<{
+  return useSWR<{
     message: string;
     data: {
       users: User[];
       count: number;
     };
   }>('/users?' + out, fetcher, {
-    shouldRetryOnError: false,
-  });
-
-  React.useEffect(() => {
-    if (data) {
+    onError: (error) => {
       toast({
-        title: 'Users loaded',
-        description: 'Users data have been loaded successfully',
-      });
-    } else if (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Failed to load users',
+        title: 'Failed to fetch users',
         description: error.message,
       });
-    }
-  }, [data, error, toast]);
-
-  return { data, error, isLoading };
+    },
+  });
 };

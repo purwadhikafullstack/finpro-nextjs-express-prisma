@@ -1,6 +1,7 @@
 import { Prisma, Role } from '@prisma/client';
 
-import ApiError from '@/utils/api.error';
+import ApiError from '@/utils/error.util';
+import { generateHash } from '@/utils/encrypt.util';
 import prisma from '@/libs/prisma';
 
 export default class UserAction {
@@ -18,7 +19,7 @@ export default class UserAction {
 
       if (id && value) {
         filter = {
-          [id as keyof Prisma.UserSelect]: { contains: value as string },
+          [id as keyof Prisma.UserSelect]: { contains: value as string, mode: 'insensitive' },
         };
       }
 
@@ -32,12 +33,17 @@ export default class UserAction {
 
       const query = {
         where: filter,
-        skip: (page - 1) * limit,
-        take: limit,
         orderBy: order,
       };
 
-      const [users, count] = await prisma.$transaction([prisma.user.findMany(query), prisma.user.count(query)]);
+      const [users, count] = await prisma.$transaction([
+        prisma.user.findMany({
+          ...query,
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        prisma.user.count(query),
+      ]);
 
       return [users, count];
     } catch (error) {
@@ -59,17 +65,34 @@ export default class UserAction {
     }
   };
 
-  create = async (email: string, fullname: string, phone: string) => {
+  create = async (email: string, fullname: string, phone: string, password: string) => {
     try {
-      const user = await prisma.user.create({
+      const user = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+
+      if (user) throw new ApiError(400, 'Email already used by another user');
+
+      const hashed = await generateHash(password);
+      const created = await prisma.user.create({
         data: {
           email,
           fullname,
           phone,
+          password: hashed,
+          role: Role.Employee,
+          is_verified: true,
+          Customer: {
+            create: {
+              //
+            },
+          },
         },
       });
 
-      return user;
+      return created;
     } catch (error) {
       throw error;
     }
@@ -133,6 +156,42 @@ export default class UserAction {
       });
 
       return user;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  search = async (query: string | undefined) => {
+    try {
+      const users = await prisma.user.findMany({
+        where: {
+          OR: [
+            {
+              fullname: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+            {
+              email: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+          ],
+          role: {
+            equals: 'Employee',
+          },
+        },
+        select: {
+          user_id: true,
+          fullname: true,
+          email: true,
+          role: true,
+        },
+      });
+
+      return users;
     } catch (error) {
       throw error;
     }

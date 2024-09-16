@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useForm } from 'react-hook-form';
 import { useToast } from '@/hooks/use-toast';
@@ -73,14 +74,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ ...props }) => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder='enter your password' {...field} />
+                <Input type='password' placeholder='enter your password' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type='submit' className='w-full'>
+        <Button type='submit' className='w-full' disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
           Login
         </Button>
       </form>

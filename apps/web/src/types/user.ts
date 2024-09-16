@@ -1,6 +1,7 @@
 export type Role =
   | 'Driver'
   | 'Customer'
+  | 'Employee'
   | 'SuperAdmin'
   | 'OutletAdmin'
   | 'WashingWorker'
@@ -16,3 +17,17 @@ export type User = {
   avatar_url: string;
   is_verified: boolean;
 };
+
+export type Customer = {
+  customer_id: string;
+  user_id: string;
+};
+
+export type Employee = {
+  employee_id: string;
+  user_id: string;
+  outlet_id?: string;
+  shift_id?: string;
+};
+
+export type UserToken = Omit<User, 'phone' | 'created_at' | 'updated_at'>;

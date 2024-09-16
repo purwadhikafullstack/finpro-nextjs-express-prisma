@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 import { NextFunction, Request, Response } from 'express';
 
-import ApiResponse from '@/utils/api.response';
+import ApiResponse from '@/utils/response.util';
 import { Role } from '@prisma/client';
 import UserAction from '@/actions/users.action';
 
@@ -67,15 +67,16 @@ export default class UsersController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, fullname, phone } = await yup
+      const { email, fullname, phone, password } = await yup
         .object({
           email: yup.string().email().required(),
           fullname: yup.string().required(),
           phone: yup.string().required(),
+          password: yup.string().required(),
         })
         .validate(req.body);
 
-      const user = await this.userAction.create(email, fullname, phone);
+      const user = await this.userAction.create(email, fullname, phone, password);
 
       return res.status(201).json(new ApiResponse('User created successfully', user));
     } catch (error) {
@@ -120,6 +121,22 @@ export default class UsersController {
       const user = await this.userAction.destroy(user_id);
 
       return res.status(200).json(new ApiResponse('User deleted successfully', user));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  search = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { query } = await yup
+        .object({
+          query: yup.string().optional(),
+        })
+        .validate(req.query);
+
+      const users = await this.userAction.search(query);
+
+      return res.status(200).json(new ApiResponse('Users retrieved successfully', users));
     } catch (error) {
       next(error);
     }

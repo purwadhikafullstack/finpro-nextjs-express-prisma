@@ -7,13 +7,13 @@ interface DashboardProps extends React.PropsWithChildren {
 
 const DashboardLayout: React.FC<DashboardProps> = ({ children }) => {
   return (
-    <div className='grid min-h-screen w-full md:grid-cols-[280px_1fr]'>
-      <Sidebar />
-      <div className='flex flex-col overflow-hidden'>
-        <Header />
-        <main className='flex-1 container flex flex-col gap-8 py-8'>{children}</main>
+    <>
+      <Sidebar className='w-[300px] h-screen hidden lg:block fixed' />
+      <div className='lg:ml-[300px] relative'>
+        <Header className='sticky top-0 z-10' />
+        <main className='container flex flex-col flex-1 gap-8 py-8'>{children}</main>
       </div>
-    </div>
+    </>
   );
 };
 

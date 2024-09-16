@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
@@ -44,7 +45,7 @@ const RegisterForm: React.FC<LoginFormProps> = ({ ...props }) => {
         title: 'Register successful',
         description: 'Please check your email to verify your account',
       });
-      router.push('/auth/login');
+      router.push('/auth/verify');
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -99,7 +100,8 @@ const RegisterForm: React.FC<LoginFormProps> = ({ ...props }) => {
           )}
         />
 
-        <Button type='submit' className='w-full'>
+        <Button type='submit' className='w-full' disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
           Register
         </Button>
       </form>

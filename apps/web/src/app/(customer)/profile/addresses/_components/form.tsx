@@ -7,8 +7,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 import { Location } from '@/types/location';
-import { Skeleton } from '@/components/ui/skeleton';
+import { MapLoader } from '@/components/loader/map';
 import { Textarea } from '@/components/ui/textarea';
 import axios from '@/lib/axios';
 import dynamic from 'next/dynamic';
@@ -21,10 +22,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 interface AddressFormProps {
   //
 }
-
-const MapSkeleton = () => {
-  return <Skeleton className='w-full aspect-[4/3] rounded-lg' />;
-};
 
 const addressSchema = yup.object({
   name: yup.string().required(),
@@ -41,8 +38,8 @@ const AddressForm: React.FC<AddressFormProps> = ({ ...props }) => {
 
   const Map = React.useMemo(
     () =>
-      dynamic(() => import('@/app/(customer)/profile/addresses/_components/map'), {
-        loading: () => <MapSkeleton />,
+      dynamic(() => import('@/components/map'), {
+        loading: () => <MapLoader />,
         ssr: false,
       }),
     []
@@ -123,22 +120,46 @@ const AddressForm: React.FC<AddressFormProps> = ({ ...props }) => {
           />
 
           <div className='grid grid-cols-2 gap-6'>
-            <FormItem className='flex items-center space-x-2'>
-              <FormLabel htmlFor='latitude'>Latitude</FormLabel>
-              <Input placeholder='enter your latitude' {...form.register('latitude')} readOnly />
-            </FormItem>
+            <FormField
+              control={form.control}
+              name='latitude'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Latitude</FormLabel>
+                  <FormControl>
+                    <Input placeholder='enter your latitude' {...form.register('latitude')} readOnly />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <FormItem className='flex items-center space-x-2'>
-              <FormLabel htmlFor='longitude'>Longitude</FormLabel>
-              <Input placeholder='enter your longitude' {...form.register('longitude')} readOnly />
-            </FormItem>
+            <FormField
+              control={form.control}
+              name='longitude'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Longitude</FormLabel>
+                  <FormControl>
+                    <Input placeholder='enter your longitude' {...form.register('longitude')} readOnly />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
-          {location ? <Map location={location} setLocation={setLocation} /> : <MapSkeleton />}
+          <FormItem>
+            <FormLabel>Location</FormLabel>
+            {location ? <Map location={location} setLocation={setLocation} className='aspect-video' /> : <MapLoader />}
+          </FormItem>
         </div>
 
         <div className='flex justify-start'>
-          <Button type='submit'>Save</Button>
+          <Button type='submit' disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
+            Create Address
+          </Button>
         </div>
       </form>
     </Form>

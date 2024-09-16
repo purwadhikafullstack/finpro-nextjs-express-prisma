@@ -6,13 +6,15 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
   Driver
   Customer
+  Employee
   SuperAdmin
   OutletAdmin
   WashingWorker
@@ -24,10 +26,10 @@ model User {
   user_id     String   @id @default(cuid())
   fullname    String
   email       String   @unique
-  phone       String
+  phone       String?
   role        Role     @default(Customer)
   password    String?
-  google_id   String?
+  google_id   String?  @unique
   avatar_url  String?
   is_verified Boolean  @default(false)
   created_at  DateTime @default(now())
@@ -35,8 +37,6 @@ model User {
 
   Customer Customer?
   Employee Employee?
-  Order    Order[]
-  Ticket   Ticket[]
 
   @@map("users")
 }
@@ -45,8 +45,10 @@ model Customer {
   customer_id String @id @default(cuid())
   user_id     String @unique
 
-  User           User             @relation(fields: [user_id], references: [user_id])
+  User           User             @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   CustomerAdress CustomerAdress[]
+  Order          Order[]
+  Ticket         Ticket[]
 
   @@map("customers")
 }
@@ -69,7 +71,8 @@ model CustomerAdress {
   created_at          DateTime @default(now())
   updated_at          DateTime @updatedAt
 
-  Customer Customer @relation(fields: [customer_id], references: [customer_id])
+  Customer Customer @relation(fields: [customer_id], references: [customer_id], onDelete: Cascade)
+  Order    Order[]
 
   @@map("customer_addresses")
 }
@@ -121,9 +124,9 @@ model Employee {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  User          User            @relation(fields: [user_id], references: [user_id])
-  Outlet        Outlet?         @relation(fields: [outlet_id], references: [outlet_id])
-  Shift         Shift?          @relation(fields: [shift_id], references: [shift_id])
+  User          User            @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  Outlet        Outlet?         @relation(fields: [outlet_id], references: [outlet_id], onDelete: SetNull)
+  Shift         Shift?          @relation(fields: [shift_id], references: [shift_id], onDelete: SetNull)
   Resolution    Resolution[]
   RequestAccess RequestAccess[]
 
@@ -131,15 +134,20 @@ model Employee {
 }
 
 model Order {
-  order_id   String   @id @default(cuid())
-  outlet_id  String
-  user_id    String
-  price      Decimal  @db.Decimal(8, 2)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  order_id            String   @id @default(cuid())
+  outlet_id           String
+  customer_id         String
+  customer_address_id String
+  is_completed        Boolean  @default(false)
+  laundry_fee         Decimal  @default(0) @db.Decimal(8, 2)
+  delivery_fee        Decimal  @default(0) @db.Decimal(8, 2)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
 
-  User          User            @relation(fields: [user_id], references: [user_id])
-  Outlet        Outlet          @relation(fields: [outlet_id], references: [outlet_id])
+  Outlet          Outlet         @relation(fields: [outlet_id], references: [outlet_id], onDelete: Cascade)
+  Customer        Customer       @relation(fields: [customer_id], references: [customer_id], onDelete: Cascade)
+  CustomerAddress CustomerAdress @relation(fields: [customer_address_id], references: [customer_address_id], onDelete: Cascade)
+
   OrderItem     OrderItem[]
   OrderProgress OrderProgress[]
   Payment       Payment[]
@@ -166,7 +174,7 @@ model Payment {
   created_at DateTime      @default(now())
   updated_at DateTime      @updatedAt
 
-  Order Order @relation(fields: [order_id], references: [order_id])
+  Order Order @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
 
   @@map("payments")
 }
@@ -174,7 +182,7 @@ model Payment {
 model LaundryItem {
   laundry_item_id String   @id @default(cuid())
   name            String
-  icon_url        String
+  icon_url        String?
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
@@ -190,8 +198,8 @@ model OrderItem {
   quantity        Int
   weight          Decimal @db.Decimal(8, 2)
 
-  Order       Order       @relation(fields: [order_id], references: [order_id])
-  LaundryItem LaundryItem @relation(fields: [laundry_item_id], references: [laundry_item_id])
+  Order       Order       @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  LaundryItem LaundryItem @relation(fields: [laundry_item_id], references: [laundry_item_id], onDelete: Cascade)
 
   @@map("order_items")
 }
@@ -203,7 +211,7 @@ model OrderProgress {
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
 
-  Order Order @relation(fields: [order_id], references: [order_id])
+  Order Order @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
 
   @@map("order_progresses")
 }
@@ -228,8 +236,8 @@ model Delivery {
   created_at  DateTime     @default(now())
   updated_at  DateTime     @updatedAt
 
-  Outlet Outlet @relation(fields: [outlet_id], references: [outlet_id])
-  Order  Order  @relation(fields: [order_id], references: [order_id])
+  Outlet Outlet @relation(fields: [outlet_id], references: [outlet_id], onDelete: Cascade)
+  Order  Order  @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
 
   @@map("deliveries")
 }
@@ -249,21 +257,21 @@ model Job {
   created_at DateTime     @default(now())
   updated_at DateTime     @updatedAt
 
-  Outlet Outlet @relation(fields: [outlet_id], references: [outlet_id])
-  Order  Order  @relation(fields: [order_id], references: [order_id])
+  Outlet Outlet @relation(fields: [outlet_id], references: [outlet_id], onDelete: Cascade)
+  Order  Order  @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
 
   @@map("jobs")
 }
 
 model Ticket {
-  ticket_id  String   @id @default(cuid())
-  order_id   String
-  user_id    String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  ticket_id   String   @id @default(cuid())
+  order_id    String
+  customer_id String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
-  Order      Order        @relation(fields: [order_id], references: [order_id])
-  User       User         @relation(fields: [user_id], references: [user_id])
+  Order      Order        @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  Customer   Customer     @relation(fields: [customer_id], references: [customer_id], onDelete: Cascade)
   Resolution Resolution[]
 
   @@map("tickets")
@@ -278,9 +286,9 @@ model Resolution {
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
 
-  Ticket   Ticket   @relation(fields: [ticket_id], references: [ticket_id])
-  Outlet   Outlet   @relation(fields: [outlet_id], references: [outlet_id])
-  Employee Employee @relation(fields: [employee_id], references: [employee_id])
+  Ticket   Ticket   @relation(fields: [ticket_id], references: [ticket_id], onDelete: Cascade)
+  Outlet   Outlet   @relation(fields: [outlet_id], references: [outlet_id], onDelete: Cascade)
+  Employee Employee @relation(fields: [employee_id], references: [employee_id], onDelete: Cascade)
 
   @@map("resolutions")
 }
@@ -299,8 +307,8 @@ model RequestAccess {
   created_at        DateTime      @default(now())
   updated_at        DateTime      @updatedAt
 
-  Outlet   Outlet   @relation(fields: [outlet_id], references: [outlet_id])
-  Employee Employee @relation(fields: [employee_id], references: [employee_id])
+  Outlet   Outlet   @relation(fields: [outlet_id], references: [outlet_id], onDelete: Cascade)
+  Employee Employee @relation(fields: [employee_id], references: [employee_id], onDelete: Cascade)
 
   @@map("request_access")
 }

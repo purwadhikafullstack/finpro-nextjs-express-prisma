@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import { NextFunction, Request, Response } from 'express';
 
 import { AccessTokenPayload } from '@/type/jwt';
-import ApiResponse from '@/utils/api.response';
+import ApiResponse from '@/utils/response.util';
 import ProfileAction from '@/actions/profile.action';
 
 export default class ProfileController {

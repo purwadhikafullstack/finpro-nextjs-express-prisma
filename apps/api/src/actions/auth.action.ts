@@ -1,7 +1,8 @@
-import { comparePasswords, generateAccessToken, generateHash, generateRefreshToken } from '@/utils/encryption';
+import { comparePasswords, generateAccessToken, generateHash, generateRefreshToken } from '@/utils/encrypt.util';
 
-import ApiError from '@/utils/api.error';
+import ApiError from '@/utils/error.util';
 import EmailAction from '@/actions/email.action';
+import { User } from '@prisma/client';
 import prisma from '@/libs/prisma';
 
 export default class AuthAction {
@@ -29,6 +30,7 @@ export default class AuthAction {
         email: user.email,
         avatar_url: user.avatar_url,
         role: user.role,
+        is_verified: user.is_verified,
       });
 
       const refresh_token = generateRefreshToken({
@@ -93,17 +95,13 @@ export default class AuthAction {
 
       const hashed = await generateHash(password);
       await prisma.user.update({
-        where: { user_id: user.user_id },
+        where: { user_id: user_id },
         data: { password: hashed },
       });
 
       await prisma.customer.create({
         data: {
-          User: {
-            connect: {
-              user_id: user.user_id,
-            },
-          },
+          user_id,
         },
       });
 
@@ -113,6 +111,7 @@ export default class AuthAction {
         email: user.email,
         avatar_url: user.avatar_url,
         role: user.role,
+        is_verified: user.is_verified,
       });
 
       const refresh_token = generateRefreshToken({
@@ -140,6 +139,29 @@ export default class AuthAction {
         email: user.email,
         avatar_url: user.avatar_url,
         role: user.role,
+        is_verified: user.is_verified,
+      });
+
+      const refresh_token = generateRefreshToken({
+        user_id: user.user_id,
+        email: user.email,
+      });
+
+      return { access_token, refresh_token };
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  google = async (user: User) => {
+    try {
+      const access_token = generateAccessToken({
+        user_id: user.user_id,
+        fullname: user.fullname,
+        email: user.email,
+        avatar_url: user.avatar_url,
+        role: user.role,
+        is_verified: user.is_verified,
       });
 
       const refresh_token = generateRefreshToken({

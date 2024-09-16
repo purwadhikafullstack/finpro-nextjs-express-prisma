@@ -7,8 +7,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Loader from '@/components/loader/loader';
+import { Loader2 } from 'lucide-react';
+import { User } from '@/types/user';
+import { fetcher } from '@/lib/axios';
 import { useAuth } from '@/hooks/use-auth';
 import { useForm } from 'react-hook-form';
+import useSWR from 'swr';
 import { useToast } from '@/hooks/use-toast';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -23,7 +28,16 @@ const profileSchema = yup.object({
 
 const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
   const { toast } = useToast();
-  const { user, update } = useAuth();
+  const { update } = useAuth();
+  const { data, error, isLoading } = useSWR<{ message: string; data: User }>('/profile', fetcher, {
+    onError: (error) => {
+      toast({
+        variant: 'destructive',
+        title: 'Failed to load profile',
+        description: error.message,
+      });
+    },
+  });
 
   const form = useForm<yup.InferType<typeof profileSchema>>({
     resolver: yupResolver(profileSchema),
@@ -34,11 +48,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
   });
 
   React.useEffect(() => {
-    if (user) {
-      form.setValue('fullname', user.fullname);
-      form.setValue('phone', user.phone);
+    if (data) {
+      form.setValue('fullname', data.data.fullname);
+      form.setValue('phone', data.data.phone);
     }
-  }, [user, form]);
+  }, [data, form]);
 
   const onSubmit = async (formData: yup.InferType<typeof profileSchema>) => {
     try {
@@ -56,6 +70,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
     }
   };
 
+  if (isLoading) return <Loader />;
+  if (error || !data) return <div>Failed to load profile</div>;
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-6'>
@@ -63,7 +80,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
           <FormItem>
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input placeholder='enter your email' defaultValue={user?.email} disabled readOnly />
+              <Input placeholder='enter your email' defaultValue={data.data.email} disabled readOnly />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -98,7 +115,10 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
         </div>
 
         <div className='flex justify-start'>
-          <Button type='submit'>Save</Button>
+          <Button type='submit' disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
+            Update Profile
+          </Button>
         </div>
       </form>
     </Form>
