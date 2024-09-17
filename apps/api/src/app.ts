@@ -1,4 +1,4 @@
-import { PORT, validateEnv } from '@/config';
+import { FRONTEND_URL, PORT, validateEnv } from '@/config';
 import express, { Express, NextFunction, Request, Response } from 'express';
 
 import ApiError from '@/utils/error.util';
@@ -26,7 +26,7 @@ export default class App {
     this.app.use(
       cors({
         credentials: true,
-        origin: 'http://localhost:3000',
+        origin: FRONTEND_URL,
         allowedHeaders: ['Content-Type', 'Authorization'],
       })
     );

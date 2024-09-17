@@ -24,7 +24,7 @@ interface VerificationEmailProps {
 }
 
 export const VerificationEmail = ({ user, url }: VerificationEmailProps) => {
-  const logo = process.env.BACKEND_URL + '/static/logo.svg';
+  const logo = process.env.BACKEND_URL + '/static/logo.png';
 
   return (
     <Html lang='en'>
@@ -34,7 +34,7 @@ export const VerificationEmail = ({ user, url }: VerificationEmailProps) => {
           <Container className='border border-solid border-[#e5e7eb] rounded-xl p-8 bg-white'>
             <Section className='flex flex-col space-y-6'>
               <Img src={logo} width='32' height='32' alt='LaundryXpress Logo' />
-              <Heading className='text-2xl font-bold'>Welcome to LaundryXpress</Heading>
+              <Heading className='text-2xl font-bold'>Welcome to {process.env.PROJECT_NAME}</Heading>
 
               <Text className='text-zinc-500'>
                 Hello {user.fullname}, you are receiving this email because you created an account on LaundryXpress,

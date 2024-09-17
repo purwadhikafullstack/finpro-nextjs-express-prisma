@@ -15,6 +15,7 @@ export async function validateEnv() {
     .object({
       PORT: yup.number().required(),
       DATABASE_URL: yup.string().required(),
+      PROJECT_NAME: yup.string().required(),
       BACKEND_URL: yup.string().required(),
       FRONTEND_URL: yup.string().required(),
       JWT_SECRET: yup.string().required(),
@@ -25,6 +26,7 @@ export async function validateEnv() {
       PRICE_PER_KM: yup.number().required(),
       PRICE_PER_KG: yup.number().required(),
       RESEND_API: yup.string().required(),
+      RESEND_FROM: yup.string().required(),
       CLOUDINARY_CLOUD_NAME: yup.string().required(),
       CLOUDINARY_API_KEY: yup.string().required(),
       CLOUDINARY_API_SECRET: yup.string().required(),
@@ -44,6 +46,7 @@ export const MAXIMUM_RADIUS = Number(process.env.MAXIMUM_RADIUS as string);
 export const PRICE_PER_KM = Number(process.env.PRICE_PER_KM as string);
 export const PRICE_PER_KG = Number(process.env.PRICE_PER_KG as string);
 export const RESEND_API = process.env.RESEND_API as string;
+export const RESEND_FROM = process.env.RESEND_FROM as string;
 export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME as string;
 export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY as string;
 export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET as string;

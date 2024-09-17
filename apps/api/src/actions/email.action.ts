@@ -1,9 +1,10 @@
-import { BACKEND_URL, RESEND_API } from '@/config';
+import { BACKEND_URL, RESEND_API, RESEND_FROM } from '@/config';
 
 import { Resend } from 'resend';
 import { User } from '@prisma/client';
 import { VerificationEmail } from '@/emails/verification';
 import { generateEmailToken } from '@/utils/encrypt.util';
+import { render } from '@react-email/components';
 
 export default class EmailAction {
   private resend: Resend;
@@ -25,11 +26,16 @@ export default class EmailAction {
       url.pathname = '/api/v1/auth/verify';
       url.searchParams.set('token', email_token);
 
+      const text = await render(VerificationEmail({ user, url: url.toString() }), {
+        plainText: true,
+      });
+
       await this.resend.emails.send({
-        from: 'LaundryXpress <onboarding@resend.dev>',
+        from: RESEND_FROM,
         to: [email],
         subject: 'Email Verification',
         react: VerificationEmail({ user, url: url.toString() }),
+        text,
       });
     } catch (error) {
       throw error;
