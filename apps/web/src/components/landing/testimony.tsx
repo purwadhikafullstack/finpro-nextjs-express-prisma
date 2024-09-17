@@ -48,9 +48,9 @@ const Testimony: React.FC<TestimonyProps> = ({ ...props }) => {
       <div ref={container} className='relative flex flex-col space-y-6 overflow-hidden mt-14'>
         <ul ref={left} className='flex items-center space-x-6 animate-left flex-nowrap shrink-0'>
           {Array.from({ length: 8 }, (_, index) => (
-            <li key={index} className='flex-none p-8 rounded-lg basis-2/3 lg:basis-1/4 bg-accent'>
+            <li key={index} className='flex-none p-8 rounded-lg basis-2/3 lg:basis-1/4 bg-muted'>
               <div className='flex space-x-4'>
-                <div className='flex items-center justify-center flex-none font-medium bg-white rounded-full size-10'>
+                <div className='flex items-center justify-center flex-none font-medium rounded-full bg-card size-10'>
                   A
                 </div>
                 <div className='flex flex-col space-y-2'>
@@ -67,9 +67,9 @@ const Testimony: React.FC<TestimonyProps> = ({ ...props }) => {
 
         <ul ref={right} className='flex items-center space-x-6 animate-right flex-nowrap shrink-0'>
           {Array.from({ length: 8 }, (_, index) => (
-            <li key={index} className='flex-none p-8 rounded-lg basis-2/3 lg:basis-1/4 bg-accent'>
+            <li key={index} className='flex-none p-8 rounded-lg basis-2/3 lg:basis-1/4 bg-muted'>
               <div className='flex space-x-4'>
-                <div className='flex items-center justify-center flex-none font-medium bg-white rounded-full size-10'>
+                <div className='flex items-center justify-center flex-none font-medium rounded-full bg-card size-10'>
                   B
                 </div>
                 <div className='flex flex-col space-y-2'>

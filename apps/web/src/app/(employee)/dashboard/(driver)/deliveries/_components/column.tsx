@@ -88,29 +88,29 @@ const TableAction: React.FC<TableActionProps> = ({ row }) => {
   const { confirm } = useConfirm();
 
   const changeProgress = async (progress: ProgressType) => {
-    try {
-      confirm({
-        title: 'Update Delivery Progress',
-        description: 'Are you sure you want to update this delivery progress?',
-      })
-        .then(async () => {
+    confirm({
+      title: 'Update Delivery Progress',
+      description: 'Are you sure you want to update this delivery progress?',
+    })
+      .then(async () => {
+        try {
           await axios.put('/deliveries/' + row.original.delivery_id, { progress });
           toast({
             title: 'Delivery progress updated',
             description: 'Your delivery progress has been updated successfully',
           });
           mutate((key) => typeof key === 'string' && key.startsWith('/deliveries'));
-        })
-        .catch(() => {
-          // do nothing
-        });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Failed to change progress',
-        description: error.message,
+        } catch (error: any) {
+          toast({
+            variant: 'destructive',
+            title: 'Failed to change progress',
+            description: error.message,
+          });
+        }
+      })
+      .catch(() => {
+        // do nothing
       });
-    }
   };
 
   return (

@@ -64,29 +64,29 @@ const CreateOrderItemsForm: React.FC<OrderItemsFormProps> = ({ order_id, ...prop
   }, [form, orderItems]);
 
   const onSubmit = async (formData: yup.InferType<typeof orderItemsSchema>) => {
-    try {
-      confirm({
-        title: 'Create Order Items',
-        description: 'Are you sure you want to update this order? make sure the details are correct.',
-      })
-        .then(async () => {
+    confirm({
+      title: 'Create Order Items',
+      description: 'Are you sure you want to update this order? make sure the details are correct.',
+    })
+      .then(async () => {
+        try {
           await axios.post('/orders/' + order_id + '/items', formData);
           toast({
             title: 'Order created',
             description: 'Your order has been created successfully',
           });
           router.push('/dashboard/orders');
-        })
-        .catch(() => {
-          // do nothing
-        });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Failed to create order',
-        description: error.message,
+        } catch (error: any) {
+          toast({
+            variant: 'destructive',
+            title: 'Failed to create order',
+            description: error.message,
+          });
+        }
+      })
+      .catch(() => {
+        // do nothing
       });
-    }
   };
 
   const handleItemClick = (item: LaundryItem) => {

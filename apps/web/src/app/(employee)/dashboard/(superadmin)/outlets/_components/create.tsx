@@ -95,29 +95,29 @@ const CreateOutletForm: React.FC<OutletCreateProps> = ({ ...props }) => {
   }, [form, employees]);
 
   const onSubmit = async (formData: yup.InferType<typeof outletSchema>) => {
-    try {
-      confirm({
-        title: 'Create Outlet',
-        description: 'Are you sure you want to create this outlet? make sure the details are correct.',
-      })
-        .then(async () => {
+    confirm({
+      title: 'Create Outlet',
+      description: 'Are you sure you want to create this outlet? make sure the details are correct.',
+    })
+      .then(async () => {
+        try {
           await axios.post('/outlets', formData);
           toast({
             title: 'Outlet created',
             description: 'Your outlet has been created successfully',
           });
           router.push('/dashboard/outlets');
-        })
-        .catch(() => {
-          // do nothing
-        });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Failed to create outlet',
-        description: error.message,
+        } catch (error: any) {
+          toast({
+            variant: 'destructive',
+            title: 'Failed to create outlet',
+            description: error.message,
+          });
+        }
+      })
+      .catch(() => {
+        // do nothing
       });
-    }
   };
 
   return (

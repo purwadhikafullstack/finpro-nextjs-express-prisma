@@ -86,12 +86,12 @@ const OutletEditForm: React.FC<OutletEditProps> = ({ outlet_id }) => {
   }, [form, location]);
 
   const onSubmit = async (formData: yup.InferType<typeof outletSchema>) => {
-    try {
-      confirm({
-        title: 'Update Outlet',
-        description: 'Are you sure you want to update this outlet? make sure the details are correct.',
-      })
-        .then(async () => {
+    confirm({
+      title: 'Update Outlet',
+      description: 'Are you sure you want to update this outlet? make sure the details are correct.',
+    })
+      .then(async () => {
+        try {
           await axios.put('/outlets/' + outlet_id, formData);
           toast({
             title: 'Outlet updated',
@@ -99,17 +99,17 @@ const OutletEditForm: React.FC<OutletEditProps> = ({ outlet_id }) => {
           });
           mutate();
           router.push('/dashboard/outlets');
-        })
-        .catch(() => {
-          // do nothing
-        });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Failed to create outlet',
-        description: error.message,
+        } catch (error: any) {
+          toast({
+            variant: 'destructive',
+            title: 'Failed to create outlet',
+            description: error.message,
+          });
+        }
+      })
+      .catch(() => {
+        // do nothing
       });
-    }
   };
 
   if (isLoading) return <div>Loading...</div>;

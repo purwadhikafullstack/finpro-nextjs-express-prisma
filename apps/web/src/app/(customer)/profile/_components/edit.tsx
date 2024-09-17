@@ -24,8 +24,13 @@ interface ProfileFormProps {
 }
 
 const profileSchema = yup.object({
-  fullname: yup.string().required(),
-  phone: yup.string().required(),
+  fullname: yup.string().min(6, 'Full name is too short').max(50, 'Full name is too long').required(),
+  phone: yup
+    .string()
+    .min(10, 'Phone number is too short')
+    .max(13, 'Phone number is too long')
+    .matches(/^\d+$/, 'Phone number must be a number')
+    .required(),
   avatar_url: yup.string().required(),
 });
 
@@ -62,28 +67,28 @@ const EditProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
   }, [data, form]);
 
   const onSubmit = async (formData: yup.InferType<typeof profileSchema>) => {
-    try {
-      confirm({
-        title: 'Update Profile',
-        description: 'Are you sure you want to update your profile? make sure the details are correct.',
-      })
-        .then(async () => {
+    confirm({
+      title: 'Update Profile',
+      description: 'Are you sure you want to update your profile?',
+    })
+      .then(async () => {
+        try {
           await update(formData);
           toast({
             title: 'Profile saved',
             description: 'Your profile has been saved successfully',
           });
-        })
-        .catch(() => {
-          // do nothing
-        });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Profile failed',
-        description: error.message,
+        } catch (error: any) {
+          toast({
+            variant: 'destructive',
+            title: 'Profile failed',
+            description: error.message,
+          });
+        }
+      })
+      .catch(() => {
+        // do nothing
       });
-    }
   };
 
   if (isLoading) return <Loader />;

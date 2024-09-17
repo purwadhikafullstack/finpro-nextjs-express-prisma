@@ -8,6 +8,7 @@ import SidebarDrawer from '@/layouts/dashboard/sidebar/drawer';
 import UserAvatar from '@/components/user-avatar';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
+import ThemeToggle from '@/components/theme-toggle';
 
 interface HeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   //
@@ -17,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ className, ...props }) => {
   const { user } = useAuth();
 
   return (
-    <header className={cn('flex items-center w-full h-16 gap-4 px-6 border-b bg-zinc-50', className)} {...props}>
+    <header className={cn('flex items-center w-full h-16 gap-4 px-6 border-b bg-card', className)} {...props}>
       <SidebarDrawer />
 
       <div className='flex-1 w-full'>
@@ -34,10 +35,12 @@ const Header: React.FC<HeaderProps> = ({ className, ...props }) => {
       </div>
 
       <div className='flex items-center space-x-4'>
-        <Button variant='outline' size='icon' className='w-8 h-8 ml-auto'>
+        <Button variant='outline' size='icon' className='ml-auto'>
           <Bell className='size-4' />
           <span className='sr-only'>Toggle notifications</span>
         </Button>
+
+        <ThemeToggle />
 
         {user && <UserAvatar user={user} />}
       </div>

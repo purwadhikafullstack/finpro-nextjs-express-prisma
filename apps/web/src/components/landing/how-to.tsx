@@ -33,47 +33,41 @@ const HowTo: React.FC<HowToProps> = ({ ...props }) => {
     },
     {
       image: '/how-to/step4.jpg',
-      title: '04. Freshly Cleaned Delivery',
+      title: 'Freshly Cleaned Delivery',
       description:
         'We will make the delivery according to the schedule you requested! No need to worry about being late, we guarantee punctuality of delivery. You can enjoy your perfectly clean clothes the way you want!',
     },
   ];
 
   return (
-    <div className='bg-primary text-white py-20' {...props}>
+    <div className='py-20 text-white bg-primary dark:bg-muted' {...props}>
       <div className='container'>
-        <div className='flex flex-col space-y-2 items-center'>
-          <h2 className='font-bold text-4xl'>How it works?</h2>
-          <p className='leading-relaxed tracking-tight text-muted text-left'>
+        <div className='flex flex-col items-center space-y-2'>
+          <h2 className='text-4xl font-bold'>How it works?</h2>
+          <p className='leading-relaxed tracking-tight text-left text-muted'>
             Book Your Laundry Delivery in 4 Simple Steps, and we will handle the rest.
           </p>
         </div>
 
-        <div className='w-full mt-14 grid lg:grid-cols-2 gap-6 items-center'>
+        <div className='grid items-center w-full gap-6 mt-14 lg:grid-cols-2'>
           <div className='flex flex-col space-y-2'>
             {steps.map((step, index) => (
               <div
                 key={index}
+                onClick={() => setSelected(index)}
                 className={cn(
-                  'group rounded-lg p-6 w-full flex flex-col space-y-2 hover:bg-white hover:text-foreground cursor-pointer',
-                  index === selected && 'bg-white text-foreground'
-                )}
-                onClick={() => setSelected(index)}>
+                  'flex flex-col space-y-2 p-8 rounded-lg group cursor-pointer hover:bg-background hover:text-foreground',
+                  index === selected && 'bg-background text-foreground'
+                )}>
                 <span
                   className={cn(
-                    'bg-white group-hover:bg-white aspect-square rounded-full size-8 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white font-medium',
+                    'size-8 rounded-full flex items-center justify-center font-bold bg-background text-foreground group-hover:bg-primary group-hover:text-white',
                     index === selected && 'bg-primary text-white'
                   )}>
                   {index + 1}
                 </span>
                 <h3 className='font-bold'>{step.title}</h3>
-                <p
-                  className={cn(
-                    'text-muted group-hover:text-muted-foreground line-clamp-2',
-                    index === selected && 'text-muted-foreground'
-                  )}>
-                  {step.description}
-                </p>
+                <p className='line-clamp-2 opacity-70'>{step.description}</p>
               </div>
             ))}
           </div>
@@ -83,7 +77,7 @@ const HowTo: React.FC<HowToProps> = ({ ...props }) => {
             alt='Logo'
             width={600}
             height={600}
-            className='w-full rounded-md h-full object-cover'
+            className='object-cover w-full h-full rounded-md'
           />
         </div>
       </div>

@@ -85,29 +85,29 @@ const CreateRequestForm: React.FC<RequestOrderFormProps> = ({ ...props }) => {
   }, [address, toast, form]);
 
   const onSubmit = async (formData: yup.InferType<typeof requestOrderSchema>) => {
-    try {
-      confirm({
-        title: 'Create Order',
-        description: 'Are you sure you want to request this order? make sure the details are correct.',
-      })
-        .then(async () => {
+    confirm({
+      title: 'Create Order',
+      description: 'Are you sure you want to request this order? make sure the details are correct.',
+    })
+      .then(async () => {
+        try {
           await axios.post('/deliveries/request', formData);
           toast({
             title: 'Order created',
             description: 'Your order has been created successfully',
           });
           router.push('/orders');
-        })
-        .catch(() => {
-          // do nothing
-        });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Failed to create order',
-        description: error.message,
+        } catch (error: any) {
+          toast({
+            variant: 'destructive',
+            title: 'Failed to create order',
+            description: error.message,
+          });
+        }
+      })
+      .catch(() => {
+        // do nothing
       });
-    }
   };
 
   const selectedOutlet = outlets.find((item) => item.outlet.outlet_id === form.watch('outlet_id'));

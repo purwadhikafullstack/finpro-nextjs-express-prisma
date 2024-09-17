@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { NavigationItem } from '@/types/navigation';
 import UserAvatar from '@/components/user-avatar';
 import { useAuth } from '@/hooks/use-auth';
+import ThemeToggle from '@/components/theme-toggle';
 
 interface AccountMenuProps {
   menus: NavigationItem[];
@@ -19,6 +20,8 @@ const AccountMenu: React.FC<AccountMenuProps> = ({ menus }) => {
   return (
     <div className='flex justify-end w-full gap-4'>
       <AppMenu menus={menus} />
+
+      <ThemeToggle />
 
       {user ? (
         <UserAvatar user={user} />

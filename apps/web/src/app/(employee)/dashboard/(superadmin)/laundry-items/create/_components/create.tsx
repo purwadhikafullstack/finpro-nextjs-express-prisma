@@ -39,29 +39,29 @@ const CreateLaundryItemForm: React.FC<CreateLaundryItemProps> = ({ ...props }) =
   });
 
   const onSubmit = async (formData: yup.InferType<typeof laundryItemSchema>) => {
-    try {
-      confirm({
-        title: 'Create Laundry Item',
-        description: 'Are you sure you want to create this laundry item? make sure the details are correct.',
-      })
-        .then(async () => {
+    confirm({
+      title: 'Create Laundry Item',
+      description: 'Are you sure you want to create this laundry item? make sure the details are correct.',
+    })
+      .then(async () => {
+        try {
           await axios.post('/laundry-items', formData);
           toast({
             title: 'Laundry Item created',
             description: 'Your laundry item has been created successfully',
           });
           router.push('/dashboard/laundry-items');
-        })
-        .catch(() => {
-          // do nothing
-        });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Failed to create laundry item',
-        description: error.message,
+        } catch (error: any) {
+          toast({
+            variant: 'destructive',
+            title: 'Failed to create laundry item',
+            description: error.message,
+          });
+        }
+      })
+      .catch(() => {
+        // do nothing
       });
-    }
   };
 
   return (

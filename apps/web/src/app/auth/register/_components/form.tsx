@@ -20,8 +20,13 @@ interface LoginFormProps {
 
 const registerSchema = yup.object({
   email: yup.string().email().required(),
-  fullname: yup.string().required(),
-  phone: yup.string().required(),
+  fullname: yup.string().min(6, 'Full name is too short').max(50, 'Full name is too long').required(),
+  phone: yup
+    .string()
+    .min(10, 'Phone number is too short')
+    .max(13, 'Phone number is too long')
+    .matches(/^\d+$/, 'Phone number must be a number')
+    .required(),
 });
 
 const RegisterForm: React.FC<LoginFormProps> = ({ ...props }) => {

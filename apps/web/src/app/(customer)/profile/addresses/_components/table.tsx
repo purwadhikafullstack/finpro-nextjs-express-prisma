@@ -33,36 +33,36 @@ const CustomerAddressTable: React.FC<AddressListProps> = ({ ...props }) => {
   const { data, error, isLoading, mutate } = useCustomerAddresses();
 
   const handleSetPrimary = async (address: Address) => {
-    try {
-      if (address.is_primary) {
-        toast({
-          title: 'Address already set as primary',
-          description: 'Your address is already set as primary.',
-        });
-        return;
-      }
+    confirm({
+      title: 'Set as Primary Address',
+      description: 'Are you sure you want to set this address as primary?',
+    })
+      .then(async () => {
+        try {
+          if (address.is_primary) {
+            toast({
+              title: 'Address already set as primary',
+              description: 'Your address is already set as primary.',
+            });
+            return;
+          }
 
-      await confirm({
-        title: 'Set as Primary Address',
-        description: 'Are you sure you want to set this address as primary?',
-      })
-        .then(async () => {
           await axios.put(`/profile/addresses/${address.customer_address_id}/set-primary`);
           toast({
             title: 'Address set as primary',
             description: 'Your address has been set as primary.',
           });
           mutate();
-        })
-        .catch(() => {
-          // do nothing
-        });
-    } catch (error: any) {
-      toast({
-        title: 'Failed to set address as primary',
-        description: error.message,
+        } catch (error: any) {
+          toast({
+            title: 'Failed to set address as primary',
+            description: error.message,
+          });
+        }
+      })
+      .catch(() => {
+        // do nothing
       });
-    }
   };
 
   if (isLoading) return <Skeleton className='w-full h-32 rounded-lg' />;
