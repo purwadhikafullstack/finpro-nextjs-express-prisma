@@ -20,6 +20,8 @@ interface AuthContextProps {
   signup: (data: { email: string; fullname: string; phone: string }) => Promise<void>;
   verify: (data: { password: string; confirmation: string; token: string }) => Promise<void>;
   update: (data: { fullname: string; phone: string; avatar_url: string }) => Promise<void>;
+  changePassword: (data: { password: string; new_password: string; confirmation: string }) => Promise<void>;
+  changeEmail: (data: { email: string; password: string }) => Promise<void>;
   google: () => Promise<void>;
   signout: () => Promise<void>;
 }
@@ -31,6 +33,8 @@ const AuthContext = React.createContext<AuthContextProps>({
   signup: async () => {},
   verify: async () => {},
   update: async () => {},
+  changePassword: async () => {},
+  changeEmail: async () => {},
   google: async () => {},
   signout: async () => {},
 });
@@ -76,10 +80,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken(data.data.access_token);
   };
 
+  const changePassword = async ({
+    password,
+    new_password,
+    confirmation,
+  }: {
+    password: string;
+    new_password: string;
+    confirmation: string;
+  }) => {
+    await axios.post('/profile/change-password', { password, new_password, confirmation });
+  };
+
+  const changeEmail = async ({ email, password }: { email: string; password: string }) => {
+    const { data } = await axios.post('/profile/change-email', { email, password });
+    setToken(data.data.access_token);
+  };
+
   const signout = async () => {
     await axios.post('/auth/logout');
     setToken(null);
-    setUser(null);
   };
 
   const google = async () => {
@@ -87,7 +107,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, signin, signup, verify, update, google, signout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        signin,
+        signup,
+        verify,
+        update,
+        changePassword,
+        changeEmail,
+        google,
+        signout,
+      }}>
       {children}
     </AuthContext.Provider>
   );

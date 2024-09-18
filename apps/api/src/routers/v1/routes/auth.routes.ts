@@ -25,6 +25,7 @@ export default class AuthRouter {
     this.router.post('/login', this.authController.login);
     this.router.post('/register', this.authController.register);
     this.router.get('/verify', this.authMiddleware.query, this.authController.verify);
+    this.router.get('/confirm-email', this.authMiddleware.query, this.authController.confirmEmail);
     this.router.post('/set-password', this.authMiddleware.body, this.authController.setPassword);
     this.router.post('/logout', this.authController.logout);
     this.router.post('/refresh', this.authMiddleware.cookie, this.authController.refresh);

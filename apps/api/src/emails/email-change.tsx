@@ -17,12 +17,12 @@ import {
 
 import { User } from '@prisma/client';
 
-interface VerificationEmailProps {
+interface EmailChangeEmailProps {
   user: User;
   url: string;
 }
 
-export const VerificationEmail = ({ user, url }: VerificationEmailProps) => {
+export const EmailChangeEmail = ({ user, url }: EmailChangeEmailProps) => {
   const logo = process.env.BACKEND_URL + '/static/logo.png';
 
   return (
@@ -36,8 +36,8 @@ export const VerificationEmail = ({ user, url }: VerificationEmailProps) => {
               <Heading className='text-2xl font-bold'>Welcome to {process.env.PROJECT_NAME}</Heading>
 
               <Text className='text-zinc-500'>
-                Hello {user.fullname}, you are receiving this email because you created an account on LaundryXpress,
-                here are the details of your account.
+                Hello {user.fullname}, you are receiving this email because you changed your email address on
+                LaundryXpress, here are the details of your account.
               </Text>
 
               <Section className='border border-solid border-[#e5e7eb] rounded-xl text-zinc-500 text-sm'>
@@ -55,10 +55,7 @@ export const VerificationEmail = ({ user, url }: VerificationEmailProps) => {
                 </Row>
               </Section>
 
-              <Text className='text-zinc-500'>
-                Please click the button below to verify your email address. If you did not create an account, please
-                ignore this email.
-              </Text>
+              <Text className='text-zinc-500'>Please click the button below to verify your email address.</Text>
 
               <Section className='flex justify-start mt-8'>
                 <Link href={url} className='font-medium text-center px-6 py-3 rounded-lg bg-[#2563eb] text-white block'>
@@ -73,7 +70,7 @@ export const VerificationEmail = ({ user, url }: VerificationEmailProps) => {
   );
 };
 
-VerificationEmail.PreviewProps = {
+EmailChangeEmail.PreviewProps = {
   user: {
     fullname: 'Alan Turing',
     phone: '+1 (555) 555-5555',
@@ -81,6 +78,6 @@ VerificationEmail.PreviewProps = {
     avatar_url: 'https://avatars.githubusercontent.com/u/275474?v=4',
   },
   url: 'https://laundry.express/auth/verify?token=abc',
-} as VerificationEmailProps;
+} as EmailChangeEmailProps;
 
-export default VerificationEmail;
+export default EmailChangeEmail;

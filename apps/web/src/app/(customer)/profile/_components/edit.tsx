@@ -10,20 +10,19 @@ import ImageUpload from '@/components/image-upload';
 import { Input } from '@/components/ui/input';
 import Loader from '@/components/loader/loader';
 import { Loader2 } from 'lucide-react';
-import { User } from '@/types/user';
-import { fetcher } from '@/lib/axios';
 import { useAuth } from '@/hooks/use-auth';
 import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
-import useSWR from 'swr';
 import { useToast } from '@/hooks/use-toast';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useProfile } from '@/hooks/use-profile';
 
 interface ProfileFormProps {
   //
 }
 
 const profileSchema = yup.object({
+  email: yup.string().email().required(),
   fullname: yup.string().min(6, 'Full name is too short').max(50, 'Full name is too long').required(),
   phone: yup
     .string()
@@ -38,20 +37,12 @@ const EditProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
   const { toast } = useToast();
   const { update } = useAuth();
   const { confirm } = useConfirm();
-
-  const { data, error, isLoading } = useSWR<{ message: string; data: User }>('/profile', fetcher, {
-    onError: (error) => {
-      toast({
-        variant: 'destructive',
-        title: 'Failed to load profile',
-        description: error.message,
-      });
-    },
-  });
+  const { data, error, isLoading, mutate } = useProfile();
 
   const form = useForm<yup.InferType<typeof profileSchema>>({
     resolver: yupResolver(profileSchema),
     defaultValues: {
+      email: '',
       fullname: '',
       phone: '',
       avatar_url: '',
@@ -60,6 +51,7 @@ const EditProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
 
   React.useEffect(() => {
     if (data) {
+      form.setValue('email', data.data.email);
       form.setValue('fullname', data.data.fullname);
       form.setValue('phone', data.data.phone || '');
       form.setValue('avatar_url', data.data.avatar_url || '');
@@ -78,6 +70,7 @@ const EditProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
             title: 'Profile saved',
             description: 'Your profile has been saved successfully',
           });
+          mutate();
         } catch (error: any) {
           toast({
             variant: 'destructive',
@@ -98,14 +91,6 @@ const EditProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-6'>
         <div className='grid gap-4'>
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input placeholder='enter your email' defaultValue={data.data.email} disabled readOnly />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-
           <FormField
             control={form.control}
             name='avatar_url'
@@ -125,6 +110,14 @@ const EditProfileForm: React.FC<ProfileFormProps> = ({ ...props }) => {
               </FormItem>
             )}
           />
+
+          <FormItem>
+            <FormLabel>Email</FormLabel>
+            <FormControl>
+              <Input placeholder='enter your email' defaultValue={form.watch('email')} disabled readOnly />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
 
           <FormField
             control={form.control}

@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-import { EmailTokenPayload, RefreshTokenPayload } from '@/type/jwt';
+import { AccessTokenPayload, EmailTokenPayload, RefreshTokenPayload } from '@/type/jwt';
 import { NextFunction, Request, Response } from 'express';
 
 import ApiError from '@/utils/error.util';
@@ -75,20 +75,34 @@ export default class AuthController {
 
   verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = req.user as EmailTokenPayload;
-
-      const { user_id } = user;
-      await this.authAction.verify(user_id);
-
-      const { token } = await yup
-        .object({
-          token: yup.string().required(),
-        })
-        .validate(req.query);
+      const { user_id } = req.user as EmailTokenPayload;
+      const { access_token } = await this.authAction.verify(user_id);
 
       const url = new URL(FRONTEND_URL);
       url.pathname = '/auth/set-password';
-      url.searchParams.set('token', token);
+      url.searchParams.set('token', access_token);
+
+      return res.redirect(url.toString());
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  confirmEmail = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { user_id } = req.user as EmailTokenPayload;
+      const { access_token, refresh_token } = await this.authAction.confirmEmail(user_id);
+
+      res.cookie('refresh_token', refresh_token, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 7,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+      });
+
+      const url = new URL(FRONTEND_URL);
+      url.pathname = '/auth/callback';
+      url.searchParams.set('token', access_token);
 
       return res.redirect(url.toString());
     } catch (error) {
@@ -115,7 +129,7 @@ export default class AuthController {
         })
         .validate(req.body);
 
-      const { user_id } = req.user as EmailTokenPayload;
+      const { user_id } = req.user as AccessTokenPayload;
       const { access_token, refresh_token } = await this.authAction.setPassword(user_id, password);
 
       res.cookie('refresh_token', refresh_token, {
@@ -175,7 +189,11 @@ export default class AuthController {
         secure: process.env.NODE_ENV === 'production',
       });
 
-      return res.redirect(FRONTEND_URL + '/auth/callback?token=' + access_token);
+      const url = new URL(FRONTEND_URL);
+      url.pathname = '/auth/callback';
+      url.searchParams.set('token', access_token);
+
+      return res.redirect(url.toString());
     } catch (error) {
       next(error);
     }

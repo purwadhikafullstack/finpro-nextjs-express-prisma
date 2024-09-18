@@ -27,6 +27,8 @@ export default class ProfileRouter {
 
     this.router.get('/', this.profileController.show);
     this.router.put('/', this.profileController.update);
+    this.router.post('/change-password', this.profileController.changePassword);
+    this.router.post('/change-email', this.profileController.changeEmail);
     this.router.get('/orders', this.orderController.customer);
     this.router.get('/addresses', this.addressController.customer);
     this.router.post('/addresses', this.addressController.create);

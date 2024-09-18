@@ -53,4 +53,64 @@ export default class ProfileController {
       next(error);
     }
   };
+
+  changePassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { user_id } = req.user as AccessTokenPayload;
+
+      const { password, new_password, confirmation } = await yup
+        .object({
+          password: yup.string().required(),
+          new_password: yup
+            .string()
+            .min(10, 'Password is too short')
+            .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+            .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+            .matches(/[0-9]/, 'Password must contain at least one number')
+            .matches(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
+            .required(),
+          confirmation: yup
+            .string()
+            .oneOf([yup.ref('new_password')], 'Passwords do not match')
+            .required(),
+        })
+        .validate(req.body);
+
+      await this.profileAction.changePassword(user_id, password, new_password);
+
+      return res.status(200).json(new ApiResponse('Password changed successfully'));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  changeEmail = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { user_id } = req.user as AccessTokenPayload;
+
+      const { email, password } = await yup
+        .object({
+          email: yup.string().email().required(),
+          password: yup.string().required(),
+        })
+        .validate(req.body);
+
+      const { access_token } = await this.profileAction.changeEmail(user_id, email, password);
+
+      res.cookie('refresh_token', access_token, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 7,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+      });
+
+      return res.status(200).json(
+        new ApiResponse('Email changed successfully, please verify your new email', {
+          access_token,
+        })
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
 }

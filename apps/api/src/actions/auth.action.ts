@@ -19,7 +19,9 @@ export default class AuthAction {
       });
 
       if (!user) throw new ApiError(400, 'Invalid email or password');
-      if (!user.password || !user.is_verified) throw new ApiError(400, 'Please verify your email, to login');
+      if (!user.password || !user.is_verified) {
+        throw new ApiError(400, 'Your account is not verified, please verify your email first');
+      }
 
       const valid = await comparePasswords(password, user.password);
       if (!valid) throw new ApiError(400, 'Invalid email or password');
@@ -74,12 +76,60 @@ export default class AuthAction {
       if (!user) throw new ApiError(404, 'User not found');
 
       user.is_verified = true;
-      await prisma.user.update({
+      const updated = await prisma.user.update({
         where: { user_id: user.user_id },
         data: { is_verified: true },
       });
 
-      return user;
+      const access_token = generateAccessToken({
+        user_id: updated.user_id,
+        fullname: updated.fullname,
+        email: updated.email,
+        avatar_url: updated.avatar_url,
+        role: updated.role,
+        is_verified: updated.is_verified,
+      });
+
+      const refresh_token = generateRefreshToken({
+        user_id: updated.user_id,
+        email: updated.email,
+      });
+
+      return { access_token, refresh_token };
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  confirmEmail = async (user_id: string) => {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { user_id },
+      });
+
+      if (!user) throw new ApiError(404, 'User not found');
+
+      user.is_verified = true;
+      const updated = await prisma.user.update({
+        where: { user_id: user.user_id },
+        data: { is_verified: true },
+      });
+
+      const access_token = generateAccessToken({
+        user_id: updated.user_id,
+        fullname: updated.fullname,
+        email: updated.email,
+        avatar_url: updated.avatar_url,
+        role: updated.role,
+        is_verified: updated.is_verified,
+      });
+
+      const refresh_token = generateRefreshToken({
+        user_id: updated.user_id,
+        email: updated.email,
+      });
+
+      return { access_token, refresh_token };
     } catch (error) {
       throw error;
     }
