@@ -1,7 +1,6 @@
-import { JobType, Prisma, ProgressType, Role } from '@prisma/client';
+import { DeliveryType, JobType, Order, OrderStatus, Prisma, ProgressType, Role } from '@prisma/client';
 
 import ApiError from '@/utils/error.util';
-import { OrderProgresses } from '@/utils/constant';
 import prisma from '@/libs/prisma';
 
 export default class JobAction {
@@ -105,6 +104,9 @@ export default class JobAction {
     try {
       const job = await prisma.job.findUnique({
         where: { job_id },
+        include: {
+          Order: true,
+        },
       });
 
       if (!job) throw new ApiError(404, 'Job not found');
@@ -137,16 +139,30 @@ export default class JobAction {
 
       if (progress !== ProgressType.Completed) return job;
 
+      const mapper = {
+        Washing: OrderStatus.ON_PROGRESS_IRONING,
+        Ironing: OrderStatus.ON_PROGRESS_PACKING,
+        Packing: job.Order.is_payable ? OrderStatus.WAITING_FOR_PAYMENT : OrderStatus.ON_PROGRESS_DROPOFF,
+      };
+
+      const status = mapper[job.type];
       await prisma.orderProgress.create({
         data: {
           order_id: job.order_id,
-          name: {
-            Washing: OrderProgresses.ON_PROGRESS_IRONING,
-            Ironing: OrderProgresses.ON_PROGRESS_PACKING,
-            Packing: OrderProgresses.WAITING_FOR_PAYMENT,
-          }[job.type],
+          status: status,
         },
       });
+
+      if (status === OrderStatus.ON_PROGRESS_DROPOFF) {
+        await prisma.delivery.create({
+          data: {
+            order_id: job.order_id,
+            outlet_id: job.outlet_id,
+            progress: ProgressType.Pending,
+            type: DeliveryType.Dropoff,
+          },
+        });
+      }
 
       if (job.type === JobType.Packing) return job;
 

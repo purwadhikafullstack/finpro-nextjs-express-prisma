@@ -4,6 +4,7 @@ import { Role } from './user';
 export interface NavigationLink {
   title: string;
   href: string;
+  active?: string;
   description?: string;
 }
 

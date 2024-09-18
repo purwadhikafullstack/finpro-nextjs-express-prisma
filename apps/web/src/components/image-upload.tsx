@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
 interface ImageUploadProps extends React.HTMLAttributes<HTMLDivElement> {
-  src: string;
+  src?: string;
   eager?: string;
   className?: string;
   imageWidth: number;
@@ -86,7 +86,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     <div>
       <div
         onClick={() => !uploading && ref.current?.click()}
-        className={cn('relative cursor-pointer group', className)}
+        className={cn('relative cursor-pointer group overflow-hidden', className)}
         {...props}>
         {!uploading && (
           <div className='absolute flex items-center justify-center w-full h-full opacity-0 group-hover:opacity-100 bg-zinc-50/75'>
@@ -115,7 +115,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             alt='user avatar'
             width={imageWidth}
             height={imageHeight}
-            className='object-cover w-full h-full rounded-full'
+            className='object-cover object-center w-full h-full'
           />
         )}
       </div>

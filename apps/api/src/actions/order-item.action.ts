@@ -1,7 +1,6 @@
-import { JobType, ProgressType } from '@prisma/client';
+import { JobType, OrderStatus, ProgressType } from '@prisma/client';
 
 import ApiError from '@/utils/error.util';
-import { OrderProgresses } from '@/utils/constant';
 import { PRICE_PER_KG } from '@/config';
 import prisma from '@/libs/prisma';
 
@@ -23,7 +22,7 @@ export default class OrderItemAction {
       });
 
       if (!order) throw new ApiError(404, 'Order not found');
-      if (!order.OrderProgress.find((item) => item.name === OrderProgresses.ARRIVED_AT_OUTLET)) {
+      if (!order.OrderProgress.find((item) => item.status === OrderStatus.ARRIVED_AT_OUTLET)) {
         throw new ApiError(400, 'Order not arrived at outlet yet');
       }
 
@@ -42,6 +41,7 @@ export default class OrderItemAction {
         prisma.order.update({
           where: { order_id },
           data: {
+            is_payable: true,
             laundry_fee: Math.ceil(weigth) * PRICE_PER_KG,
           },
         }),
@@ -60,7 +60,7 @@ export default class OrderItemAction {
         prisma.orderProgress.create({
           data: {
             order_id,
-            name: OrderProgresses.ON_PROGRESS_WASHING,
+            status: OrderStatus.ON_PROGRESS_WASHING,
           },
         }),
 

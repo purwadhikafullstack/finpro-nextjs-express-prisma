@@ -17,6 +17,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import DataTableColumnHeader from '@/components/table/header';
 import Link from 'next/link';
 import { MoreHorizontal } from 'lucide-react';
+import { OrderStatusMapper } from '@/lib/constant';
 import { Outlet } from '@/types/outlet';
 import { User } from '@/types/user';
 
@@ -74,12 +75,16 @@ const columns: ColumnDef<
   },
   {
     enableSorting: false,
-    accessorKey: 'OrderProgress.name',
+    accessorKey: 'OrderProgress.status',
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title='Order Progress' />;
     },
     cell: ({ row }) => {
-      return <Badge className='whitespace-nowrap'>{row.original.OrderProgress?.name}</Badge>;
+      return (
+        <Badge className='whitespace-nowrap'>
+          {row.original.OrderProgress && OrderStatusMapper[row.original.OrderProgress.status]}
+        </Badge>
+      );
     },
   },
   {
@@ -104,7 +109,7 @@ const columns: ColumnDef<
             <Link href={'/dashboard/orders/' + row.original.order_id} className='w-full'>
               <DropdownMenuItem>View Order</DropdownMenuItem>
             </Link>
-            {row.original.OrderProgress && row.original.OrderProgress.name === 'Laundry Telah Sampai Outlet' && (
+            {row.original.OrderProgress && row.original.OrderProgress.status === 'ARRIVED_AT_OUTLET' && (
               <Link href={'/dashboard/orders/' + row.original.order_id + '/create'} className='w-full'>
                 <DropdownMenuItem>Add Order Items</DropdownMenuItem>
               </Link>

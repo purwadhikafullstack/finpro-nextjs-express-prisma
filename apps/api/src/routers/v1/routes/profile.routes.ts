@@ -29,7 +29,11 @@ export default class ProfileRouter {
     this.router.put('/', this.profileController.update);
     this.router.post('/change-password', this.profileController.changePassword);
     this.router.post('/change-email', this.profileController.changeEmail);
+
     this.router.get('/orders', this.orderController.customer);
+    this.router.get('/orders/:order_id', this.orderController.show);
+    this.router.post('/orders/:order_id/payment', this.orderController.payment);
+
     this.router.get('/addresses', this.addressController.customer);
     this.router.post('/addresses', this.addressController.create);
     this.router.put('/addresses/:customer_address_id/set-primary', this.addressController.primary);

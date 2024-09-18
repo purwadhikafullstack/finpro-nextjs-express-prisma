@@ -1,18 +1,6 @@
-import {
-  Car,
-  Heart,
-  Home,
-  Lock,
-  PersonStanding,
-  Shirt,
-  ShoppingCart,
-  Store,
-  Timer,
-  Users,
-  Zap,
-  ZoomIn,
-} from 'lucide-react';
+import { Car, Home, Shirt, ShoppingCart, Store, Users, Zap } from 'lucide-react';
 
+import { OrderStatus } from '@/types/order';
 import { SidebarMenu } from '@/types/navigation';
 
 export const PROJECT_NAME = process.env.NEXT_PUBLIC_PROJECT_NAME as string;
@@ -63,3 +51,15 @@ export const AVATAR_LINKS = [
   { title: 'Profile', href: '/profile' },
   { title: 'Orders', href: '/orders' },
 ];
+
+export const OrderStatusMapper: Record<OrderStatus, string> = {
+  WAITING_FOR_PICKUP: 'Menunggu Penjemputan Driver',
+  ON_PROGRESS_PICKUP: 'Laundry Sedang Menuju Outlet',
+  ARRIVED_AT_OUTLET: 'Laundry Telah Sampai Outlet',
+  ON_PROGRESS_WASHING: 'Laundry Sedang Dicuci',
+  ON_PROGRESS_IRONING: 'Laundry Sedang Disetrika',
+  ON_PROGRESS_PACKING: 'Laundry Sedang Di Packing',
+  WAITING_FOR_PAYMENT: 'Menunggu Pembayaran',
+  ON_PROGRESS_DROPOFF: 'Laundry Sedang Dikirim Menuju Customer',
+  COMPLETED_ORDER: 'Laundry Telah Diterima Customer',
+};

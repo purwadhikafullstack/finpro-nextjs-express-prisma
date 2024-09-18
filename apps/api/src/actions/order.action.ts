@@ -1,4 +1,6 @@
-import { Prisma, Role } from '@prisma/client';
+import { MIDTRANS_PASSWORD, MIDTRANS_SERVER_KEY, MIDTRANS_URL, NODE_ENV } from '@/config';
+import { PaymentMethod, Prisma, Role } from '@prisma/client';
+import axios, { isAxiosError } from 'axios';
 
 import ApiError from '@/utils/error.util';
 import prisma from '@/libs/prisma';
@@ -118,8 +120,25 @@ export default class OrderAction {
     }
   };
 
-  show = async (order_id: string) => {
+  show = async (user_id: string, role: Role, order_id: string) => {
     try {
+      if (role !== 'SuperAdmin' && role !== 'OutletAdmin') {
+        const user = await prisma.user.findUnique({
+          where: {
+            user_id,
+            Customer: {
+              Order: {
+                some: {
+                  order_id,
+                },
+              },
+            },
+          },
+        });
+
+        if (!user) throw new ApiError(404, 'User not found, or order not belong to this user');
+      }
+
       const order = await prisma.order.findUnique({
         where: { order_id },
         include: {
@@ -136,6 +155,7 @@ export default class OrderAction {
           },
           CustomerAddress: true,
           OrderProgress: true,
+          Payment: true,
         },
       });
 
@@ -143,6 +163,109 @@ export default class OrderAction {
 
       return order;
     } catch (error) {
+      throw error;
+    }
+  };
+
+  payment = async (user_id: string, order_id: string, method: PaymentMethod, receipt_url: string | undefined) => {
+    try {
+      const order = await prisma.order.findUnique({
+        where: {
+          order_id,
+          Customer: {
+            User: {
+              user_id,
+            },
+          },
+        },
+        include: {
+          OrderProgress: true,
+          OrderItem: true,
+          Customer: {
+            include: {
+              User: true,
+            },
+          },
+          Payment: true,
+        },
+      });
+
+      if (!order) throw new ApiError(404, 'Order not found, or not belong to this user');
+      if (!order.is_payable) throw new ApiError(400, 'Order cannot be paid, please check your order progress');
+      if (order.Payment) throw new ApiError(400, 'Theres already a payment for this order');
+
+      if (method === 'Manual') {
+        const updated = await prisma.order.update({
+          where: { order_id },
+          data: {
+            is_payable: false,
+            Payment: {
+              create: {
+                method,
+                receipt_url,
+                status: 'Paid',
+              },
+            },
+          },
+          include: {
+            Payment: true,
+          },
+        });
+
+        return updated.Payment;
+      }
+
+      const { data } = await axios.post(
+        MIDTRANS_URL,
+        {
+          transaction_details: {
+            order_id,
+            gross_amount: Number(order.delivery_fee) + Number(order.laundry_fee),
+            item_details: order.OrderItem.map((item) => ({
+              id: item.order_item_id,
+              quantity: item.quantity,
+            })),
+            customer_details: {
+              first_name: order.Customer.User.fullname,
+              email: order.Customer.User.email,
+            },
+          },
+        },
+        {
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: 'Basic ' + Buffer.from(MIDTRANS_SERVER_KEY + ':' + MIDTRANS_PASSWORD).toString('base64'),
+          },
+        }
+      );
+
+      const updated = await prisma.order.update({
+        where: { order_id },
+        data: {
+          is_payable: false,
+          Payment: {
+            create: {
+              method,
+              payment_url: data.redirect_url,
+              status: 'Paid',
+            },
+          },
+        },
+        include: {
+          Payment: true,
+        },
+      });
+
+      return updated.Payment;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        throw new ApiError(
+          (error.response && error.response.status) || 500,
+          (error.response && error.response.data) || 'Something went wrong'
+        );
+      }
+
       throw error;
     }
   };

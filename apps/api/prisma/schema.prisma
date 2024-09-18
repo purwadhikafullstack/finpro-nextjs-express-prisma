@@ -139,6 +139,7 @@ model Order {
   customer_id         String
   customer_address_id String
   is_completed        Boolean  @default(false)
+  is_payable          Boolean  @default(false)
   laundry_fee         Decimal  @default(0) @db.Decimal(8, 2)
   delivery_fee        Decimal  @default(0) @db.Decimal(8, 2)
   created_at          DateTime @default(now())
@@ -150,10 +151,10 @@ model Order {
 
   OrderItem     OrderItem[]
   OrderProgress OrderProgress[]
-  Payment       Payment[]
   Ticket        Ticket[]
   Delivery      Delivery[]
   Job           Job[]
+  Payment       Payment?
 
   @@map("orders")
 }
@@ -165,16 +166,22 @@ enum PaymentStatus {
   Refunded
 }
 
-model Payment {
-  payment_id String        @id @default(cuid())
-  order_id   String
-  method     String
-  amount     Decimal       @db.Decimal(8, 2)
-  status     PaymentStatus @default(Pending)
-  created_at DateTime      @default(now())
-  updated_at DateTime      @updatedAt
+enum PaymentMethod {
+  PaymentGateway
+  Manual
+}
 
-  Order Order @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+model Payment {
+  payment_id  String        @id @default(cuid())
+  order_id    String        @unique
+  method      PaymentMethod
+  payment_url String?
+  receipt_url String?
+  status      PaymentStatus @default(Pending)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+
+  Order Order @relation(fields: [order_id], references: [order_id])
 
   @@map("payments")
 }
@@ -204,12 +211,24 @@ model OrderItem {
   @@map("order_items")
 }
 
+enum OrderStatus {
+  WAITING_FOR_PICKUP
+  ON_PROGRESS_PICKUP
+  ARRIVED_AT_OUTLET
+  ON_PROGRESS_WASHING
+  ON_PROGRESS_IRONING
+  ON_PROGRESS_PACKING
+  WAITING_FOR_PAYMENT
+  ON_PROGRESS_DROPOFF
+  COMPLETED_ORDER
+}
+
 model OrderProgress {
-  order_progrses_id String   @id @default(cuid())
+  order_progress_id String      @id @default(cuid()) @map("order_progrses_id")
   order_id          String
-  name              String
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
+  status            OrderStatus
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
 
   Order Order @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
 
@@ -250,8 +269,8 @@ enum JobType {
 
 model Job {
   job_id     String       @id @default(cuid())
-  outlet_id  String
   order_id   String
+  outlet_id  String
   progress   ProgressType @default(Pending)
   type       JobType
   created_at DateTime     @default(now())

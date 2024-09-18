@@ -8,9 +8,9 @@ interface LayoutProps extends React.PropsWithChildren {
 
 export default async function Layout({ children }: LayoutProps): Promise<React.JSX.Element> {
   const links = [
-    { title: 'All Orders', href: '/orders/all' },
-    { title: 'Ongoing Order', href: '/orders/ongoing' },
-    { title: 'Completed Order', href: '/orders/completed' },
+    { title: 'All Orders', href: '/orders', active: '/orders/**' },
+    { title: 'Ongoing Order', href: '/orders?status=Ongoing' },
+    { title: 'Completed Order', href: '/orders?status=Completed' },
   ];
 
   return (

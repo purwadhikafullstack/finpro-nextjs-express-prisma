@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { cn, formatDateTime } from '@/lib/utils';
 
 import { Badge } from '@/components/ui/badge';
+import { OrderStatusMapper } from '@/lib/constant';
 import { useOrderDetail } from '@/hooks/use-order-detail';
 
 interface ComponentProps {
@@ -59,7 +60,7 @@ const OrderDetail: React.FC<ComponentProps> = ({ order_id, ...props }) => {
                     {idx + 1}
                   </div>
                   <div className='flex items-center justify-between w-full'>
-                    <span className='font-medium'>{item.name}</span>
+                    <span className='font-medium'>{OrderStatusMapper[item.status]}</span>
                     <Badge variant='outline'>{formatDateTime(item.created_at)}</Badge>
                   </div>
                 </div>

@@ -6,9 +6,9 @@ import AppMenu from './app-menu';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { NavigationItem } from '@/types/navigation';
+import ThemeToggle from '@/components/theme-toggle';
 import UserAvatar from '@/components/user-avatar';
 import { useAuth } from '@/hooks/use-auth';
-import ThemeToggle from '@/components/theme-toggle';
 
 interface AccountMenuProps {
   menus: NavigationItem[];

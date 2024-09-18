@@ -6,6 +6,7 @@ import { Order, OrderItem, OrderProgress } from '@/types/order';
 import { Address } from '@/types/address';
 import { LaundryItem } from '@/types/laundry-item';
 import { Outlet } from '@/types/outlet';
+import { Payment } from '@/types/payment';
 import { fetcher } from '@/lib/axios';
 import useSWR from 'swr';
 import { useToast } from './use-toast';
@@ -27,6 +28,7 @@ export const useOrderDetail = (order_id: string) => {
       };
       CustomerAddress: Address;
       OrderProgress: OrderProgress[];
+      Payment?: Payment;
     };
   }>('/orders/' + order_id, fetcher, {
     onError: (error) => {

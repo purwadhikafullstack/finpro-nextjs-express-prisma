@@ -30,6 +30,11 @@ export async function validateEnv() {
       CLOUDINARY_CLOUD_NAME: yup.string().required(),
       CLOUDINARY_API_KEY: yup.string().required(),
       CLOUDINARY_API_SECRET: yup.string().required(),
+      MIDTRANS_ID: yup.string().required(),
+      MIDTRANS_URL: yup.string().url().required(),
+      MIDTRANS_PASSWORD: yup.string().required(),
+      MIDTRANS_CLIENT_KEY: yup.string().required(),
+      MIDTRANS_SERVER_KEY: yup.string().required(),
     })
     .validate(process.env);
 }
@@ -50,3 +55,8 @@ export const RESEND_FROM = process.env.RESEND_FROM as string;
 export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME as string;
 export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY as string;
 export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET as string;
+export const MIDTRANS_ID = process.env.MIDTRANS_ID as string;
+export const MIDTRANS_URL = process.env.MIDTRANS_URL as string;
+export const MIDTRANS_PASSWORD = process.env.MIDTRANS_PASSWORD as string;
+export const MIDTRANS_CLIENT_KEY = process.env.MIDTRANS_CLIENT_KEY as string;
+export const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY as string;

@@ -13,9 +13,9 @@ import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
+import { useProfile } from '@/hooks/use-profile';
 import { useToast } from '@/hooks/use-toast';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useProfile } from '@/hooks/use-profile';
 
 interface ProfileFormProps {
   //

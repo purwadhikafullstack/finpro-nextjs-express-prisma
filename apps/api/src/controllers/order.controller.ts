@@ -1,10 +1,11 @@
 import * as yup from 'yup';
 
-import { NextFunction, Request, Response } from 'express';
+import e, { NextFunction, Request, Response } from 'express';
 
 import { AccessTokenPayload } from '@/type/jwt';
 import ApiResponse from '@/utils/response.util';
 import OrderAction from '@/actions/order.action';
+import { PaymentMethod } from '@prisma/client';
 
 export default class OrderController {
   private orderAction: OrderAction;
@@ -70,15 +71,48 @@ export default class OrderController {
 
   show = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { user_id, role } = req.user as AccessTokenPayload;
+
       const { order_id } = await yup
         .object({
           order_id: yup.string().required(),
         })
         .validate(req.params);
 
-      const order = await this.orderAction.show(order_id);
+      const order = await this.orderAction.show(user_id, role, order_id);
 
       return res.status(200).json(new ApiResponse('Order retrieved successfully', order));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  payment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { user_id } = req.user as AccessTokenPayload;
+
+      const { order_id } = await yup
+        .object({
+          order_id: yup.string().required(),
+        })
+        .validate(req.params);
+
+      const { method, receipt_url } = await yup
+        .object({
+          method: yup.string().oneOf(Object.values(PaymentMethod)).required(),
+          receipt_url: yup
+            .string()
+            .url()
+            .when('method', {
+              is: (method: PaymentMethod) => method === 'Manual',
+              then: (schema: yup.Schema) => schema.required(),
+              otherwise: (schema: yup.Schema) => schema.notRequired(),
+            }),
+        })
+        .validate(req.body);
+
+      const payment = await this.orderAction.payment(user_id, order_id, method, receipt_url);
+      return res.status(200).json(new ApiResponse('Your order payment created successfully', payment));
     } catch (error) {
       next(error);
     }

@@ -2,10 +2,24 @@
 
 import * as React from 'react';
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Order, OrderProgress } from '@/types/order';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatCurrency, formatDateTime } from '@/lib/utils';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { MoreHorizontal } from 'lucide-react';
+import { OrderStatusMapper } from '@/lib/constant';
+import { Outlet } from '@/types/outlet';
 import { useCustomerOrders } from '@/hooks/use-customer-orders';
 
 interface CustomerOrderTableProps {
@@ -23,11 +37,11 @@ const CustomerOrderTable: React.FC<CustomerOrderTableProps> = ({ type, ...props 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Order ID</TableHead>
             <TableHead>Delivery Fee</TableHead>
             <TableHead>Laundry Fee</TableHead>
-            <TableHead>Created</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Created</TableHead>
+            <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -40,25 +54,62 @@ const CustomerOrderTable: React.FC<CustomerOrderTableProps> = ({ type, ...props 
           )}
           {data.data.map((order, idx) => {
             const latest = order.OrderProgress && order.OrderProgress.at(0);
+
             return (
               <TableRow key={idx}>
-                <TableCell>
-                  <span className='block w-32 font-medium uppercase truncate'>{order.order_id}</span>
-                </TableCell>
                 <TableCell>
                   <Badge variant='secondary'>{formatCurrency(order.delivery_fee)}</Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant='secondary'>{formatCurrency(order.laundry_fee)}</Badge>
                 </TableCell>
-                <TableCell>{formatDate(order.created_at)}</TableCell>
-                <TableCell>{latest && <Badge className='whitespace-nowrap'>{latest.name}</Badge>}</TableCell>
+                <TableCell>
+                  {latest && <Badge className='whitespace-nowrap'>{OrderStatusMapper[latest.status]}</Badge>}
+                </TableCell>
+                <TableCell>
+                  <span className='whitespace-nowrap text-muted-foreground'>{formatDateTime(order.created_at)}</span>
+                </TableCell>
+                <TableCell>
+                  <TableAction order={order} />
+                </TableCell>
               </TableRow>
             );
           })}
         </TableBody>
       </Table>
     </div>
+  );
+};
+
+interface TableActionProps {
+  order: Order & {
+    Outlet?: Outlet;
+    OrderProgress?: OrderProgress[];
+  };
+}
+
+const TableAction: React.FC<TableActionProps> = ({ order }) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant='ghost' className='w-8 h-8 p-0'>
+          <span className='sr-only'>Open menu</span>
+          <MoreHorizontal className='w-4 h-4' />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align='end'>
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <Link href={'/orders/' + order.order_id} className='w-full'>
+          <DropdownMenuItem>View Order</DropdownMenuItem>
+        </Link>
+        {order.is_payable && (
+          <Link href={'/orders/' + order.order_id + '/payment'} className='w-full'>
+            <DropdownMenuItem>Process Payment</DropdownMenuItem>
+          </Link>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

@@ -1,8 +1,7 @@
-import { DeliveryType, Prisma, ProgressType, Role } from '@prisma/client';
+import { DeliveryType, OrderStatus, Prisma, ProgressType, Role } from '@prisma/client';
 import { MAXIMUM_RADIUS, PRICE_PER_KM } from '@/config';
 
 import ApiError from '@/utils/error.util';
-import { OrderProgresses } from '@/utils/constant';
 import { getDistance } from '@/utils/distance.util';
 import prisma from '@/prisma';
 
@@ -169,7 +168,7 @@ export default class DeliveryAction {
           },
           OrderProgress: {
             create: {
-              name: OrderProgresses.WAITING_FOR_PICKUP,
+              status: OrderStatus.WAITING_FOR_PICKUP,
             },
           },
         },
@@ -207,14 +206,14 @@ export default class DeliveryAction {
         await prisma.orderProgress.create({
           data: {
             order_id: delivery.order_id,
-            name: OrderProgresses.ON_PROGRESS_PICKUP,
+            status: OrderStatus.ON_PROGRESS_PICKUP,
           },
         });
       } else if (progress === ProgressType.Completed) {
         await prisma.orderProgress.create({
           data: {
             order_id: delivery.order_id,
-            name: OrderProgresses.ARRIVED_AT_OUTLET,
+            status: OrderStatus.ARRIVED_AT_OUTLET,
           },
         });
       }
