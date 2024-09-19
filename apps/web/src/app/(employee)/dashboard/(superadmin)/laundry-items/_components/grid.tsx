@@ -2,15 +2,10 @@
 
 import * as React from 'react';
 
-import { ColumnFiltersState, PaginationState, SortingState } from '@tanstack/react-table';
-import { Plus, Shirt } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import Loader from '@/components/loader/loader';
-import { useDebounceValue } from 'usehooks-ts';
+import { Plus } from 'lucide-react';
 import { useLaundryItems } from '@/hooks/use-laundry-items';
 
 interface LaundryItemGridProps {
@@ -18,10 +13,6 @@ interface LaundryItemGridProps {
 }
 
 const LaundryItemGrid: React.FC<LaundryItemGridProps> = ({ ...props }) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const search = useSearchParams();
-
   const { data, error, isLoading } = useLaundryItems();
 
   if (isLoading) return <Loader />;
@@ -46,7 +37,7 @@ const LaundryItemGrid: React.FC<LaundryItemGridProps> = ({ ...props }) => {
         {data.data.map((item) => (
           <div
             key={item.laundry_item_id}
-            className='relative border rounded-lg group hover:border-primary hover:cursor-pointer'>
+            className='relative border rounded-lg group hover:border-primary hover:cursor-pointer bg-card'>
             <div className='flex items-end p-6 aspect-square'>
               <h3 className='text-lg font-medium group-hover:text-primary'>{item.name}</h3>
             </div>

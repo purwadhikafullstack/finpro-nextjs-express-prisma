@@ -10,10 +10,6 @@ import { useToast } from './use-toast';
 export const useCustomerOrders = (type: 'All' | 'Ongoing' | 'Completed') => {
   const { toast } = useToast();
 
-  const query = new URLSearchParams();
-  query.append('type', type);
-  const out = query.toString();
-
   return useSWR<{
     message: string;
     data: Array<
@@ -22,12 +18,23 @@ export const useCustomerOrders = (type: 'All' | 'Ongoing' | 'Completed') => {
         OrderProgress?: OrderProgress[];
       }
     >;
-  }>('/profile/orders?' + out, fetcher, {
-    onError: (error) => {
-      toast({
-        title: 'Failed to fetch customer orders',
-        description: error.message,
-      });
-    },
-  });
+  }>(
+    [
+      '/profile/orders?',
+      {
+        params: {
+          type,
+        },
+      },
+    ],
+    fetcher,
+    {
+      onError: (error) => {
+        toast({
+          title: 'Failed to fetch customer orders',
+          description: error.message,
+        });
+      },
+    }
+  );
 };

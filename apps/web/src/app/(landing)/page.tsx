@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import Feature from '@/components/landing/feature';
-import FloatingButton from '@/components/floating-button';
 import Hero from '@/components/landing/hero';
 import HowTo from '@/components/landing/how-to';
 import Showcase from '@/components/landing/showcase';
@@ -22,7 +21,6 @@ export default async function Page({ ...props }: PageProps): Promise<React.JSX.E
       <Feature data-aos='fade-up' data-aos-delay={300} className='container' />
       <HowTo data-aos='fade-up' data-aos-delay={400} />
       <Testimony data-aos='fade-up' data-aos-delay={500} />
-      <FloatingButton />
     </div>
   );
 }

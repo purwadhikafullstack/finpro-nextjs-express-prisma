@@ -11,24 +11,6 @@ import { useToast } from './use-toast';
 export const useJobs = (filter: ColumnFiltersState, pagination: PaginationState, sorting: SortingState) => {
   const { toast } = useToast();
 
-  const query = new URLSearchParams();
-  query.append('page', (pagination.pageIndex + 1).toString());
-  query.append('limit', pagination.pageSize.toString());
-
-  if (filter.length > 0) {
-    const item = filter[0];
-    query.append('id', item.id);
-    query.append('value', item.value as string);
-  }
-
-  if (sorting.length > 0) {
-    const item = sorting[0];
-    query.append('key', item.id);
-    query.append('desc', item.desc.toString());
-  }
-
-  const out = query.toString();
-
   return useSWR<{
     message: string;
     data: {
@@ -39,12 +21,32 @@ export const useJobs = (filter: ColumnFiltersState, pagination: PaginationState,
       >;
       count: number;
     };
-  }>('/jobs?' + out, fetcher, {
-    onError: (error) => {
-      toast({
-        title: 'Failed to fetch jobs',
-        description: error.message,
-      });
-    },
-  });
+  }>(
+    [
+      '/jobs',
+      {
+        params: {
+          page: (pagination.pageIndex + 1).toString(),
+          limit: pagination.pageSize.toString(),
+          ...(filter.length > 0 && {
+            id: filter[0].id,
+            value: filter[0].value as string,
+          }),
+          ...(sorting.length > 0 && {
+            key: sorting[0].id,
+            desc: sorting[0].desc.toString(),
+          }),
+        },
+      },
+    ],
+    fetcher,
+    {
+      onError: (error) => {
+        toast({
+          title: 'Failed to fetch jobs',
+          description: error.message,
+        });
+      },
+    }
+  );
 };

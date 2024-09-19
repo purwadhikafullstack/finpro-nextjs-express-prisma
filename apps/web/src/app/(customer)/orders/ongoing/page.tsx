@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { Button } from '@/components/ui/button';
-import CustomerOrderTable from './_components/table';
+import CustomerOrderTable from '../_components/table';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -15,12 +15,12 @@ export default async function Page({ ...props }: PageProps): Promise<React.JSX.E
   return (
     <Card>
       <CardHeader>
-        <CardTitle className='text-xl font-bold'>All Customer Orders</CardTitle>
+        <CardTitle className='text-xl font-bold'>Ongoing Customer Orders</CardTitle>
         <CardDescription>Manage all your orders.</CardDescription>
       </CardHeader>
 
       <CardContent>
-        <CustomerOrderTable type='All' />
+        <CustomerOrderTable type='Ongoing' />
       </CardContent>
 
       <CardFooter>

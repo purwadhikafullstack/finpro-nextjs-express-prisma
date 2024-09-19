@@ -247,9 +247,6 @@ export default class OutletsAction {
         MAXIMUM_RADIUS
       );
 
-      console.log(customer_address.latitude, customer_address.longitude);
-      console.log(latStart, latEnd, lonStart, lonEnd);
-
       const outlets = await prisma.outlet.findMany({
         where: {
           AND: [
@@ -271,8 +268,6 @@ export default class OutletsAction {
           created_at: 'asc',
         },
       });
-
-      if (!outlets) throw new ApiError(404, 'No outlet found nearby');
 
       return outlets.map((outlet) => ({
         outlet,
