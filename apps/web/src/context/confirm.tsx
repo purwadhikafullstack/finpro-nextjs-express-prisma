@@ -2,17 +2,10 @@
 
 import * as React from 'react';
 
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { Button } from '@/components/ui/button';
+import { Check } from 'lucide-react';
 
 interface ConfirmContextProps {
   confirm: (options: ModalOption) => Promise<unknown>;
@@ -25,6 +18,7 @@ const ConfirmContext = React.createContext<ConfirmContextProps>({
 interface ModalOption {
   title: string;
   description: string;
+  variant?: 'default' | 'destructive';
 }
 
 interface PromiseHandler {
@@ -36,9 +30,10 @@ export const ConfirmProvider = ({ children }: { children: React.ReactNode }) => 
   const promise = React.useRef<PromiseHandler | null>(null);
   const [options, setOptions] = React.useState<ModalOption | null>();
 
-  const confirm = ({ title, description }: ModalOption) => {
+  const confirm = ({ title, description, variant = 'default' }: ModalOption) => {
     setOptions({
       title,
+      variant,
       description,
     });
     return new Promise((resolve, reject) => {
@@ -65,18 +60,19 @@ export const ConfirmProvider = ({ children }: { children: React.ReactNode }) => 
       <Dialog open={!!options} onOpenChange={(open) => !open && setOptions(null)}>
         <DialogContent className='sm:max-w-md'>
           <DialogHeader>
-            <DialogTitle>{options && options.title}</DialogTitle>
-            <DialogDescription>{options && options.description}</DialogDescription>
+            <DialogTitle className='text-start'>{options && options.title}</DialogTitle>
           </DialogHeader>
+          <p className='text-sm text-muted-foreground'>{options && options.description}</p>
           <DialogFooter>
-            <div className='flex justify-center w-full space-x-2 sm:justify-end'>
+            <div className='flex justify-end w-full space-x-2'>
               <DialogClose asChild>
                 <Button variant='secondary' onClick={handleCancel}>
                   Close
                 </Button>
               </DialogClose>
               <DialogClose asChild>
-                <Button onClick={handleConfirm} autoFocus>
+                <Button variant={options && options.variant} onClick={handleConfirm} autoFocus>
+                  <Check className='mr-2 size-4' />
                   Confirm
                 </Button>
               </DialogClose>

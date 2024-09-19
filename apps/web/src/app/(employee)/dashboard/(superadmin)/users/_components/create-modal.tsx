@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import PasswordMeter from '@/components/password-meter';
 import axios from '@/lib/axios';
+import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
 import { useSWRConfig } from 'swr';
 import { useToast } from '@/hooks/use-toast';
@@ -45,6 +46,7 @@ const createUserSchema = yup.object({
 
 const AddUserModal: React.FC<AddUserModalProps> = ({ ...props }) => {
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const { mutate } = useSWRConfig();
   const [open, setOpen] = React.useState(false);
 
@@ -59,21 +61,31 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ ...props }) => {
   });
 
   const onSubmit = async (formData: yup.InferType<typeof createUserSchema>) => {
-    try {
-      await axios.post('/users', formData);
-      toast({
-        title: 'Success',
-        description: 'User created successfully',
+    confirm({
+      title: 'Create User',
+      description: 'Are you sure you want to create this user? make sure the details are correct.',
+    })
+      .then(async () => {
+        try {
+          await axios.post('/users', formData);
+          toast({
+            title: 'User created',
+            description: 'Your user has been created successfully',
+          });
+          form.reset();
+          setOpen(false);
+          mutate((key) => Array.isArray(key) && key.includes('/users'));
+        } catch (error: any) {
+          toast({
+            variant: 'destructive',
+            title: 'Failed to create user',
+            description: error.message,
+          });
+        }
+      })
+      .catch(() => {
+        // do nothing
       });
-      mutate((key) => typeof key === 'string' && key.startsWith('/users'));
-      setOpen(false);
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Failed to create user',
-        description: error.message,
-      });
-    }
   };
 
   return (

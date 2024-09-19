@@ -18,7 +18,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import AddUserModal from './modal';
+import AddUserModal from './create-modal';
 import { DataTablePagination } from '@/components/table/pagination';
 import { Input } from '@/components/ui/input';
 import TableLoader from '@/components/loader/table';

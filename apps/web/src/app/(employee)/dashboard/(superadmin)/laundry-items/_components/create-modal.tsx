@@ -3,16 +3,26 @@
 import * as React from 'react';
 import * as yup from 'yup';
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Loader2, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import ImageUpload from '@/components/image-upload';
 import { Input } from '@/components/ui/input';
-import { Loader2 } from 'lucide-react';
 import axios from '@/lib/axios';
 import useConfirm from '@/hooks/use-confirm';
 import { useForm } from 'react-hook-form';
+import { useLaundryItems } from '@/hooks/use-laundry-items';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -26,10 +36,12 @@ const laundryItemSchema = yup.object({
   icon_url: yup.string().url().required(),
 });
 
-const CreateLaundryItemForm: React.FC<CreateLaundryItemProps> = ({ ...props }) => {
+const CreateLaundryItemModal: React.FC<CreateLaundryItemProps> = ({ ...props }) => {
   const router = useRouter();
   const { toast } = useToast();
   const { confirm } = useConfirm();
+  const { mutate } = useLaundryItems();
+  const [open, setOpen] = React.useState(false);
 
   const form = useForm<yup.InferType<typeof laundryItemSchema>>({
     resolver: yupResolver(laundryItemSchema),
@@ -51,7 +63,9 @@ const CreateLaundryItemForm: React.FC<CreateLaundryItemProps> = ({ ...props }) =
             title: 'Laundry Item created',
             description: 'Your laundry item has been created successfully',
           });
-          router.push('/dashboard/laundry-items');
+          form.reset();
+          setOpen(false);
+          mutate();
         } catch (error: any) {
           toast({
             variant: 'destructive',
@@ -66,15 +80,21 @@ const CreateLaundryItemForm: React.FC<CreateLaundryItemProps> = ({ ...props }) =
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col space-y-6'>
-        <Card>
-          <CardHeader>
-            <CardTitle className='text-xl font-bold'>Create Laundry Item</CardTitle>
-            <CardDescription>Make sure to add all the details of your laundry item.</CardDescription>
-          </CardHeader>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className='w-full'>
+          <Plus className='inline-block w-4 h-4 mr-2' />
+          <span>Add Laundry Item</span>
+        </Button>
+      </DialogTrigger>
 
-          <CardContent>
+      <DialogContent className='sm:max-w-md'>
+        <DialogHeader>
+          <DialogTitle>Create New Laundry Item</DialogTitle>
+          <DialogDescription>Create a new laundry item.</DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className='grid gap-4'>
               <FormField
                 control={form.control}
@@ -95,7 +115,7 @@ const CreateLaundryItemForm: React.FC<CreateLaundryItemProps> = ({ ...props }) =
                 name='icon_url'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Icon</FormLabel>
+                    <FormLabel>Image</FormLabel>
                     <ImageUpload
                       imageWidth={300}
                       imageHeight={300}
@@ -103,25 +123,30 @@ const CreateLaundryItemForm: React.FC<CreateLaundryItemProps> = ({ ...props }) =
                       src={form.watch('icon_url')}
                       eager='w_200,h_200,c_fill'
                       onChangeImage={(original, eager) => form.setValue('icon_url', eager ? eager : original)}
-                      className='overflow-hidden border rounded-lg max-w-32 bg-accent aspect-square'
+                      className='overflow-hidden border rounded-lg bg-accent aspect-square'
                     />
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-          </CardContent>
 
-          <CardFooter>
-            <Button type='submit' disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
-              Create Laundry Item
-            </Button>
-          </CardFooter>
-        </Card>
-      </form>
-    </Form>
+            <DialogFooter className='mt-4 sm:justify-end'>
+              <DialogClose asChild>
+                <Button type='button' variant='secondary'>
+                  Close
+                </Button>
+              </DialogClose>
+              <Button type='submit' disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && <Loader2 className='mr-2 size-4 animate-spin' />}
+                Create Laundry Item
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export default CreateLaundryItemForm;
+export default CreateLaundryItemModal;

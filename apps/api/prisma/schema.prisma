@@ -125,8 +125,8 @@ model Employee {
   updated_at  DateTime @updatedAt
 
   User          User            @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-  Outlet        Outlet?         @relation(fields: [outlet_id], references: [outlet_id], onDelete: SetNull)
-  Shift         Shift?          @relation(fields: [shift_id], references: [shift_id], onDelete: SetNull)
+  Outlet        Outlet?         @relation(fields: [outlet_id], references: [outlet_id], onDelete: Cascade)
+  Shift         Shift?          @relation(fields: [shift_id], references: [shift_id], onDelete: Cascade)
   Resolution    Resolution[]
   RequestAccess RequestAccess[]
 
@@ -138,6 +138,7 @@ model Order {
   outlet_id           String
   customer_id         String
   customer_address_id String
+  weight              Decimal  @default(1) @db.Decimal(8, 2)
   is_completed        Boolean  @default(false)
   is_payable          Boolean  @default(false)
   laundry_fee         Decimal  @default(0) @db.Decimal(8, 2)
@@ -199,11 +200,10 @@ model LaundryItem {
 }
 
 model OrderItem {
-  order_item_id   String  @id @default(cuid())
+  order_item_id   String @id @default(cuid())
   order_id        String
   laundry_item_id String
   quantity        Int
-  weight          Decimal @db.Decimal(8, 2)
 
   Order       Order       @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
   LaundryItem LaundryItem @relation(fields: [laundry_item_id], references: [laundry_item_id], onDelete: Cascade)

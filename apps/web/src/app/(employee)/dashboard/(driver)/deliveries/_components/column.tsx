@@ -99,7 +99,7 @@ const TableAction: React.FC<TableActionProps> = ({ row }) => {
             title: 'Delivery progress updated',
             description: 'Your delivery progress has been updated successfully',
           });
-          mutate((key) => typeof key === 'string' && key.startsWith('/deliveries'));
+          mutate((key) => Array.isArray(key) && key.includes('/deliveries'));
         } catch (error: any) {
           toast({
             variant: 'destructive',

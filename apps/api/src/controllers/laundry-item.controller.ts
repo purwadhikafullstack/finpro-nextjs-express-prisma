@@ -28,7 +28,7 @@ export default class LaundryItemController {
         .object({
           laundry_item_id: yup.string().required(),
         })
-        .validate(req.query);
+        .validate(req.params);
 
       const item = await this.laundryItemAction.show(laundry_item_id);
 
@@ -43,7 +43,7 @@ export default class LaundryItemController {
       const { name, icon_url } = await yup
         .object({
           name: yup.string().required(),
-          icon_url: yup.string().optional(),
+          icon_url: yup.string().url().required(),
         })
         .validate(req.body);
 
@@ -61,12 +61,12 @@ export default class LaundryItemController {
         .object({
           laundry_item_id: yup.string().required(),
         })
-        .validate(req.query);
+        .validate(req.params);
 
       const { name, icon_url } = await yup
         .object({
           name: yup.string().required(),
-          icon_url: yup.string().optional(),
+          icon_url: yup.string().url().required(),
         })
         .validate(req.body);
 
@@ -84,7 +84,7 @@ export default class LaundryItemController {
         .object({
           laundry_item_id: yup.string().required(),
         })
-        .validate(req.query);
+        .validate(req.params);
 
       const item = await this.laundryItemAction.destroy(laundry_item_id);
 

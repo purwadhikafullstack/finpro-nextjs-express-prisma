@@ -1,4 +1,4 @@
-import { Car, Home, Shirt, ShoppingCart, Store, Users, Zap } from 'lucide-react';
+import { Car, Home, Shirt, ShoppingCart, Store, User, Users, Zap } from 'lucide-react';
 
 import { OrderStatus } from '@/types/order';
 import { SidebarMenu } from '@/types/navigation';
@@ -48,8 +48,8 @@ export const FEATURES_LIST = [
 ];
 
 export const AVATAR_LINKS = [
-  { title: 'Profile', href: '/profile' },
-  { title: 'Orders', href: '/orders' },
+  { title: 'Profile', href: '/profile', icon: User },
+  { title: 'Orders', href: '/orders', icon: ShoppingCart },
 ];
 
 export const OrderStatusMapper: Record<OrderStatus, string> = {

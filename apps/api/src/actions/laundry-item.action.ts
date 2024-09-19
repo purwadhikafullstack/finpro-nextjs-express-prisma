@@ -26,12 +26,12 @@ export default class LaundryItemAction {
     }
   };
 
-  create = async (name: string, icon_url: string | undefined) => {
+  create = async (name: string, icon_url: string) => {
     try {
       const item = await prisma.laundryItem.create({
         data: {
           name,
-          icon_url: icon_url!,
+          icon_url,
         },
       });
 
@@ -41,7 +41,7 @@ export default class LaundryItemAction {
     }
   };
 
-  update = async (laundry_item_id: string, name: string, icon_url: string | undefined) => {
+  update = async (laundry_item_id: string, name: string, icon_url: string) => {
     try {
       const item = await prisma.laundryItem.update({
         where: { laundry_item_id },

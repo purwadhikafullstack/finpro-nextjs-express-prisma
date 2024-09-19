@@ -1,6 +1,7 @@
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Check, LayoutGrid, LogOut, ShoppingBag } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +13,6 @@ import {
 
 import { AVATAR_LINKS } from '@/lib/constant';
 import { Badge } from '@/components/ui/badge';
-import { Check } from 'lucide-react';
 import Link from 'next/link';
 import { UserToken } from '@/types/user';
 import { useAuth } from '@/hooks/use-auth';
@@ -66,13 +66,46 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user }) => {
           <span className='px-2 text-sm text-muted-foreground'>{user.email}</span>
         </div>
         <DropdownMenuSeparator />
-        {AVATAR_LINKS.map((link) => (
-          <Link key={link.title} href={link.href}>
-            <DropdownMenuItem className='cursor-pointer'>{link.title}</DropdownMenuItem>
+        {AVATAR_LINKS.map((link) => {
+          const Icon = link.icon;
+
+          return (
+            <Link key={link.title} href={link.href}>
+              <DropdownMenuItem className='cursor-pointer'>
+                <div className='flex items-center justify-between w-full'>
+                  <span>{link.title}</span>
+                  <Icon className='size-4 text-muted-foreground' />
+                </div>
+              </DropdownMenuItem>
+            </Link>
+          );
+        })}
+        {user && user.role !== 'Customer' ? (
+          <Link href='/dashboard'>
+            <DropdownMenuItem className='cursor-pointer'>
+              <div className='flex items-center justify-between w-full'>
+                <span>Dashboard</span>
+                <LayoutGrid className='size-4 text-muted-foreground' />
+              </div>
+            </DropdownMenuItem>
           </Link>
-        ))}
+        ) : (
+          <Link href='/request'>
+            <DropdownMenuItem className='cursor-pointer'>
+              <div className='flex items-center justify-between w-full'>
+                <span>Place Order</span>
+                <ShoppingBag className='size-4 text-muted-foreground' />
+              </div>
+            </DropdownMenuItem>
+          </Link>
+        )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleSignout()}>Logout</DropdownMenuItem>
+        <DropdownMenuItem className='cursor-pointer' onClick={() => handleSignout()}>
+          <div className='flex items-center justify-between w-full'>
+            <span>Logout</span>
+            <LogOut className='size-4 text-muted-foreground' />
+          </div>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

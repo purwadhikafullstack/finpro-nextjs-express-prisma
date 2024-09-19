@@ -2,10 +2,9 @@
 
 import * as React from 'react';
 
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import CreateLaundryItemModal from './create-modal';
+import LaundryItemCard from '@/app/(employee)/dashboard/(superadmin)/laundry-items/_components/card';
 import Loader from '@/components/loader/loader';
-import { Plus } from 'lucide-react';
 import { useLaundryItems } from '@/hooks/use-laundry-items';
 
 interface LaundryItemGridProps {
@@ -22,26 +21,14 @@ const LaundryItemGrid: React.FC<LaundryItemGridProps> = ({ ...props }) => {
     <div className='w-full'>
       <div className='flex flex-col mb-6 space-y-4 lg:justify-between lg:flex-row lg:items-center lg:space-y-0 lg:space-x-4'>
         <div className='flex flex-col items-center w-full space-x-2 space-y-4 lg:w-auto lg:flex-row lg:space-y-0 lg:space-x-4'>
-          <Link href='/dashboard/laundry-items/create' className='w-full'>
-            <Button className='w-full'>
-              <Plus className='inline-block w-4 h-4 mr-2' />
-              <span>Add Laundry Items</span>
-            </Button>
-          </Link>
+          <CreateLaundryItemModal />
         </div>
       </div>
 
       {data.data.length === 0 && <div>No laundry items found.</div>}
-
-      <div className='grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-6'>
+      <div className='grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
         {data.data.map((item) => (
-          <div
-            key={item.laundry_item_id}
-            className='relative border rounded-lg group hover:border-primary hover:cursor-pointer bg-card'>
-            <div className='flex items-end p-6 aspect-square'>
-              <h3 className='text-lg font-medium group-hover:text-primary'>{item.name}</h3>
-            </div>
-          </div>
+          <LaundryItemCard key={item.laundry_item_id} item={item} withAction />
         ))}
       </div>
     </div>

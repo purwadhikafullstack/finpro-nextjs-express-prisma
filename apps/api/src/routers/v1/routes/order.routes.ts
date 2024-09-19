@@ -23,14 +23,10 @@ export default class OrderRouter {
 
   private initializeRoutes(): void {
     this.router.use(this.authMiddleware.header);
-    this.router.use(this.roleMiddleware.role(['OutletAdmin', 'SuperAdmin']));
-
-    this.router.get('/', this.orderController.index);
-    // this.router.post('/', this.orderController.create);
     this.router.get('/:order_id', this.orderController.show);
-    // this.router.put('/:order_id', this.orderController.update);
-    // this.router.delete('/:order_id', this.orderController.destroy);
 
+    this.router.use(this.roleMiddleware.role(['OutletAdmin', 'SuperAdmin']));
+    this.router.get('/', this.orderController.index);
     this.router.post('/:order_id/items', this.orderItemController.create);
   }
 

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import { Badge } from '@/components/ui/badge';
+import DetailList from '@/components/detail-list';
 import { useOutletDetail } from '@/hooks/use-outlet-detail';
 
 interface OutletDetailsProps {
@@ -83,18 +84,6 @@ const OutletDetails: React.FC<OutletDetailsProps> = ({ outlet_id, ...props }) =>
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
-  );
-};
-
-const DetailList: React.FC<{ title: string; data: string | undefined }> = ({ title, data }) => {
-  return (
-    <div className='flex flex-col space-y-4 text-sm'>
-      <div className='flex w-full space-x-2 items-bottom'>
-        <span className='flex-none'>{title}</span>
-        <div className='w-full border-b border-dotted border-muted-foreground'></div>
-        <span className='flex-none text-muted-foreground'>{data}</span>
       </div>
     </div>
   );

@@ -6,13 +6,12 @@ import prisma from '@/libs/prisma';
 
 interface ChoosenItem {
   name: string;
-  weight: number;
   quantity: number;
   laundry_item_id: string;
 }
 
 export default class OrderItemAction {
-  create = async (order_id: string, order_items: ChoosenItem[]) => {
+  create = async (order_id: string, order_items: ChoosenItem[], weight: number) => {
     try {
       const order = await prisma.order.findUnique({
         where: { order_id },
@@ -35,14 +34,14 @@ export default class OrderItemAction {
       });
 
       if (laundry_items.length !== order_items.length) throw new ApiError(400, 'Some laundry items not found');
-      const weigth = order_items.reduce((acc, item) => acc + item.weight, 0);
 
       await prisma.$transaction([
         prisma.order.update({
           where: { order_id },
           data: {
+            weight,
             is_payable: true,
-            laundry_fee: Math.ceil(weigth) * PRICE_PER_KG,
+            laundry_fee: Math.ceil(weight) * PRICE_PER_KG,
           },
         }),
 
@@ -50,7 +49,6 @@ export default class OrderItemAction {
           prisma.orderItem.create({
             data: {
               order_id,
-              weight: item.weight,
               quantity: item.quantity,
               laundry_item_id: item.laundry_item_id,
             },

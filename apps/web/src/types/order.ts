@@ -22,6 +22,7 @@ export type Order = {
   outlet_id: string;
   customer_id: string;
   customer_address_id: string;
+  weight: number;
   delivery_fee: number;
   laundry_fee: number;
   is_completed: boolean;

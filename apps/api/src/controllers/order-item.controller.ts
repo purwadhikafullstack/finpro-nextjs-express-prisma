@@ -20,24 +20,24 @@ export default class OrderItemController {
         })
         .validate(req.params);
 
-      const { order_items } = await yup
+      const { order_items, weight } = await yup
         .object({
           order_items: yup
             .array(
               yup
                 .object({
                   name: yup.string().required(),
-                  weight: yup.number().required(),
                   quantity: yup.number().required(),
                   laundry_item_id: yup.string().required(),
                 })
                 .required()
             )
             .required(),
+          weight: yup.number().min(1, 'Minimum weight is 1kg').required(),
         })
         .validate(req.body);
 
-      const created = await this.orderItemAction.create(order_id, order_items);
+      const created = await this.orderItemAction.create(order_id, order_items, weight);
 
       return res.status(201).json(new ApiResponse('Order items created successfully', created));
     } catch (error) {
